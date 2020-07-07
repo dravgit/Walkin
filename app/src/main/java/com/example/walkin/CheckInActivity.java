@@ -41,6 +41,8 @@ import com.centerm.smartpos.aidl.magcard.TrackData;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
 import com.centerm.smartpos.util.HexUtil;
+import com.example.walkin.models.LoginResponseModel;
+import com.example.walkin.utils.NetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +93,12 @@ public class CheckInActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
+        NetworkUtil.Companion.login("", "", new NetworkUtil.Companion.NetworkLisener<LoginResponseModel>() {
+            @Override
+            public void onResponse(LoginResponseModel response) {
+
+            }
+        });
         mLoading = new ProgressDialog(this);
         mLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoading.setCanceledOnTouchOutside(false);

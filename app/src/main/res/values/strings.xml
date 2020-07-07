@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Walkin</string>
+    <string name="not_found_company">ไม่พบข้อมูลบริษัท</string>
+    <string name="not_found_serial">ไม่พบอุปกรณ์</string>
 </resources>
