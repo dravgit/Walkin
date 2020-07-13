@@ -1,19 +1,15 @@
 package com.example.walkin.utils
 
 import android.app.ProgressDialog
-import android.widget.Toast
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.example.walkin.R
 import com.example.walkin.app.WalkinApplication
-import com.example.walkin.models.BaseResponseModel
-import com.example.walkin.models.LoginResponseModel
+import com.example.walkin.models.*
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import org.json.JSONObject
-import kotlin.reflect.KClass
 
 
 class NetworkUtil {
@@ -21,20 +17,18 @@ class NetworkUtil {
         private val STATUS_CODE_SUCCESS = 200
         private val STATUS_CODE_COMPANY_NOT_FOUND = 901
         private val STATUS_CODE_SEARIAL_NOT_FOUND = 902
-
-
         private val URL_DOMAIN = "http://165.22.250.233"
         private val URL_KACHEN_DOMAIN = "http://165.22.250.233"
         val URL_LOGIN = "$URL_DOMAIN/api/v1/login"
         val URL_CHECK_DEVICE = "$URL_KACHEN_DOMAIN/api/v1/checkdevice"
-        val URL_GET_SUMMARY = ""
-        val URL_SUBMIT = ""
-        val URL_SEARCH = ""
-        val URL_GET_LIST_DATA = ""
+        val URL_GET_SUMMARY = "$URL_DOMAIN/api/v1/sumary"
+        val URL_SEARCH = "$URL_DOMAIN/api/v1/search/order"
+        val URL_GET_LIST_DATA = "$URL_DOMAIN/api/v1/search/listbytype"
+        val URL_CHECK_IN = "$URL_DOMAIN/api/v1/checkin"
+        val URL_CHECK_OUT = "$URL_DOMAIN/api/v1/checkout"
+        var progressdialog: ProgressDialog? = null
 
-        var progressdialog : ProgressDialog? = null
-
-        fun login(user: String, password: String, listener: NetworkLisener<LoginResponseModel>, kClass : Class<LoginResponseModel>) {
+        fun login(user: String, password: String, listener: NetworkLisener<LoginResponseModel>, kClass: Class<LoginResponseModel>) {
             showLoadingDialog()
             PreferenceUtils.setLoginUserName(user)
             PreferenceUtils.setLoginPassword(password)
@@ -51,7 +45,7 @@ class NetworkUtil {
             AndroidNetworking.post(URL_CHECK_DEVICE)
                 .addBodyParameter("serial_number", android.os.Build.SERIAL)
                 .addBodyParameter("company_id", companyId)
-                .setTag("login")
+                .setTag("checkDevice")
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONObject(object : JSONObjectRequestListener {
@@ -59,11 +53,15 @@ class NetworkUtil {
                         response?.let {
                             val status = it.getInt("status_code")
                             if (STATUS_CODE_SUCCESS == status) {
-                                if (PreferenceUtils.getToken().isNotEmpty()) {
+                                if (PreferenceUtils.getToken()
+                                        .isNotEmpty()) {
                                     PreferenceUtils.setLoginSuccess()
                                 }
                                 listener.onResponse(response)
                             } else {
+                                val error = ANError(it.getString("message"))
+                                error.errorCode = status
+                                listener.onError(error)
                                 showError(status)
                             }
                         }
@@ -74,32 +72,83 @@ class NetworkUtil {
                         hideLoadingDialog()
                         anError?.let {
                             showError(it.errorCode)
+                            listener.onError(anError)
                         }
                     }
                 })
         }
 
-        fun loadSummaryData() {
-//            AndroidNetworking.post(URL_LOGIN)
-//                .addHeaders("Authorization", "Bearer "+ PreferenceUtils.getToken())
-//                .addHeaders("Content-type", "application/json")
-//                .addHeaders("Accept", "application/json")
-//                .addBodyParameter("idcard", lendParamModel.idcard)
-//                .addBodyParameter("customer_name", lendParamModel.customer_name)
-//                .addBodyParameter("customer_address", lendParamModel.customer_address)
-//                .addBodyParameter("customer_image", lendParamModel.customer_image)
-//                .addBodyParameter("customer_phonenumber", lendParamModel.customer_phonenumber)
-//                .addBodyParameter("product", Gson().toJson(lendParamModel.product))
-//                .addBodyParameter("deadline", lendParamModel.deadline)
-//                .addBodyParameter("user_id", PreferencesManager.getInstance().userId)
-//                .addBodyParameter("tid", PreferencesManager.getInstance().tid)
-//                .setTag("sellItem")
-//                .setPriority(Priority.HIGH)
-//                .build()
-//                .getAsJSONObject(listener)
-
+        fun loadSummaryData(listener: NetworkLisener<SummaryModel>, kClass: Class<SummaryModel>) {
+            AndroidNetworking.post(URL_GET_SUMMARY)
+                .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
+                .addHeaders("Content-type", "application/json")
+                .addHeaders("Accept", "application/json")
+                .addBodyParameter("company_id", PreferenceUtils.getCompanyId())
+                .setTag("loadSummaryData")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(getResponseListener(kClass, listener))
         }
 
+        fun getListByType(type: String, listener: NetworkLisener<PartialVisitorResponseModel>, kClass: Class<PartialVisitorResponseModel>) {
+            AndroidNetworking.get(URL_GET_LIST_DATA)
+                .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
+                .addHeaders("Content-type", "application/json")
+                .addHeaders("Accept", "application/json")
+                .addPathParameter("company_id", PreferenceUtils.getCompanyId())
+                .addPathParameter("type", type)
+                .addPathParameter("limit", "500")
+                .addPathParameter("offset", "0")
+                .setTag("getListByType")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(getResponseListener(kClass, listener))
+        }
+
+        fun searchByOrder(code: String, listener: NetworkLisener<VisitorResponseModel>, kClass: Class<VisitorResponseModel>) {
+            AndroidNetworking.get(URL_SEARCH)
+                .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
+                .addHeaders("Content-type", "application/json")
+                .addHeaders("Accept", "application/json")
+                .addPathParameter("company_id", PreferenceUtils.getCompanyId())
+                .addPathParameter("contact_code", code)
+                .setTag("searchByOrder")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(getResponseListener(kClass, listener))
+        }
+
+        //        CheckinParamModel.Builder("", "", "", "").idcard("").build()
+        fun checkIn(param: CheckInParamModel, listener: NetworkLisener<CheckInResponseModel>, kClass: Class<CheckInResponseModel>) {
+            AndroidNetworking.post(URL_CHECK_IN)
+                .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
+                .addHeaders("Content-type", "application/json")
+                .addHeaders("Accept", "application/json")
+                .addBodyParameter("idcard", param.idcard)
+                .addBodyParameter("name", param.name)
+                .addBodyParameter("vehicle_id", param.vehicleId)
+                .addBodyParameter("temperature", param.temperature)
+                .addBodyParameter("department_id", param.departmentId)
+                .addBodyParameter("objective_id", param.objectiveId)
+                .addBodyParameter("images", param.images)
+                .setTag("checkIn")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(getResponseListener(kClass, listener))
+        }
+
+        fun checkOut(code: String, listener: NetworkLisener<CheckOutResponseModel>, kClass: Class<CheckOutResponseModel>) {
+            AndroidNetworking.post(URL_CHECK_OUT)
+                .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
+                .addHeaders("Content-type", "application/json")
+                .addHeaders("Accept", "application/json")
+                .addBodyParameter("company_id", PreferenceUtils.getCompanyId())
+                .addBodyParameter("contact_code", code)
+                .setTag("checkOut")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(getResponseListener(kClass, listener))
+        }
 
         private fun showLoadingDialog() {
             progressdialog = ProgressDialog(WalkinApplication.appContext)
@@ -114,7 +163,8 @@ class NetworkUtil {
                 }
             }
         }
-        private fun <T : BaseResponseModel>getResponseListener(kClass: Class<T>, listener: NetworkLisener<T>): JSONObjectRequestListener {
+
+        private fun <T : BaseResponseModel> getResponseListener(kClass: Class<T>, listener: NetworkLisener<T>): JSONObjectRequestListener {
             return object : JSONObjectRequestListener {
                 override fun onResponse(response: JSONObject?) {
                     response?.let {
@@ -128,6 +178,9 @@ class NetworkUtil {
                                 listener.onResponse(Gson().fromJson(jsonData.toString(), kClass))
                             }
                         } else {
+                            val obj = JSONObject().put("error_code", status)
+                                .put("msg", it.getString("message"))
+                            listener.onError(obj)
                             showError(status)
                         }
                     }
@@ -137,6 +190,9 @@ class NetworkUtil {
                 override fun onError(anError: ANError?) {
                     anError?.let {
                         showError(it.errorCode)
+                        val obj = JSONObject().put("error_code", it.errorCode)
+                            .put("msg", it.message)
+                        listener.onError(obj)
                     }
                     hideLoadingDialog()
                 }
@@ -155,12 +211,9 @@ class NetworkUtil {
             val companyPhone = company?.getString("phone")
             val companyEmail = company?.getString("email")
             val companyStatus = company?.getString("status")
-            val signature =data?.optJSONArray("signature")
-            val department =data?.optJSONArray("department")
-            val objectiveType =data?.optJSONArray("objective_type")
-
-
-
+            val signature = data?.optJSONArray("signature")
+            val department = data?.optJSONArray("department")
+            val objectiveType = data?.optJSONArray("objective_type")
         }
 
         fun showError(status: Int) {
@@ -173,6 +226,7 @@ class NetworkUtil {
 
         interface NetworkLisener<T> {
             fun onResponse(response: T)
+            fun onError(jsonObject: JSONObject)
         }
     }
 }
