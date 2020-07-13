@@ -17,6 +17,7 @@
         <activity android:name=".CheckOutActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".CheckInActivity" />
+        <activity android:name=".ScanActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

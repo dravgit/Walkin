@@ -87,7 +87,6 @@ public class PreferenceUtils {
         return getSharedPreferences().getString(PREFERENCE_KEY_COMPANY_ADDRESS, "");
     }
 
-
     public static void setCompanyPhone(String companyPhone) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
         editor.putString(PREFERENCE_KEY_COMPANY_PHONE, companyPhone).apply();
