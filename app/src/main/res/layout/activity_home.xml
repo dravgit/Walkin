@@ -41,19 +41,53 @@
         app:layout_constraintRight_toRightOf="parent">
 
 
-        <Button
+        <RelativeLayout
             android:id="@+id/btnTotalCheckin"
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            />
+            android:background="@drawable/border"
+            >
+            <TextView
+                android:text="จำนวนผู้เข้าตึก"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:gravity="center"
+                />
+            <TextView
+                android:text="00"
+                android:textColor="#F48024"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="75dp"
+                android:gravity="center"
+                />
+        </RelativeLayout>
 
-        <Button
+        <RelativeLayout
             android:id="@+id/btnTotalCheckout"
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            />
+            android:background="@drawable/border"
+            >
+                <TextView
+                    android:text="จำนวนผู้ออกจากตึก"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="30dp"
+                    android:gravity="center"
+                />
+                <TextView
+                    android:text="00"
+                    android:textColor="#F48024"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="75dp"
+                    android:gravity="center"
+                />
+        </RelativeLayout>
 
     </TableRow>
 
@@ -66,19 +100,53 @@
         app:layout_constraintRight_toRightOf="parent">
 
 
-        <Button
+        <RelativeLayout
             android:id="@+id/btnTotalRemain"
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            />
+            android:background="@drawable/border"
+            >
+            <TextView
+                android:text="จำนวนผู้ที่เยังอยู่ในตึก"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:gravity="center"
+                />
+            <TextView
+                android:text="00"
+                android:textColor="#F48024"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="75dp"
+                android:gravity="center"
+                />
+        </RelativeLayout>
 
-        <Button
-            android:id="@+id/btnTotal"
+        <RelativeLayout
+            android:id="@+id/btnTotalVisitor"
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            />
+            android:background="@drawable/border"
+            >
+            <TextView
+                android:text="จำนวนผู้ที่อยู่เกิน 1 วัน"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:gravity="center"
+                />
+            <TextView
+                android:text="00"
+                android:textColor="#F48024"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="75dp"
+                android:gravity="center"
+                />
+        </RelativeLayout>
 
     </TableRow>
 
