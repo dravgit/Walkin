@@ -41,9 +41,12 @@ import com.centerm.smartpos.aidl.magcard.TrackData;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
 import com.centerm.smartpos.util.HexUtil;
+import com.example.walkin.models.CheckInParamModel;
+import com.example.walkin.models.CheckInResponseModel;
 import com.example.walkin.models.LoginResponseModel;
 import com.example.walkin.utils.NetworkUtil;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
