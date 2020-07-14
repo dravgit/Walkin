@@ -1,6 +1,7 @@
 package com.example.walkin.utils
 
 import android.app.ProgressDialog
+import android.provider.MediaStore.Video
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
@@ -9,7 +10,9 @@ import com.example.walkin.R
 import com.example.walkin.app.WalkinApplication
 import com.example.walkin.models.*
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 
 class NetworkUtil {
@@ -90,7 +93,7 @@ class NetworkUtil {
                 .getAsJSONObject(getResponseListener(kClass, listener))
         }
 
-        fun getListByType(type: String, listener: NetworkLisener<PartialVisitorResponseModel>, kClass: Class<PartialVisitorResponseModel>) {
+        fun getListByType(type: String, listener: NetworkLisener<List<PartialVisitorResponseModel>>, kClass: Class<List<PartialVisitorResponseModel>>) {
             AndroidNetworking.get(URL_GET_LIST_DATA)
                 .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
                 .addHeaders("Content-type", "application/json")
@@ -102,7 +105,7 @@ class NetworkUtil {
                 .setTag("getListByType")
                 .setPriority(Priority.HIGH)
                 .build()
-                .getAsJSONObject(getResponseListener(kClass, listener))
+                .getAsJSONObject(getListResponseListener(kClass, listener))
         }
 
         fun searchByOrder(code: String, listener: NetworkLisener<VisitorResponseModel>, kClass: Class<VisitorResponseModel>) {
@@ -164,6 +167,58 @@ class NetworkUtil {
             }
         }
 
+        private fun <T : BaseResponseModel> getListResponseListener(kClass: Class<List<T>>, listener: NetworkLisener<List<T>>): JSONObjectRequestListener {
+            return object : JSONObjectRequestListener {
+                override fun onResponse(response: JSONObject?) {
+                    response?.let {
+                        val status = it.getInt("status_code")
+                        if (STATUS_CODE_SUCCESS.equals(status)) {
+                                val jsonData = it.getJSONObject("data")
+                                listener.onResponse(Gson().fromJson(jsonData.toString(), object : TypeToken<List<PartialVisitorResponseModel>>() {}.type ))
+                        } else {
+                            val obj = JSONObject().put("error_code", status)
+                                .put("msg", it.getString("message"))
+                            val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                            listener.onError(walkInErrorModel)
+                            showError(status)
+                        }
+                    }
+                    hideLoadingDialog()
+                }
+
+                override fun onError(anError: ANError?) {
+                    anError?.let {
+                        if (401 == it.errorCode) {
+                            login(PreferenceUtils.getLoginUserName(), PreferenceUtils.getLoginPassword(), object : NetworkLisener<LoginResponseModel> {
+                                override fun onResponse(response: LoginResponseModel) {
+                                    listener.onExpired()
+                                }
+
+                                override fun onError(errorModel: WalkInErrorModel) {
+                                    showError(it.errorCode)
+                                    val obj = JSONObject().put("error_code", it.errorCode)
+                                        .put("msg", it.message)
+                                    val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                                    listener.onError(walkInErrorModel)
+                                }
+
+                                override fun onExpired() {
+
+                                }
+                            }, LoginResponseModel::class.java)
+                        } else {
+                            showError(it.errorCode)
+                            val obj = JSONObject().put("error_code", it.errorCode)
+                                .put("msg", it.message)
+                            val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                            listener.onError(walkInErrorModel)
+                        }
+                    }
+                    hideLoadingDialog()
+                }
+            }
+        }
+
         private fun <T : BaseResponseModel> getResponseListener(kClass: Class<T>, listener: NetworkLisener<T>): JSONObjectRequestListener {
             return object : JSONObjectRequestListener {
                 override fun onResponse(response: JSONObject?) {
@@ -180,7 +235,8 @@ class NetworkUtil {
                         } else {
                             val obj = JSONObject().put("error_code", status)
                                 .put("msg", it.getString("message"))
-                            listener.onError(obj)
+                            val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                            listener.onError(walkInErrorModel)
                             showError(status)
                         }
                     }
@@ -189,10 +245,31 @@ class NetworkUtil {
 
                 override fun onError(anError: ANError?) {
                     anError?.let {
-                        showError(it.errorCode)
-                        val obj = JSONObject().put("error_code", it.errorCode)
-                            .put("msg", it.message)
-                        listener.onError(obj)
+                        if (401 == it.errorCode) {
+                            login(PreferenceUtils.getLoginUserName(), PreferenceUtils.getLoginPassword(), object : NetworkLisener<LoginResponseModel> {
+                                override fun onResponse(response: LoginResponseModel) {
+                                    listener.onExpired()
+                                }
+
+                                override fun onError(errorModel: WalkInErrorModel) {
+                                    showError(it.errorCode)
+                                    val obj = JSONObject().put("error_code", it.errorCode)
+                                        .put("msg", it.message)
+                                    val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                                    listener.onError(walkInErrorModel)
+                                }
+
+                                override fun onExpired() {
+
+                                }
+                            }, LoginResponseModel::class.java)
+                        } else {
+                            showError(it.errorCode)
+                            val obj = JSONObject().put("error_code", it.errorCode)
+                                .put("msg", it.message)
+                            val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
+                            listener.onError(walkInErrorModel)
+                        }
                     }
                     hideLoadingDialog()
                 }
@@ -226,7 +303,8 @@ class NetworkUtil {
 
         interface NetworkLisener<T> {
             fun onResponse(response: T)
-            fun onError(jsonObject: JSONObject)
+            fun onError(errorModel: WalkInErrorModel)
+            fun onExpired()
         }
     }
 }

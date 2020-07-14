@@ -146,8 +146,10 @@ public class CheckInActivity extends BaseActivity {
         okCheckin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
-                CheckInActivity.this.startActivity(intent);
+
+//                NetworkUtil.Companion.checkIn();
+//                Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
+//                CheckInActivity.this.startActivity(intent);
                 // call api
             }
         });
