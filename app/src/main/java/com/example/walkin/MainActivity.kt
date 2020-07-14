@@ -5,29 +5,39 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
+import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.models.LoginResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import com.example.walkin.utils.PreferenceUtils
+import com.example.walkin.utils.Util
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     var btnLogin: Button? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         btnLogin = findViewById<View>(R.id.btnLogin) as Button
         btnLogin!!.setOnClickListener {
-
+            login()
         }
     }
+
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
+
+    }
+
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+
+    }
+
     fun login() {
         val userName = tVusername.text.toString()
-        val userPassword = tVusername.text.toString()
+        val userPassword = tVpassword.text.toString()
 
         if (userName.isEmpty() || userPassword.isEmpty()) {
             Toast.makeText(this@MainActivity, "username and password is not empty", Toast.LENGTH_LONG).show()

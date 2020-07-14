@@ -116,9 +116,9 @@ public class PreferenceUtils {
         return getSharedPreferences().getString(PREFERENCE_KEY_COMPANY_STATUS, "");
     }
 
-    public static void setSignature(String department) {
+    public static void setSignature(String signature) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
-        editor.putString(PREFERENCE_KEY_SIGNATURE, department).apply();
+        editor.putString(PREFERENCE_KEY_SIGNATURE, signature).apply();
     }
 
     public static SignatureModel getSignature() {
