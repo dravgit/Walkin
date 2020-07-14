@@ -83,11 +83,11 @@ class NetworkUtil {
         }
 
         fun loadSummaryData(listener: NetworkLisener<SummaryModel>, kClass: Class<SummaryModel>) {
-            AndroidNetworking.post(URL_GET_SUMMARY)
+            AndroidNetworking.get(URL_GET_SUMMARY)
                 .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
                 .addHeaders("Content-type", "application/json")
                 .addHeaders("Accept", "application/json")
-                .addBodyParameter("company_id", PreferenceUtils.getCompanyId())
+                .addPathParameter("company_id", PreferenceUtils.getCompanyId())
                 .setTag("loadSummaryData")
                 .setPriority(Priority.HIGH)
                 .build()
