@@ -11,11 +11,11 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder>{
-    private MyListData[] listdata;
+public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder>{
+    private DetailListData[] listdata;
     boolean status;
     // RecyclerView recyclerView;
-    public MyListAdapter(MyListData[] listdata,boolean statusCode) {
+    public DetailAdapter(DetailListData[] listdata, boolean statusCode) {
         this.listdata = listdata;
         this.status = statusCode;
     }
@@ -29,14 +29,14 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final MyListData myListData = listdata[position];
+        final DetailListData detailListData = listdata[position];
         holder.textView.setText(listdata[position].getDescription());
         holder.imageView1.setImageResource(listdata[position].getImgId());
         holder.imageView2.setImageResource(listdata[position].getImgId());
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(),"click on item: "+myListData.getDescription(),Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(),"click on item: "+ detailListData.getDescription(),Toast.LENGTH_LONG).show();
             }
         });
         if (status == true){

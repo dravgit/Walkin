@@ -1,9 +1,9 @@
 package com.example.walkin;
 
-public class MyListData {
+public class DetailListData {
     private String description;
     private int imgId;
-    public MyListData(String description, int imgId) {
+    public DetailListData(String description, int imgId) {
         this.description = description;
         this.imgId = imgId;
     }

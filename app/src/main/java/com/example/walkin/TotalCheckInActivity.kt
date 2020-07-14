@@ -12,22 +12,22 @@ class TotalCheckInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        val myListData: Array<MyListData> = arrayOf<MyListData>(
-                MyListData("Email", android.R.drawable.ic_dialog_email),
-                MyListData("Info", android.R.drawable.ic_dialog_info),
-                MyListData("Delete", android.R.drawable.ic_delete),
-                MyListData("Dialer", android.R.drawable.ic_dialog_dialer),
-                MyListData("Alert", android.R.drawable.ic_dialog_alert),
-                MyListData("Map", android.R.drawable.ic_dialog_map),
-                MyListData("Email", android.R.drawable.ic_dialog_email),
-                MyListData("Info", android.R.drawable.ic_dialog_info),
-                MyListData("Delete", android.R.drawable.ic_delete),
-                MyListData("Dialer", android.R.drawable.ic_dialog_dialer),
-                MyListData("Alert", android.R.drawable.ic_dialog_alert),
-                MyListData("Map", android.R.drawable.ic_dialog_map))
+        val myListData: Array<DetailListData> = arrayOf<DetailListData>(
+                DetailListData("Email", android.R.drawable.ic_dialog_email),
+                DetailListData("Info", android.R.drawable.ic_dialog_info),
+                DetailListData("Delete", android.R.drawable.ic_delete),
+                DetailListData("Dialer", android.R.drawable.ic_dialog_dialer),
+                DetailListData("Alert", android.R.drawable.ic_dialog_alert),
+                DetailListData("Map", android.R.drawable.ic_dialog_map),
+                DetailListData("Email", android.R.drawable.ic_dialog_email),
+                DetailListData("Info", android.R.drawable.ic_dialog_info),
+                DetailListData("Delete", android.R.drawable.ic_delete),
+                DetailListData("Dialer", android.R.drawable.ic_dialog_dialer),
+                DetailListData("Alert", android.R.drawable.ic_dialog_alert),
+                DetailListData("Map", android.R.drawable.ic_dialog_map))
 
         val recyclerView = findViewById<View>(R.id.recyclerView) as RecyclerView
-        val adapter = MyListAdapter(myListData,statusCode)
+        val adapter = DetailAdapter(myListData, statusCode)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
