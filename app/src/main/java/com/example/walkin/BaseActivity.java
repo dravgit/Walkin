@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
+import com.example.walkin.utils.Util;
 
 public abstract class BaseActivity extends Activity {
 
@@ -23,6 +24,7 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         bindService();
         bindServiceSwipe();
+        Util.Companion.setActivityContext(this);
     }
 
     protected void bindService() {

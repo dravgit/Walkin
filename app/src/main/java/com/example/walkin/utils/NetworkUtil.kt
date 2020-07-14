@@ -1,6 +1,7 @@
 package com.example.walkin.utils
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.provider.MediaStore.Video
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
@@ -154,7 +155,7 @@ class NetworkUtil {
         }
 
         private fun showLoadingDialog() {
-            progressdialog = ProgressDialog(WalkinApplication.appContext)
+            progressdialog = ProgressDialog(Util.activityContext)
             progressdialog?.setMessage("Please Wait....")
             progressdialog?.show()
         }
@@ -225,7 +226,7 @@ class NetworkUtil {
                     response?.let {
                         val status = it.getInt("status_code")
                         if (STATUS_CODE_SUCCESS.equals(status)) {
-                            if (kClass.isInstance(LoginResponseModel::class.java)) {
+                            if (kClass.isAssignableFrom(LoginResponseModel::class.java)) {
                                 updateInfo(it)
                                 listener.onResponse(Gson().fromJson(it.toString(), kClass))
                             } else {
@@ -278,6 +279,7 @@ class NetworkUtil {
 
         private fun updateInfo(info: JSONObject) {
             val data = info.optJSONObject("data")
+            val token = info.getString("access_token")
             val user = data?.optJSONObject("user")
             val userId = user?.getString("id")
             val userName = user?.getString("name")
@@ -291,6 +293,19 @@ class NetworkUtil {
             val signature = data?.optJSONArray("signature")
             val department = data?.optJSONArray("department")
             val objectiveType = data?.optJSONArray("objective_type")
+            PreferenceUtils.setLoginSuccess()
+            PreferenceUtils.setToken(token)
+            PreferenceUtils.setUserId(userId)
+            PreferenceUtils.setUserName(userName)
+            PreferenceUtils.setCompanyId(companyId)
+            PreferenceUtils.setCompanyName(companyName)
+            PreferenceUtils.setCompanyAddress(companyAddress)
+            PreferenceUtils.setCompanyPhone(companyPhone)
+            PreferenceUtils.setCompanyEmail(companyEmail)
+            PreferenceUtils.setCompanyStatus(companyStatus)
+            PreferenceUtils.setSignature(signature.toString())
+            PreferenceUtils.setDepartment(department.toString())
+            PreferenceUtils.setObjectiveType(objectiveType.toString())
         }
 
         fun showError(status: Int) {
