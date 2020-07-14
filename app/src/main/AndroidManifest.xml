@@ -14,16 +14,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".DetailActivity">
+
+        </activity>
+        <activity android:name=".CheckOutActivity" >
+
+        </activity>
+        <activity android:name=".HomeActivity" >
+
+        </activity>
+        <activity android:name=".CheckInActivity">
+
+        </activity>
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CheckOutActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".CheckInActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".TotalCheckInActivity">
+
+        </activity>
+        <activity android:name=".TotalCheckOutActivity">
+
+        </activity>
+        <activity android:name=".TotalRemainActivity">
+
+        </activity>
+        <activity android:name=".TotalVisitorActivity">
 
         </activity>
     </application>

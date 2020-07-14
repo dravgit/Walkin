@@ -5,12 +5,12 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_detail.*
 
 
-class DetailActivity : AppCompatActivity() {
-
+class TotalCheckOutActivity : AppCompatActivity() {
+    var statusCode = true
     override fun onCreate(savedInstanceState: Bundle?) {
-        var statusCode = false
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         val myListData: Array<MyListData> = arrayOf<MyListData>(
@@ -25,11 +25,13 @@ class DetailActivity : AppCompatActivity() {
                 MyListData("Delete", android.R.drawable.ic_delete),
                 MyListData("Dialer", android.R.drawable.ic_dialog_dialer),
                 MyListData("Alert", android.R.drawable.ic_dialog_alert),
-                MyListData("Map", android.R.drawable.ic_dialog_map))
+                MyListData("Map", android.R.drawable.ic_dialog_map)
+        )
         val recyclerView = findViewById<View>(R.id.recyclerView) as RecyclerView
         val adapter = MyListAdapter(myListData,statusCode)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+        tVdetail.setText("จำนวนผู้ออกจากตึก")
     }
 }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".HomeActivity"
+    android:descendantFocusability="blocksDescendants"
     android:orientation="vertical">
 
     <FrameLayout
@@ -26,7 +27,7 @@
     </FrameLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/headerCheckin"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -39,9 +40,14 @@
             >
         <TextView
             android:id="@+id/tVdetail"
-            android:text="test"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#2CBE4E"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
             />
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="fill_parent"

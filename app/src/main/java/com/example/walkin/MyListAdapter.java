@@ -3,6 +3,7 @@ package com.example.walkin;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -12,10 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder>{
     private MyListData[] listdata;
-
+    boolean status;
     // RecyclerView recyclerView;
-    public MyListAdapter(MyListData[] listdata) {
+    public MyListAdapter(MyListData[] listdata,boolean statusCode) {
         this.listdata = listdata;
+        this.status = statusCode;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -37,6 +39,11 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
                 Toast.makeText(view.getContext(),"click on item: "+myListData.getDescription(),Toast.LENGTH_LONG).show();
             }
         });
+        if (status == true){
+            holder.btnReprint.setVisibility(View.GONE);
+        }else{
+            holder.btnReprint.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -49,11 +56,13 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         public ImageView imageView1,imageView2;
         public TextView textView;
         public RelativeLayout relativeLayout;
+        public Button btnReprint;
         public ViewHolder(View itemView) {
             super(itemView);
             this.imageView1 = (ImageView) itemView.findViewById(R.id.imageView1);
             this.imageView2 = (ImageView) itemView.findViewById(R.id.imageView2);
             this.textView = (TextView) itemView.findViewById(R.id.textView1);
+            this.btnReprint = (Button) itemView.findViewById(R.id.btnReprint);
             relativeLayout = (RelativeLayout)itemView.findViewById(R.id.relativeLayout);
         }
     }

@@ -93,12 +93,6 @@ public class CheckInActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
-        NetworkUtil.Companion.login("", "", new NetworkUtil.Companion.NetworkLisener<LoginResponseModel>() {
-            @Override
-            public void onResponse(LoginResponseModel response) {
-
-            }
-        });
         mLoading = new ProgressDialog(this);
         mLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoading.setCanceledOnTouchOutside(false);
