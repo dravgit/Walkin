@@ -78,6 +78,7 @@ class NetworkUtil {
                     override fun onError(anError: ANError?) {
                         hideLoadingDialog()
                         anError?.let {
+                            it.printStackTrace()
                             showError(it.errorCode)
                             listener.onError(anError)
                         }
@@ -192,6 +193,7 @@ class NetworkUtil {
 
                 override fun onError(anError: ANError?) {
                     anError?.let {
+                        it.printStackTrace()
                         if (401 == it.errorCode) {
                             login(PreferenceUtils.getLoginUserName(), PreferenceUtils.getLoginPassword(), object : NetworkLisener<LoginResponseModel> {
                                 override fun onResponse(response: LoginResponseModel) {
@@ -250,6 +252,7 @@ class NetworkUtil {
                 override fun onError(anError: ANError?) {
                     hideLoadingDialog()
                     anError?.let {
+                        it.printStackTrace()
                         if (401 == it.errorCode) {
                                 login(PreferenceUtils.getLoginUserName(),
                                       PreferenceUtils.getLoginPassword(),
