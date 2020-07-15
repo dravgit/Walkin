@@ -132,6 +132,7 @@ class NetworkUtil {
                 .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
                 .addHeaders("Content-type", "application/json")
                 .addHeaders("Accept", "application/json")
+                .addBodyParameter("user_id", PreferenceUtils.getUserId())
                 .addBodyParameter("idcard", param.idcard)
                 .addBodyParameter("name", param.name)
                 .addBodyParameter("vehicle_id", param.vehicleId)
