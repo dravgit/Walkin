@@ -16,15 +16,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".CheckOutActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".CheckInActivity" />
-        <activity android:name=".ScanActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".HomeActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".CheckInActivity" />
+        <activity android:name=".ScanActivity" />
+        <activity android:name=".MainActivity">
+
         </activity>
         <activity android:name=".TotalCheckInActivity">
 
