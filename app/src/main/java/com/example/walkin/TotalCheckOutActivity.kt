@@ -5,33 +5,43 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.walkin.models.PartialVisitorResponseModel
+import com.example.walkin.models.WalkInErrorModel
+import com.example.walkin.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 
 
 class TotalCheckOutActivity : AppCompatActivity() {
     var statusCode = true
+    lateinit var adapter : DetailAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        val myListData: Array<DetailListData> = arrayOf<DetailListData>(
-                DetailListData("Email", android.R.drawable.ic_dialog_email),
-                DetailListData("Info", android.R.drawable.ic_dialog_info),
-                DetailListData("Delete", android.R.drawable.ic_delete),
-                DetailListData("Dialer", android.R.drawable.ic_dialog_dialer),
-                DetailListData("Alert", android.R.drawable.ic_dialog_alert),
-                DetailListData("Map", android.R.drawable.ic_dialog_map),
-                DetailListData("Email", android.R.drawable.ic_dialog_email),
-                DetailListData("Info", android.R.drawable.ic_dialog_info),
-                DetailListData("Delete", android.R.drawable.ic_delete),
-                DetailListData("Dialer", android.R.drawable.ic_dialog_dialer),
-                DetailListData("Alert", android.R.drawable.ic_dialog_alert),
-                DetailListData("Map", android.R.drawable.ic_dialog_map)
-        )
         val recyclerView = findViewById<View>(R.id.recyclerView) as RecyclerView
-        val adapter = DetailAdapter(myListData, statusCode)
+        adapter = DetailAdapter(this@TotalCheckOutActivity)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
         tVdetail.setText("จำนวนผู้ออกจากตึก")
+        btnRefresh.setOnClickListener {
+            loadData()
+        }
+        loadData()
+    }
+
+    fun loadData() {
+        NetworkUtil.getListByType(NetworkUtil.STATUS_TYPE_OUT, object : NetworkUtil.Companion.NetworkLisener<List<PartialVisitorResponseModel>> {
+            override fun onResponse(response: List<PartialVisitorResponseModel>) {
+                adapter.setListdata(response)
+            }
+
+            override fun onError(errorModel: WalkInErrorModel) {
+
+            }
+
+            override fun onExpired() {
+                loadData()
+            }
+        })
     }
 }

@@ -47,24 +47,34 @@ class HomeActivity : AppCompatActivity() {
         }
 
         btnRefresh.setOnClickListener {
-            NetworkUtil.loadSummaryData(object : NetworkUtil.Companion.NetworkLisener<SummaryModel> {
-                override fun onResponse(response: SummaryModel) {
-                    setupView(response)
-                }
-
-                override fun onError(errorModel: WalkInErrorModel) {
-                    Toast.makeText(this@HomeActivity, errorModel.msg, Toast.LENGTH_LONG).show()
-                }
-
-                override fun onExpired() {
-                    btnRefresh.callOnClick()
-                }
-            }, SummaryModel::class.java)
+            loadData()
         }
-
     }
 
-    fun setupView(response: SummaryModel) {
+    override fun onResume() {
+        super.onResume()
+        loadData()
+    }
 
+    fun loadData() {
+        NetworkUtil.loadSummaryData(object : NetworkUtil.Companion.NetworkLisener<SummaryModel> {
+            override fun onResponse(response: SummaryModel) {
+                setupView(response)
+            }
+
+            override fun onError(errorModel: WalkInErrorModel) {
+                Toast.makeText(this@HomeActivity, errorModel.msg, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onExpired() {
+                btnRefresh.callOnClick()
+            }
+        }, SummaryModel::class.java)
+    }
+    fun setupView(response: SummaryModel) {
+        tv_number_in.setText(response.total_in)
+        tv_number_out.setText(response.total_out)
+        tv_number_stay.setText(response.total_not_out)
+        tv_number_more_one.setText(response.total_over)
     }
 }

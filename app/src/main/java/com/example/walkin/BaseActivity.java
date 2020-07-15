@@ -72,6 +72,8 @@ public abstract class BaseActivity extends Activity {
         }
     };
 
+
+
     protected void log(String log) {
         Log.i("Centerm", log);
     }

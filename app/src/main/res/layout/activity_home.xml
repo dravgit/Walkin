@@ -56,6 +56,7 @@
                 android:gravity="center"
                 />
             <TextView
+                android:id="@+id/tv_number_in"
                 android:text="00"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
@@ -80,6 +81,7 @@
                     android:gravity="center"
                 />
                 <TextView
+                    android:id="@+id/tv_number_out"
                     android:text="00"
                     android:textColor="#F48024"
                     android:layout_width="match_parent"
@@ -108,13 +110,14 @@
             android:background="@drawable/border"
             >
             <TextView
-                android:text="จำนวนผู้ที่เยังอยู่ในตึก"
+                android:text="จำนวนผู้ที่ยังอยู่ในตึก"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
                 android:gravity="center"
                 />
             <TextView
+                android:id="@+id/tv_number_stay"
                 android:text="00"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
@@ -139,6 +142,7 @@
                 android:gravity="center"
                 />
             <TextView
+                android:id="@+id/tv_number_more_one"
                 android:text="00"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
