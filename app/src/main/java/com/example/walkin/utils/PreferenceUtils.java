@@ -8,6 +8,9 @@ import com.example.walkin.models.LoginResponseModel;
 import com.example.walkin.models.ObjectiveTypeModel;
 import com.example.walkin.models.SignatureModel;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.List;
 
 public class PreferenceUtils {
 
@@ -131,9 +134,9 @@ public class PreferenceUtils {
         editor.putString(PREFERENCE_KEY_DEPARTMENT, department).apply();
     }
 
-    public static DepartmentModel getDepartment() {
+    public static List<DepartmentModel> getDepartment() {
         String department = getSharedPreferences().getString(PREFERENCE_KEY_DEPARTMENT, "");
-        return new Gson().fromJson(department, DepartmentModel.class);
+        return new Gson().fromJson(department, new TypeToken<List<DepartmentModel>>() {}.getType());
     }
 
     public static void setObjectiveType(String type) {
@@ -141,9 +144,9 @@ public class PreferenceUtils {
         editor.putString(PREFERENCE_KEY_OBJECTIVE_TYPE, type).apply();
     }
 
-    public static ObjectiveTypeModel getObjectiveType() {
+    public static List<ObjectiveTypeModel> getObjectiveType() {
         String objectiveType = getSharedPreferences().getString(PREFERENCE_KEY_OBJECTIVE_TYPE, "");
-        return new Gson().fromJson(objectiveType, ObjectiveTypeModel.class);
+        return new Gson().fromJson(objectiveType, new TypeToken<List<ObjectiveTypeModel>>() {}.getType());
     }
 
     public static void setLoginSuccess() {
