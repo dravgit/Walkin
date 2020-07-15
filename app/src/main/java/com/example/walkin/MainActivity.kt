@@ -25,6 +25,11 @@ class MainActivity : BaseActivity() {
         btnLogin!!.setOnClickListener {
             login()
         }
+        if (PreferenceUtils.isLoginSuccess()) {
+            val intent = Intent(this@MainActivity, HomeActivity::class.java)
+            this@MainActivity.startActivity(intent)
+            this@MainActivity.finish()
+        }
     }
 
     override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
@@ -63,6 +68,7 @@ class MainActivity : BaseActivity() {
             override fun onResponse(response: JSONObject?) {
                 val intent = Intent(this@MainActivity, HomeActivity::class.java)
                 this@MainActivity.startActivity(intent)
+                this@MainActivity.finish()
             }
 
             override fun onError(anError: ANError?) {

@@ -2,4 +2,11 @@
     <string name="app_name">Walkin</string>
     <string name="not_found_company">ไม่พบข้อมูลบริษัท</string>
     <string name="not_found_serial">ไม่พบอุปกรณ์</string>
+    <string name="something_error">เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่</string>
+
+
+    <string name="contact_s">ติดต่อ %s</string>
+    <string name="stay_in">ยังอยู่ในตึก</string>
+
+
 </resources>
