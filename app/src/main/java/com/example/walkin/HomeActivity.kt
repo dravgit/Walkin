@@ -17,7 +17,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         btnCheckin.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this@HomeActivity, ScanActivity::class.java)
+            val intent = Intent(this@HomeActivity, CheckInActivity::class.java)
             this@HomeActivity.startActivity(intent)
         })
         btnCheckout.setOnClickListener(View.OnClickListener {
