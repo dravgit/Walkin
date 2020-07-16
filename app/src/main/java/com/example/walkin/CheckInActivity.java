@@ -2,7 +2,6 @@ package com.example.walkin;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -12,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -39,13 +39,16 @@ import com.centerm.smartpos.aidl.iccard.AidlICCard;
 import com.centerm.smartpos.aidl.magcard.AidlMagCard;
 import com.centerm.smartpos.aidl.magcard.AidlMagCardListener;
 import com.centerm.smartpos.aidl.magcard.TrackData;
+import com.centerm.smartpos.aidl.printer.AidlPrinter;
+import com.centerm.smartpos.aidl.printer.AidlPrinterStateChangeListener;
+import com.centerm.smartpos.aidl.printer.PrinterParams;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
+import com.centerm.smartpos.constant.DeviceErrorCode;
 import com.centerm.smartpos.util.HexUtil;
 import com.example.walkin.models.CheckInParamModel;
 import com.example.walkin.models.CheckInResponseModel;
 import com.example.walkin.models.DepartmentModel;
-import com.example.walkin.models.LoginResponseModel;
 import com.example.walkin.models.ObjectiveTypeModel;
 import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
@@ -59,6 +62,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -67,7 +71,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class CheckInActivity extends BaseActivity {
-
+    private AidlPrinter printDev = null;
+    private AidlPrinterStateChangeListener callback = new PrinterCallback();
     private static final int CAMERA_PERM_CODE = 101;
     private static final int CAMERA_USER_CODE = 102;
     private static final int CAMERA_CAR_CODE = 103;
@@ -113,7 +118,6 @@ public class CheckInActivity extends BaseActivity {
         iVphoto = findViewById(R.id.iVphoto);
         Log.i("C", "Create2");
         bindService();
-        bindServiceSwipe();
         edtCar = (EditText) findViewById(R.id.edtCar);
         edtTemp = (EditText) findViewById(R.id.edtTemp);
         capUser = (ImageButton) findViewById(R.id.user);
@@ -187,8 +191,7 @@ public class CheckInActivity extends BaseActivity {
                         @Override
                         public void onResponse(CheckInResponseModel response) {
                             CheckInResponseModel data = response;
-                            String test = data.getChcekin_time();
-                            Log.e("Response",test);
+                            print(data);
                         }
                     }, CheckInResponseModel.class);
                 }else{
@@ -333,15 +336,44 @@ public class CheckInActivity extends BaseActivity {
         intent.setPackage("com.centerm.centermposoverseaservice");
         intent.setAction("com.centerm.CentermPosOverseaService.MANAGER_SERVICE");
         bindService(intent, conn, Context.BIND_AUTO_CREATE);
-    }
 
-    @Override
-    protected void bindServiceSwipe() {
         Intent intent1 = new Intent();
         intent1.setPackage("com.centerm.smartposservice");
         intent1.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
         bindService(intent1, conn1, Context.BIND_AUTO_CREATE);
+
+        intent = new Intent();
+        intent.setPackage("com.centerm.smartposservice");
+        intent.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
+        bindService(intent, conn2, Context.BIND_AUTO_CREATE);
     }
+
+    @Override
+    protected void onPrintDeviceConnected(AidlDeviceManager manager) {
+        try {
+            printDev = AidlPrinter.Stub.asInterface(manager
+                    .getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PrinterCallback extends AidlPrinterStateChangeListener.Stub {
+
+        @Override
+        public void onPrintError(int arg0) throws RemoteException {
+            // showMessage("打印机异常" + arg0, Color.RED);
+        }
+
+        @Override
+        public void onPrintFinish() throws RemoteException {
+        }
+
+        @Override
+        public void onPrintOutOfPaper() throws RemoteException {
+        }
+    }
+
 
 
     @Override
@@ -386,6 +418,11 @@ public class CheckInActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void showMessage(String str, int black) {
+        this.showMessage(str, Color.BLACK);
     }
 
 
@@ -794,5 +831,77 @@ public class CheckInActivity extends BaseActivity {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
 
         return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private void print(CheckInResponseModel data) {
+        try {
+            List<PrinterParams> textList = new ArrayList<PrinterParams>();
+            PrinterParams printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setText("CHECK-IN");
+            printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setText("CODE : " + data.getContact_code());
+            printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ชื่อ-นามสกุล : " + data.getFullname());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+
+            printDev.printDatas(textList, callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
