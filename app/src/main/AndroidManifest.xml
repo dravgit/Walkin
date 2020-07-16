@@ -17,6 +17,11 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".CheckOutActivity" />
         <activity android:name=".HomeActivity" >
+
+        </activity>
+        <activity android:name=".CheckInActivity" />
+        <activity android:name=".ScanActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,11 +29,6 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
-        <activity android:name=".CheckInActivity" />
-        <activity android:name=".ScanActivity" />
-        <activity android:name=".MainActivity">
-
         </activity>
         <activity android:name=".TotalCheckInActivity">
 

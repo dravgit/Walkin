@@ -57,7 +57,7 @@
 
     <TextView
         android:id="@+id/headtVname"
-        android:text="ชื่อ :"
+        android:text="ชื่อ : "
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
 
     <TextView
         android:id="@+id/headtVidcard"
-        android:text="หมายเลขบัตร :"
+        android:text="หมายเลขบัตร : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -90,12 +90,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVname"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVidcard"
         />
 
     <TextView
         android:id="@+id/headtVcar"
-        android:text="ทะเบียนรถ :"
+        android:text="ทะเบียนรถ : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -109,12 +109,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVidcard"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVcar"
         />
 
     <TextView
         android:id="@+id/headtVtemperate"
-        android:text="อุณหภูมิ :"
+        android:text="อุณหภูมิ : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -128,12 +128,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVcar"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVtemperate"
         />
 
     <TextView
         android:id="@+id/headtVdepartment"
-        android:text="แผนกที่มาติดต่อ :"
+        android:text="แผนกที่มาติดต่อ : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -147,12 +147,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVtemperate"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVdepartment"
         />
 
     <TextView
         android:id="@+id/headtVobjective"
-        android:text="จุดประสงค์ที่ติดต่อ :"
+        android:text="จุดประสงค์ที่ติดต่อ : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -166,12 +166,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVdepartment"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVobjective"
         />
 
     <TextView
         android:id="@+id/headtVcheckintime"
-        android:text="วันเวลาที่เข้า :"
+        android:text="วันเวลาที่เข้า : "
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -185,11 +185,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tVobjective"
-        app:layout_constraintLeft_toRightOf="@id/headtVname"
+        app:layout_constraintLeft_toRightOf="@id/headtVcheckintime"
+        />
+
+    <TextView
+        android:id="@+id/tVcode"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/tVcheckintime"
+        app:layout_constraintLeft_toRightOf="@id/headtVcheckintime"
         />
 
     <Button
-        android:id="@+id/cancleCheckin"
+        android:id="@+id/cancleCheckout"
         android:background="@color/colorDanger"
         android:text="ยกเลิก"
         android:textColor="@color/white"
@@ -197,11 +207,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/okCheckin"
+        app:layout_constraintRight_toLeftOf="@+id/okCheckout"
         app:layout_constraintTop_toBottomOf="@+id/headtVcheckintime" />
 
     <Button
-        android:id="@+id/okCheckin"
+        android:id="@+id/okCheckout"
         android:background="@color/colorAccent"
         android:text="ยืนยันออกตึก"
         android:textColor="@color/white"
@@ -210,7 +220,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cancleCheckin"
+        app:layout_constraintStart_toEndOf="@+id/cancleCheckout"
         app:layout_constraintTop_toBottomOf="@+id/tVcheckintime"
         />
 

@@ -44,10 +44,13 @@ import com.centerm.smartpos.constant.Constant;
 import com.centerm.smartpos.util.HexUtil;
 import com.example.walkin.models.CheckInParamModel;
 import com.example.walkin.models.CheckInResponseModel;
+import com.example.walkin.models.DepartmentModel;
 import com.example.walkin.models.LoginResponseModel;
+import com.example.walkin.models.ObjectiveTypeModel;
 import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
 import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
+import com.example.walkin.utils.PreferenceUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -120,8 +123,8 @@ public class CheckInActivity extends BaseActivity {
         okCheckin = (Button) findViewById(R.id.okCheckin);
         dropdownDepartment = (Spinner) findViewById(R.id.dropdownDepartment);
         dropdownObjective = (Spinner) findViewById(R.id.dropdownObjective);
-        ArrayAdapter<String> adapterDepartment = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, department);
-        ArrayAdapter<String> adapterObjective = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, objective);
+        ArrayAdapter<DepartmentModel> adapterDepartment = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getDepartment());
+        ArrayAdapter<ObjectiveTypeModel> adapterObjective = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getObjectiveType());
         dropdownDepartment.setAdapter(adapterDepartment);
         dropdownObjective.setAdapter(adapterObjective);
         capUser.setOnClickListener(new View.OnClickListener() {
@@ -155,13 +158,13 @@ public class CheckInActivity extends BaseActivity {
                 String name,department_id,objective_id,images;
                 JSONArray JSONArray = fileImg();
                 int selectedItemOfDepartment = dropdownDepartment.getSelectedItemPosition();
-                String actualPositionOfDepartment = (String) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
+                DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
-                String actualPositionOfObjective = (String) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if(edtnameTH != null && !actualPositionOfDepartment.isEmpty() && !actualPositionOfObjective.isEmpty() && JSONArray.length() != 0){
+                ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
+                if(edtnameTH != null && JSONArray.length() != 0){
                     name = edtnameTH.getText().toString();
-                    department_id = dropdownDepartment.getSelectedItem().toString();
-                    objective_id = dropdownObjective.getSelectedItem().toString();
+                    department_id = actualPositionOfDepartment.getID();
+                    objective_id = actualPositionOfObjective.getID();
                     images = fileImg().toString();
                     CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
                     Log.e("CHECK",param.toString());
@@ -169,7 +172,6 @@ public class CheckInActivity extends BaseActivity {
                             .vehicleId(edtCar.getText().toString())
                             .temperature(edtTemp.getText().toString());
                     CheckInParamModel data = param.build();
-                    Log.e("CHECK","test");
                     Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
                     CheckInActivity.this.startActivity(intent);
                     NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
@@ -179,12 +181,14 @@ public class CheckInActivity extends BaseActivity {
                         }
                         @Override
                         public void onError(@NotNull WalkInErrorModel errorModel) {
-                            Log.e("CHECK","CHECKKKKKKK");
+                            Log.e("CHECK","Error.");
                         }
 
                         @Override
                         public void onResponse(CheckInResponseModel response) {
-                            Log.e("CHECK",response.toString());
+                            CheckInResponseModel data = response;
+                            String test = data.getChcekin_time();
+                            Log.e("Response",test);
                         }
                     }, CheckInResponseModel.class);
                 }else{
