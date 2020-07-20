@@ -5,13 +5,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.models.SummaryModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.list_item.*
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
