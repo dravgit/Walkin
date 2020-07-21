@@ -33,22 +33,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun showMessage(str: String?, black: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
-
-    }
-
-    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
-
-    }
-
-    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
-
-    }
-
     fun login() {
         val userName = tVusername.text.toString()
         val userPassword = tVpassword.text.toString()

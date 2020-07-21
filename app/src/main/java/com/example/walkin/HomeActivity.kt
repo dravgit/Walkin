@@ -13,12 +13,6 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.list_item.*
 
 class HomeActivity : BaseActivity() {
-    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
-    }
-
-    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -57,6 +51,10 @@ class HomeActivity : BaseActivity() {
         }
     }
 
+    override fun showMessage(str: String?, black: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onResume() {
         super.onResume()
         loadData()
@@ -83,4 +81,8 @@ class HomeActivity : BaseActivity() {
         tv_number_stay.setText(response.total_not_out)
         tv_number_more_one.setText(response.total_over)
     }
+
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {}
+    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {}
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {}
 }

@@ -61,7 +61,6 @@ class CheckOutActivity : AppCompatActivity() {
                 var data = response
                 var list = data.images
                 Log.e("LIST",list.toString())
-                var i = 0
                 tVname.setText(data.name())
                 tVidcard.setText(data.idcard())
                 tVcar.setText(data.vehicle_id())
@@ -72,7 +71,7 @@ class CheckOutActivity : AppCompatActivity() {
                 tVcode.setText(data.contact_code)
                 imgVcar.setBackground(null)
                 imgVperson.setBackground(null)
-                for (i in i..list.size-1)
+                for (i in 0..list.size-1)
                 {
                     if(list[i].type == "1"){
                         Glide.with(this@CheckOutActivity)
