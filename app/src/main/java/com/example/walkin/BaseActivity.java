@@ -23,7 +23,7 @@ public abstract class BaseActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindService();
-        Util.Companion.setActivityContext(this);
+        Util.Companion.setContext(this);
     }
 
     protected void bindService() {
@@ -42,13 +42,6 @@ public abstract class BaseActivity extends Activity {
         intent.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
         bindService(intent, conn2, Context.BIND_AUTO_CREATE);
     }
-
-//    protected void bindServiceSwipe() {
-//        Intent intent1 = new Intent();
-//        intent1.setPackage("com.centerm.smartposservice");
-//        intent1.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
-//        bindService(intent1, conn1, Context.BIND_AUTO_CREATE);
-//    }
 
     public ServiceConnection conn1 = new ServiceConnection() {
         @Override
