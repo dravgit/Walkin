@@ -1,10 +1,15 @@
 package com.example.walkin.utils
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.example.walkin.R
 import com.example.walkin.app.WalkinApplication
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.WriterException
+import com.google.zxing.common.BitMatrix
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +46,27 @@ class Util() {
             val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH)
             cal.time = sdf.parse(date)
             return cal
+        }
+
+        @Throws(WriterException::class)
+        fun createImageFromQRCode(message: String?): Bitmap? {
+            var bitMatrix: BitMatrix? = null
+            bitMatrix = MultiFormatWriter().encode(message, BarcodeFormat.QR_CODE, 180, 180)
+            val width = bitMatrix.width
+            val height = bitMatrix.height
+            val pixels = IntArray(width * height)
+            for (i in 0 until height) {
+                for (j in 0 until width) {
+                    if (bitMatrix[j, i]) {
+                        pixels[i * width + j] = -0x1000000
+                    } else {
+                        pixels[i * width + j] = -0x1
+                    }
+                }
+            }
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+            return bitmap
         }
     }
 }
