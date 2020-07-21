@@ -55,20 +55,24 @@ class MainActivity : BaseActivity() {
         if (userName.isEmpty() || userPassword.isEmpty()) {
             Toast.makeText(this@MainActivity, "username and password is not empty", Toast.LENGTH_LONG).show()
         } else {
-            NetworkUtil.login(userName, userPassword, object : NetworkUtil.Companion.NetworkLisener<LoginResponseModel> {
-                override fun onResponse(response: LoginResponseModel) {
-                    checkDevice(PreferenceUtils.getCompanyId())
-                }
-
-                override fun onError(errorModel: WalkInErrorModel) {
-                    Toast.makeText(this@MainActivity, errorModel.msg, Toast.LENGTH_LONG).show()
-                }
-
-                override fun onExpired() {
-
-                }
-            }, LoginResponseModel::class.java)
+            reLogin(userName,userPassword)
         }
+    }
+
+    fun reLogin(userName: String,userPassword: String){
+        NetworkUtil.login(userName, userPassword, object : NetworkUtil.Companion.NetworkLisener<LoginResponseModel> {
+            override fun onResponse(response: LoginResponseModel) {
+                checkDevice(PreferenceUtils.getCompanyId())
+            }
+
+            override fun onError(errorModel: WalkInErrorModel) {
+                Toast.makeText(this@MainActivity, errorModel.msg, Toast.LENGTH_LONG).show()
+            }
+
+            override fun onExpired() {
+                reLogin(userName,userPassword)
+            }
+        }, LoginResponseModel::class.java)
     }
 
     fun checkDevice(companyId: String) {
