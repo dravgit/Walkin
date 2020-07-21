@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,20 +39,30 @@ import com.centerm.smartpos.aidl.iccard.AidlICCard;
 import com.centerm.smartpos.aidl.magcard.AidlMagCard;
 import com.centerm.smartpos.aidl.magcard.AidlMagCardListener;
 import com.centerm.smartpos.aidl.magcard.TrackData;
+import com.centerm.smartpos.aidl.printer.AidlPrinter;
+import com.centerm.smartpos.aidl.printer.AidlPrinterStateChangeListener;
+import com.centerm.smartpos.aidl.printer.PrinterParams;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
+import com.centerm.smartpos.constant.DeviceErrorCode;
 import com.centerm.smartpos.util.HexUtil;
 import com.example.walkin.models.CheckInParamModel;
 import com.example.walkin.models.CheckInResponseModel;
-import com.example.walkin.models.LoginResponseModel;
+import com.example.walkin.models.DepartmentModel;
+import com.example.walkin.models.ObjectiveTypeModel;
+import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
+import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
+import com.example.walkin.utils.PreferenceUtils;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -59,7 +71,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class CheckInActivity extends BaseActivity {
-
+    private AidlPrinter printDev = null;
+    private AidlPrinterStateChangeListener callback = new PrinterCallback();
     private static final int CAMERA_PERM_CODE = 101;
     private static final int CAMERA_USER_CODE = 102;
     private static final int CAMERA_CAR_CODE = 103;
@@ -81,7 +94,7 @@ public class CheckInActivity extends BaseActivity {
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
     private ProgressDialog mLoading;
     private MediaPlayer mediaPlayer;
-    private EditText tVnameTH, tVidcard;
+    private EditText edtnameTH, edtidcard, edtCar, edtTemp;
     private List<String> months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     private List<String> months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.");
     private ImageView iVphoto;
@@ -100,12 +113,13 @@ public class CheckInActivity extends BaseActivity {
         mLoading.setCanceledOnTouchOutside(false);
         mLoading.setMessage("Reading...");
         mediaPlayer = MediaPlayer.create(this, R.raw.beep_sound);
-        tVnameTH = findViewById(R.id.tVnameTH);
-        tVidcard = findViewById(R.id.tVidcard);
+        edtnameTH = findViewById(R.id.edtnameTH);
+        edtidcard = findViewById(R.id.edtidcard);
         iVphoto = findViewById(R.id.iVphoto);
         Log.i("C", "Create2");
         bindService();
-        bindServiceSwipe();
+        edtCar = (EditText) findViewById(R.id.edtCar);
+        edtTemp = (EditText) findViewById(R.id.edtTemp);
         capUser = (ImageButton) findViewById(R.id.user);
         capCar = (ImageButton) findViewById(R.id.car);
         capCard = (ImageButton) findViewById(R.id.card);
@@ -113,8 +127,8 @@ public class CheckInActivity extends BaseActivity {
         okCheckin = (Button) findViewById(R.id.okCheckin);
         dropdownDepartment = (Spinner) findViewById(R.id.dropdownDepartment);
         dropdownObjective = (Spinner) findViewById(R.id.dropdownObjective);
-        ArrayAdapter<String> adapterDepartment = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, department);
-        ArrayAdapter<String> adapterObjective = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, objective);
+        ArrayAdapter<DepartmentModel> adapterDepartment = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getDepartment());
+        ArrayAdapter<ObjectiveTypeModel> adapterObjective = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getObjectiveType());
         dropdownDepartment.setAdapter(adapterDepartment);
         dropdownObjective.setAdapter(adapterObjective);
         capUser.setOnClickListener(new View.OnClickListener() {
@@ -145,13 +159,112 @@ public class CheckInActivity extends BaseActivity {
         okCheckin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String name,department_id,objective_id,images;
+                JSONArray JSONArray = fileImg();
+                int selectedItemOfDepartment = dropdownDepartment.getSelectedItemPosition();
+                DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
+                int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
+                ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
+                if(edtnameTH != null && JSONArray.length() != 0){
+                    name = edtnameTH.getText().toString();
+                    department_id = actualPositionOfDepartment.getID();
+                    objective_id = actualPositionOfObjective.getID();
+                    images = fileImg().toString();
+                    CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
+                    Log.e("CHECK",param.toString());
+                    param.idcard(edtidcard.getText().toString())
+                            .vehicleId(edtCar.getText().toString())
+                            .temperature(edtTemp.getText().toString());
+                    CheckInParamModel data = param.build();
+                    Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
+                    CheckInActivity.this.startActivity(intent);
+                    NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
+                        @Override
+                        public void onExpired() {
+                            okCheckin.callOnClick();
+                        }
+                        @Override
+                        public void onError(@NotNull WalkInErrorModel errorModel) {
+                            Log.e("CHECK","Error.");
+                        }
 
-//                NetworkUtil.Companion.checkIn();
-//                Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
-//                CheckInActivity.this.startActivity(intent);
-                // call api
+                        @Override
+                        public void onResponse(CheckInResponseModel response) {
+                            CheckInResponseModel data = response;
+                            print(data);
+                        }
+                    }, CheckInResponseModel.class);
+                }else{
+                    Toast.makeText(getApplicationContext(),"กรุณากรอกข้อมูลให้ครบ",Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+    public boolean isJSONValid(String JSON) {
+        try {
+            new JSONObject(JSON);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                new JSONArray(JSON);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private JSONArray fileImg(){
+        JSONArray jsonArray = new JSONArray();
+        if(iVphoto.getDrawable() != null){
+            String imgIc = encodeImg(iVphoto);
+            JSONObject JObject = addImg(4,imgIc);
+            jsonArray.put(JObject);
+        }
+        if(capUser.getDrawable() != null){
+            String imgIc = encodeImg(capUser);
+            JSONObject JObject = addImg(1,imgIc);
+            jsonArray.put(JObject);
+        }
+        if(capCar.getDrawable() != null){
+            String imgIc = encodeImg(capCar);
+            JSONObject JObject = addImg(2,imgIc);
+            jsonArray.put(JObject);
+        }
+        if(capCard.getDrawable() != null){
+            String imgIc = encodeImg(capCard);
+            JSONObject JObject = addImg(3,imgIc);
+            jsonArray.put(JObject);
+        }
+        return jsonArray;
+    }
+
+    private JSONObject addImg(int type,String base64){
+        JSONObject img = new JSONObject();
+        try {
+            img.put("file", base64);
+            img.put("type", type);
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return img;
+    }
+
+    private String encodeImg(ImageView type) {
+        String encoded = "";
+        type.invalidate();
+        BitmapDrawable drawable = (BitmapDrawable) type.getDrawable();
+        if(drawable != null){
+            Bitmap bitmap = drawable.getBitmap();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream .toByteArray();
+            encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        }
+        return encoded;
     }
 
     private void cameraUser() {
@@ -223,15 +336,44 @@ public class CheckInActivity extends BaseActivity {
         intent.setPackage("com.centerm.centermposoverseaservice");
         intent.setAction("com.centerm.CentermPosOverseaService.MANAGER_SERVICE");
         bindService(intent, conn, Context.BIND_AUTO_CREATE);
-    }
 
-    @Override
-    protected void bindServiceSwipe() {
         Intent intent1 = new Intent();
         intent1.setPackage("com.centerm.smartposservice");
         intent1.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
         bindService(intent1, conn1, Context.BIND_AUTO_CREATE);
+
+        intent = new Intent();
+        intent.setPackage("com.centerm.smartposservice");
+        intent.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
+        bindService(intent, conn2, Context.BIND_AUTO_CREATE);
     }
+
+    @Override
+    protected void onPrintDeviceConnected(AidlDeviceManager manager) {
+        try {
+            printDev = AidlPrinter.Stub.asInterface(manager
+                    .getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PrinterCallback extends AidlPrinterStateChangeListener.Stub {
+
+        @Override
+        public void onPrintError(int arg0) throws RemoteException {
+            // showMessage("打印机异常" + arg0, Color.RED);
+        }
+
+        @Override
+        public void onPrintFinish() throws RemoteException {
+        }
+
+        @Override
+        public void onPrintOutOfPaper() throws RemoteException {
+        }
+    }
+
 
 
     @Override
@@ -276,6 +418,11 @@ public class CheckInActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void showMessage(String str, int black) {
+        this.showMessage(str, Color.BLACK);
     }
 
 
@@ -374,14 +521,14 @@ public class CheckInActivity extends BaseActivity {
                     String thName = jObject.getString("ThaiName");
                     String regex = "(#)+";
                     String output = thName.replaceAll(regex, " ");
-                    tVnameTH.setText(output);
+                    edtnameTH.setText(output);
                     String id_card = jObject.getString("CitizenId");
                     id_card = id_card.charAt(0) + "-" + id_card.charAt(1) + id_card.charAt(2) +
                             id_card.charAt(3) + id_card.charAt(4) + "-" + id_card.charAt(5) +
                             id_card.charAt(6) + id_card.charAt(7) + id_card.charAt(8) + id_card.charAt(9) +
                             "-" + id_card.charAt(10) + id_card.charAt(11) + "-" + id_card.charAt(12);
                     id_card = id_card.substring(0, 11) + "X-XX-X";
-                    tVidcard.setText(id_card);
+                    edtidcard.setText(id_card);
                     Toast.makeText(CheckInActivity.this,
                             "time running is " + second + "s", Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
@@ -577,9 +724,9 @@ public class CheckInActivity extends BaseActivity {
     }
 
     private void c() {
-        tVidcard.setText("");
-        tVnameTH.setText("");
-        tVidcard.setText("");
+        edtidcard.setText("");
+        edtnameTH.setText("");
+        edtidcard.setText("");
         iVphoto.setImageBitmap(null);
         iVphoto.destroyDrawingCache();
     }
@@ -617,7 +764,7 @@ public class CheckInActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tVnameTH.setText("");
+                        edtnameTH.setText("");
                     }
                 });
             }
@@ -651,7 +798,7 @@ public class CheckInActivity extends BaseActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    tVnameTH.setText(_xname[2] + " " + _xname[1] + " " + _xname[0]);
+                                    edtnameTH.setText(_xname[2] + " " + _xname[1] + " " + _xname[0]);
                                 }
                             });
                         }
@@ -684,5 +831,77 @@ public class CheckInActivity extends BaseActivity {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
 
         return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private void print(CheckInResponseModel data) {
+        try {
+            List<PrinterParams> textList = new ArrayList<PrinterParams>();
+            PrinterParams printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setText("CHECK-IN");
+            printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setText("CODE : " + data.getContact_code());
+            printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ชื่อ-นามสกุล : " + data.getFullname());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(20);
+            printerParams.setText("____________________________");
+            textList.add(printerParams);
+
+            printDev.printDatas(textList, callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

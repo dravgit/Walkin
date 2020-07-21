@@ -28,18 +28,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".TotalCheckInActivity">
-
-        </activity>
-        <activity android:name=".TotalCheckOutActivity">
-
-        </activity>
-        <activity android:name=".TotalRemainActivity">
-
-        </activity>
-        <activity android:name=".TotalVisitorActivity">
-
-        </activity>
+        <activity android:name=".TotalCheckInActivity" />
+        <activity android:name=".TotalCheckOutActivity" />
+        <activity android:name=".TotalRemainActivity" />
+        <activity android:name=".TotalVisitorActivity" />
     </application>
 
 </manifest>
