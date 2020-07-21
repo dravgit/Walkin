@@ -24,7 +24,7 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         bindService();
         bindServiceSwipe();
-        Util.Companion.setActivityContext(this);
+        Util.Companion.setContext(this);
     }
 
     protected void bindService() {
