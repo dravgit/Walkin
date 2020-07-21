@@ -50,10 +50,12 @@ import com.example.walkin.models.CheckInParamModel;
 import com.example.walkin.models.CheckInResponseModel;
 import com.example.walkin.models.DepartmentModel;
 import com.example.walkin.models.ObjectiveTypeModel;
+import com.example.walkin.models.SignatureModel;
 import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
 import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
 import com.example.walkin.utils.PreferenceUtils;
+import com.example.walkin.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -835,6 +837,9 @@ public class CheckInActivity extends BaseActivity {
 
     private void print(CheckInResponseModel data) {
         try {
+            Bitmap bitmap = Util.Companion.createImageFromQRCode(data.getContact_code());
+            List<SignatureModel> signature = PreferenceUtils.getSignature();
+
             List<PrinterParams> textList = new ArrayList<PrinterParams>();
             PrinterParams printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
@@ -843,9 +848,10 @@ public class CheckInActivity extends BaseActivity {
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setText("CODE : " + data.getContact_code());
-            printerParams.setTextSize(20);
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
+            printerParams.setLineHeight(200);
+            printerParams.setBitmap(bitmap);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
@@ -872,31 +878,19 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
             textList.add(printerParams);
 
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
+            for (int i = 0;i<signature.size();i++){
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setTextSize(20);
+                printerParams.setText("\n\n\n\n\n____________________________");
+                textList.add(printerParams);
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setLineHeight(30);
+                printerParams.setTextSize(20);
+                printerParams.setText(signature.get(i).getname());
+                textList.add(printerParams);
+            }
 
             printDev.printDatas(textList, callback);
         } catch (Exception e) {

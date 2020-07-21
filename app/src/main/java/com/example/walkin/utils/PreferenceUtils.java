@@ -124,9 +124,9 @@ public class PreferenceUtils {
         editor.putString(PREFERENCE_KEY_SIGNATURE, signature).apply();
     }
 
-    public static SignatureModel getSignature() {
+    public static List<SignatureModel> getSignature() {
         String signature = getSharedPreferences().getString(PREFERENCE_KEY_SIGNATURE, "");
-        return new Gson().fromJson(signature, SignatureModel.class);
+        return new Gson().fromJson(signature, new TypeToken<List<SignatureModel>>() {}.getType());
     }
 
     public static void setDepartment(String department) {
