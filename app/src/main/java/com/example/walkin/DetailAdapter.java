@@ -1,6 +1,10 @@
 package com.example.walkin;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +17,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.centerm.smartpos.aidl.printer.AidlPrinter;
+import com.centerm.smartpos.aidl.printer.AidlPrinterStateChangeListener;
+import com.centerm.smartpos.aidl.printer.PrinterParams;
+import com.example.walkin.models.CheckInResponseModel;
 import com.example.walkin.models.ImageModel;
 import com.example.walkin.models.PartialVisitorResponseModel;
+import com.example.walkin.models.SignatureModel;
+import com.example.walkin.models.VisitorResponseModel;
+import com.example.walkin.models.WalkInErrorModel;
+import com.example.walkin.utils.NetworkUtil;
+import com.example.walkin.utils.PreferenceUtils;
 import com.example.walkin.utils.Util;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +39,8 @@ import java.util.List;
 public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder>{
     private List<PartialVisitorResponseModel> listdata = new ArrayList<>();
     Context context;
+    private AidlPrinter printDev = null;
+
     // RecyclerView recyclerView;
     public DetailAdapter(Context context) {
         this.context = context;
@@ -32,6 +49,10 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
     public void setListdata(List<PartialVisitorResponseModel> listdata) {
         this.listdata = listdata;
         notifyDataSetChanged();
+    }
+
+    public void setPrinter(AidlPrinter printDev) {
+        this.printDev = printDev;
     }
 
     @Override
@@ -56,7 +77,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 @Override
                 public void onClick(View view) {
                     String code = view.getTag().toString();
-
+                    search(code);
                 }
             });
         } else {
@@ -96,6 +117,104 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         });
     }
 
+    private void search(final String code) {
+        NetworkUtil.Companion.searchByOrder(code, new NetworkUtil.Companion.NetworkLisener<VisitorResponseModel>() {
+            @Override
+            public void onResponse(VisitorResponseModel response) {
+                print(response);
+            }
+
+            @Override
+            public void onError(@NotNull WalkInErrorModel errorModel) {
+                Log.e("error", errorModel.getMsg());
+            }
+
+            @Override
+            public void onExpired() {
+                search(code);
+            }
+        }, VisitorResponseModel.class);
+    }
+
+    private void print(VisitorResponseModel data) {
+        try {
+            Bitmap bitmap = Util.Companion.createImageFromQRCode(data.getContact_code());
+            List<SignatureModel> signature = PreferenceUtils.getSignature();
+
+            List<PrinterParams> textList = new ArrayList<PrinterParams>();
+            PrinterParams printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setText("CHECK-IN");
+            printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ชื่อ-นามสกุล : " + data.name());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
+            printerParams.setLineHeight(200);
+            printerParams.setBitmap(bitmap);
+            textList.add(printerParams);
+
+
+            for (int i = 0;i<signature.size();i++){
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setTextSize(20);
+                printerParams.setText("\n\n\n\n\n____________________________");
+                textList.add(printerParams);
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setLineHeight(30);
+                printerParams.setTextSize(20);
+                printerParams.setText(signature.get(i).getname()+ "\n\n\n\n\n");
+                textList.add(printerParams);
+            }
+
+            printDev.printDatas(textList, new AidlPrinterStateChangeListener.Stub() {
+                @Override
+                public void onPrintFinish() throws RemoteException {
+                    Log.e("panya", "onPrintFinish");
+                }
+
+                @Override
+                public void onPrintError(int i) throws RemoteException {
+                    Log.e("panya", "onPrintError");
+                }
+
+                @Override
+                public void onPrintOutOfPaper() throws RemoteException {
+                    Log.e("panya", "onPrintOutOfPaper");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     public int getItemCount() {

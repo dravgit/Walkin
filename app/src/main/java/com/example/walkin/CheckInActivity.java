@@ -903,7 +903,7 @@ public class CheckInActivity extends BaseActivity {
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
                 printerParams.setLineHeight(30);
                 printerParams.setTextSize(20);
-                printerParams.setText(signature.get(i).getname());
+                printerParams.setText(signature.get(i).getname()+ "\n\n\n\n\n\n");
                 textList.add(printerParams);
             }
 
