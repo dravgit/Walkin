@@ -50,10 +50,12 @@ import com.example.walkin.models.CheckInParamModel;
 import com.example.walkin.models.CheckInResponseModel;
 import com.example.walkin.models.DepartmentModel;
 import com.example.walkin.models.ObjectiveTypeModel;
+import com.example.walkin.models.SignatureModel;
 import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
 import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
 import com.example.walkin.utils.PreferenceUtils;
+import com.example.walkin.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -78,7 +80,7 @@ public class CheckInActivity extends BaseActivity {
     private static final int CAMERA_CAR_CODE = 103;
     private static final int CAMERA_CARD_CODE = 104;
     private AidlMagCard magCard = null;
-    private TextView expdate;
+    private TextView expdate, tVbirth, tVaddress, tVgender;
     private TextView name;
     private TextView bdate;
     private TextView xid;
@@ -118,6 +120,9 @@ public class CheckInActivity extends BaseActivity {
         iVphoto = findViewById(R.id.iVphoto);
         Log.i("C", "Create2");
         bindService();
+        tVaddress = (TextView) findViewById(R.id.tVaddress);
+        tVgender = (TextView) findViewById(R.id.tVgender);
+        tVbirth = (TextView) findViewById(R.id.tVbirth);
         edtCar = (EditText) findViewById(R.id.edtCar);
         edtTemp = (EditText) findViewById(R.id.edtTemp);
         capUser = (ImageButton) findViewById(R.id.user);
@@ -174,8 +179,12 @@ public class CheckInActivity extends BaseActivity {
                     Log.e("CHECK",param.toString());
                     param.idcard(edtidcard.getText().toString())
                             .vehicleId(edtCar.getText().toString())
-                            .temperature(edtTemp.getText().toString());
+                            .temperature(edtTemp.getText().toString())
+                            .gender(tVgender.getText().toString())
+                            .address(tVaddress.getText().toString())
+                            .birthDate(tVbirth.getText().toString());
                     CheckInParamModel data = param.build();
+                    Log.e("DATA",data.toString());
                     Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
                     CheckInActivity.this.startActivity(intent);
                     NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
@@ -529,6 +538,15 @@ public class CheckInActivity extends BaseActivity {
                             "-" + id_card.charAt(10) + id_card.charAt(11) + "-" + id_card.charAt(12);
                     id_card = id_card.substring(0, 11) + "X-XX-X";
                     edtidcard.setText(id_card);
+                    String gender = jObject.getString("Gender");
+                    String address = jObject.getString("Address");
+                    String birth = jObject.getString("BirthDate");
+                    Log.e("Address",address);
+                    Log.e("gender",gender);
+                    Log.e("birth",birth);
+                    tVaddress.setText(address);
+                    tVgender.setText(gender);
+                    tVbirth.setText(birth);
                     Toast.makeText(CheckInActivity.this,
                             "time running is " + second + "s", Toast.LENGTH_LONG).show();
                 } catch (JSONException e) {
@@ -670,7 +688,6 @@ public class CheckInActivity extends BaseActivity {
                                         aidlIdCardTha.searchIDCard(6000, new AidlIdCardThaListener.Stub() {
                                             @Override
                                             public void onFindIDCard(final ThiaIdInfoBeen been) throws RemoteException {
-
                                                 Log.e("DATA",been.getLaserNumber());
                                                 String s = been.toJSONString();
                                                 Log.i(TAG, s);
@@ -835,6 +852,9 @@ public class CheckInActivity extends BaseActivity {
 
     private void print(CheckInResponseModel data) {
         try {
+            Bitmap bitmap = Util.Companion.createImageFromQRCode(data.getContact_code());
+            List<SignatureModel> signature = PreferenceUtils.getSignature();
+
             List<PrinterParams> textList = new ArrayList<PrinterParams>();
             PrinterParams printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
@@ -843,9 +863,10 @@ public class CheckInActivity extends BaseActivity {
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setText("CODE : " + data.getContact_code());
-            printerParams.setTextSize(20);
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
+            printerParams.setLineHeight(200);
+            printerParams.setBitmap(bitmap);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
@@ -872,31 +893,19 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
             textList.add(printerParams);
 
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setTextSize(20);
-            printerParams.setText("____________________________");
-            textList.add(printerParams);
+            for (int i = 0;i<signature.size();i++){
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setTextSize(20);
+                printerParams.setText("\n\n\n\n\n____________________________");
+                textList.add(printerParams);
+                printerParams = new PrinterParams();
+                printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+                printerParams.setLineHeight(30);
+                printerParams.setTextSize(20);
+                printerParams.setText(signature.get(i).getname());
+                textList.add(printerParams);
+            }
 
             printDev.printDatas(textList, callback);
         } catch (Exception e) {

@@ -51,7 +51,7 @@ class Util() {
         @Throws(WriterException::class)
         fun createImageFromQRCode(message: String?): Bitmap? {
             var bitMatrix: BitMatrix? = null
-            bitMatrix = MultiFormatWriter().encode(message, BarcodeFormat.QR_CODE, 180, 180)
+            bitMatrix = MultiFormatWriter().encode(message, BarcodeFormat.QR_CODE, 240, 240)
             val width = bitMatrix.width
             val height = bitMatrix.height
             val pixels = IntArray(width * height)
