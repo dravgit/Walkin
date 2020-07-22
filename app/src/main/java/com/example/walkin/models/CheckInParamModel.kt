@@ -1,19 +1,28 @@
 package com.example.walkin.models
 
-class CheckInParamModel private constructor(val idcard: String?, val name: String, val vehicleId: String?, val temperature: String?,
-                                            val departmentId: String, val objectiveId: String, val images: String) {
-    data class Builder(val name: String, val department_id: String, val objective_id: String, val images: String) {
+class CheckInParamModel private constructor(val idcard: String?, val name: String, val vehicleId: String, val temperature: String,
+                                            val departmentId: String, val objectiveId: String, val images: String, val gender: String, val address: String, val birthDate: String) {
+    data class Builder(val name: String, val departmentId: String, val objectiveId: String, val images: String) {
         var idcard: String? = null
             private set
-        var vehicle_id: String? = null
+        var vehicleId: String = ""
             private set
-        var temperature: String? = null
+        var temperature: String = ""
+            private set
+        var gender: String = ""
+            private set
+        var address: String = ""
+            private set
+        var birthDate: String = ""
             private set
 
         fun idcard(idcard: String) = apply { this.idcard = idcard }
-        fun vehicleId(vehicleId: String) = apply { this.vehicle_id = vehicleId }
+        fun vehicleId(vehicleId: String) = apply { this.vehicleId = vehicleId }
         fun temperature(temperature: String) = apply { this.temperature = temperature }
+        fun gender(gender: String) = apply { this.gender = gender }
+        fun address(address: String) = apply { this.address = address }
+        fun birthDate(birthDate: String) = apply { this.birthDate = birthDate }
 
-        fun build() = CheckInParamModel(idcard, name, vehicle_id, temperature, department_id, objective_id, images)
+        fun build() = CheckInParamModel(idcard, name, vehicleId, temperature, departmentId, objectiveId, images, gender, address, birthDate)
     }
 }
