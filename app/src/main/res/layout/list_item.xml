@@ -77,10 +77,14 @@
     </TableLayout>
     <Button
         android:id="@+id/btnReprint"
-        android:background="#ffffff"
+        android:textColor="#ffffff"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tl_container"
+        android:background="@drawable/reprint"
+        android:layout_gravity="center_horizontal"
+        android:text="พิมพ์ใบเสร็จอีกครั้ง"
+        android:drawableTop="@drawable/iconreprint"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="16dp"
