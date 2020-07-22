@@ -51,6 +51,14 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         if (detailListData.getCheckout_time().isEmpty()) {
             holder.tvOut.setText(context.getString(R.string.stay_in));
             holder.btnReprint.setVisibility(View.VISIBLE);
+            holder.btnReprint.setTag(detailListData.getContact_code());
+            holder.btnReprint.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String code = view.getTag().toString();
+
+                }
+            });
         } else {
             holder.btnReprint.setVisibility(View.GONE);
             holder.tvOut.setText(Util.Companion.toDateFormat(detailListData.getCheckout_time()));
