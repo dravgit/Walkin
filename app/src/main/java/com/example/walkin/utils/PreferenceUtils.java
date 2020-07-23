@@ -2,7 +2,23 @@ package com.example.walkin.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Environment;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.walkin.R;
+import com.example.walkin.app.WalkinApplication;
 import com.example.walkin.models.DepartmentModel;
 import com.example.walkin.models.LoginResponseModel;
 import com.example.walkin.models.ObjectiveTypeModel;
@@ -10,6 +26,10 @@ import com.example.walkin.models.SignatureModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 public class PreferenceUtils {
@@ -29,6 +49,8 @@ public class PreferenceUtils {
     private static final String PREFERENCE_KEY_SIGNATURE = "signature";
     private static final String PREFERENCE_KEY_DEPARTMENT = "department";
     private static final String PREFERENCE_KEY_OBJECTIVE_TYPE = "objective_type";
+    private static final String PREFERENCE_KEY_COMPANY_LOGO = "company_logo";
+
 
     private static Context mAppContext;
 
@@ -43,6 +65,34 @@ public class PreferenceUtils {
     private static SharedPreferences getSharedPreferences() {
         return mAppContext.getSharedPreferences("walkin", Context.MODE_PRIVATE);
     }
+
+    public static void setUriLogo(String companyLogoUrl) {
+
+        Glide.with(WalkinApplication.appContext)
+                .load(companyLogoUrl)
+                .into(new CustomTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        String path = saveImage(((BitmapDrawable)resource).getBitmap());
+                        SharedPreferences.Editor editor = getSharedPreferences().edit();
+                        editor.putString(PREFERENCE_KEY_COMPANY_LOGO, path).apply();
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
+    }
+
+    public static Bitmap getBitmapLogo() {
+        String path = getSharedPreferences().getString(PREFERENCE_KEY_COMPANY_LOGO, "");
+        if (path.isEmpty()) {
+            return BitmapFactory.decodeResource(WalkinApplication.appContext.getResources(), R.drawable.print_ogo);
+        }
+        return getBitmap(path);
+    }
+
 
     public static void setUserId(String userId) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
@@ -74,6 +124,48 @@ public class PreferenceUtils {
     public static void setCompanyName(String companyName) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
         editor.putString(PREFERENCE_KEY_COMPANY_NAME, companyName).apply();
+    }
+
+    private static String saveImage(Bitmap resource) {
+
+        String savedImagePath = "";
+        String imageFileName =  "company_logo" + ".jpg";
+
+
+        final File storageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                "/walkin");
+
+        boolean success = true;
+        if(!storageDir.exists()){
+            success = storageDir.mkdirs();
+        }
+
+        if(success){
+            File imageFile = new File(storageDir, imageFileName);
+            savedImagePath = imageFile.getAbsolutePath();
+            try {
+                OutputStream fOut = new FileOutputStream(imageFile);
+                resource.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                fOut.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        return savedImagePath;
+    }
+
+    private static Bitmap getBitmap(String path) {
+        Bitmap bitmap=null;
+        try {
+            File f= new File(path);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bitmap ;
     }
 
     public static String getCompanyName() {

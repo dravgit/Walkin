@@ -5,13 +5,26 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.models.PartialVisitorResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 
 
-class TotalCheckOutActivity : AppCompatActivity() {
+class TotalCheckOutActivity : BaseActivity() {
+    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+    }
+
+    override fun showMessage(str: String?, black: Int) {
+    }
+
     var statusCode = true
     lateinit var adapter : DetailAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +49,7 @@ class TotalCheckOutActivity : AppCompatActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
-
+                checkError(errorModel)
             }
 
             override fun onExpired() {

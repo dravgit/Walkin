@@ -144,32 +144,39 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             List<PrinterParams> textList = new ArrayList<PrinterParams>();
             PrinterParams printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setText("CHECK-IN");
+            printerParams.setText("CHECK-IN\n\n");
             printerParams.setTextSize(20);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
+            printerParams.setLineHeight(200);
+            printerParams.setBitmap(PreferenceUtils.getBitmapLogo());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(20);
-            printerParams.setText("ชื่อ-นามสกุล : " + data.name());
+            printerParams.setText("\n\nชื่อ-นามสกุล : " + data.name());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(20);
-            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(20);
-            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(20);
-            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
