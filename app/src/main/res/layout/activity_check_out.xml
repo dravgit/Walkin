@@ -188,6 +188,24 @@
         app:layout_constraintLeft_toRightOf="@id/headtVcheckintime"
         />
 
+
+    <TextView
+        android:id="@+id/headtVcheckouttime"
+        android:text="วันเวลาที่ออก : "
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/headtVcheckintime"
+        app:layout_constraintLeft_toLeftOf="@id/imgVperson"
+        />
+    <TextView
+        android:id="@+id/tVcheckouttime"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/headtVcheckintime"
+        app:layout_constraintLeft_toRightOf="@id/headtVcheckouttime"
+        />
     <TextView
         android:id="@+id/tVcode"
         android:layout_marginTop="15dp"
