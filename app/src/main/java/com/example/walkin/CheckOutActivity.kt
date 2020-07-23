@@ -6,13 +6,25 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.models.CheckOutResponseModel
 import com.example.walkin.models.VisitorResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_check_out.*
 
-class CheckOutActivity : AppCompatActivity() {
+class CheckOutActivity : BaseActivity() {
+    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+    }
+
+    override fun showMessage(str: String?, black: Int) {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val REQUEST_CODE = 0
@@ -27,10 +39,12 @@ class CheckOutActivity : AppCompatActivity() {
                 NetworkUtil.checkOut(tVcode.getText().toString(),object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel>{
                     override fun onResponse(response: CheckOutResponseModel) {
                         Log.e("Status","SUCCESS")
+                        this@CheckOutActivity.finish()
                     }
 
                     override fun onError(errorModel: WalkInErrorModel) {
                         Log.e("Status","ERROR")
+                        checkError(errorModel)
                     }
 
                     override fun onExpired() {
@@ -38,8 +52,6 @@ class CheckOutActivity : AppCompatActivity() {
                     }
 
                 }, CheckOutResponseModel::class.java)
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
             }
         }
 
@@ -99,6 +111,7 @@ class CheckOutActivity : AppCompatActivity() {
 
             override fun onError(errorModel: WalkInErrorModel) {
                 Log.e("CHECK",errorModel.toString())
+                checkError(errorModel)
             }
 
             override fun onExpired() {
