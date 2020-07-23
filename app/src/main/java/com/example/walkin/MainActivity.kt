@@ -8,12 +8,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
-import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.models.LoginResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import com.example.walkin.utils.PreferenceUtils
-import com.example.walkin.utils.Util
+import com.example.walkin.utils.Util.Companion.setContext
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 
@@ -32,6 +31,7 @@ class MainActivity : AppCompatActivity() {
             this@MainActivity.startActivity(intent)
             this@MainActivity.finish()
         }
+        setContext(this)
     }
 
     fun login() {
