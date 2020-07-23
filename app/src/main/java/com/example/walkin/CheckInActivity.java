@@ -195,6 +195,7 @@ public class CheckInActivity extends BaseActivity {
                         @Override
                         public void onError(@NotNull WalkInErrorModel errorModel) {
                             Log.e("CHECK","Error.");
+                            checkError(errorModel);
                         }
 
                         @Override
@@ -891,6 +892,13 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(20);
             printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
+            printerParams.setLineHeight(200);
+            printerParams.setBitmap(bitmap);
             textList.add(printerParams);
 
             for (int i = 0;i<signature.size();i++){

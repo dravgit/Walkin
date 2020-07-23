@@ -5,6 +5,7 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
+import com.bumptech.glide.Glide
 import com.example.walkin.R
 import com.example.walkin.models.*
 import com.google.gson.Gson
@@ -18,6 +19,7 @@ class NetworkUtil {
         private val STATUS_CODE_SUCCESS = 200
         private val STATUS_CODE_COMPANY_NOT_FOUND = 901
         private val STATUS_CODE_SEARIAL_NOT_FOUND = 902
+        val STATUS_CODE_INVALID_PASSWORD = 201
         private val URL_DOMAIN = "http://165.22.250.233"
         private val URL_KACHEN_DOMAIN = "http://165.22.250.233"
         val URL_LOGIN = "$URL_DOMAIN/api/v1/login"

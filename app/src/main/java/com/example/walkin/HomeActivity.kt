@@ -52,7 +52,7 @@ class HomeActivity : BaseActivity() {
     }
 
     override fun showMessage(str: String?, black: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onResume() {
@@ -67,6 +67,7 @@ class HomeActivity : BaseActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
+                checkError(errorModel)
                 Toast.makeText(this@HomeActivity, errorModel.msg, Toast.LENGTH_LONG).show()
             }
 
