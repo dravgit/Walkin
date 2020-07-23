@@ -43,6 +43,7 @@
         android:layout_marginRight="15dp"
         android:hint="Username"
         android:maxLines="1"
+        android:inputType="textVisiblePassword|textNoSuggestions"
         app:layout_constraintTop_toBottomOf="@+id/tVvisitor"
         app:layout_constraintBottom_toTopOf="@+id/tVpassword"
         app:layout_constraintLeft_toLeftOf="parent"

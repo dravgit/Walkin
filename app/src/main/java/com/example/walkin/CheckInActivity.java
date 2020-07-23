@@ -533,11 +533,11 @@ public class CheckInActivity extends BaseActivity {
                     String output = thName.replaceAll(regex, " ");
                     edtnameTH.setText(output);
                     String id_card = jObject.getString("CitizenId");
-                    id_card = id_card.charAt(0) + "-" + id_card.charAt(1) + id_card.charAt(2) +
-                            id_card.charAt(3) + id_card.charAt(4) + "-" + id_card.charAt(5) +
-                            id_card.charAt(6) + id_card.charAt(7) + id_card.charAt(8) + id_card.charAt(9) +
-                            "-" + id_card.charAt(10) + id_card.charAt(11) + "-" + id_card.charAt(12);
-                    id_card = id_card.substring(0, 11) + "X-XX-X";
+//                    id_card = id_card.charAt(0) + "-" + id_card.charAt(1) + id_card.charAt(2) +
+//                            id_card.charAt(3) + id_card.charAt(4) + "-" + id_card.charAt(5) +
+//                            id_card.charAt(6) + id_card.charAt(7) + id_card.charAt(8) + id_card.charAt(9) +
+//                            "-" + id_card.charAt(10) + id_card.charAt(11) + "-" + id_card.charAt(12);
+//                    id_card = id_card.substring(0, 11) + "X-XX-X";
                     edtidcard.setText(id_card);
                     String gender = jObject.getString("Gender");
                     String address = jObject.getString("Address");
@@ -812,7 +812,8 @@ public class CheckInActivity extends BaseActivity {
                             _name = _name.replace("^", "");
                             final String[] _xname = _name.split("\\$");
                             final String[] _second = hextostring(arg0.getSecondTrackData()).substring(6, hextostring(arg0.getSecondTrackData()).length()).split("=");
-                            //final String _encry = hextostring(arg0.getEncryptTrackData());
+                            char[] _x = _second[0].toUpperCase().toCharArray();
+                            edtidcard.setText(_x[0] + "" + _x[1] + _x[2] + _x[3] + _x[4] + "" + _x[5] + _x[6] + _x[7] + _x[8] + _x[9] + "" + _x[10] + _x[11] + "" + _x[12]);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -868,6 +869,12 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
             printerParams.setLineHeight(200);
             printerParams.setBitmap(bitmap);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(20);
+            printerParams.setText("CODE : " + data.getContact_code());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();

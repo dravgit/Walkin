@@ -43,21 +43,26 @@
 
         <RelativeLayout
             android:id="@+id/btnTotalCheckin"
-            android:layout_margin="15dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/border"
+            android:background="@drawable/home"
             >
             <TextView
                 android:text="จำนวนผู้เข้าตึก"
+                android:textSize="18dp"
+                android:layout_marginTop="40dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
                 android:gravity="center"
                 />
             <TextView
                 android:id="@+id/tv_number_in"
                 android:text="00"
+                android:textSize="28dp"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,21 +73,28 @@
 
         <RelativeLayout
             android:id="@+id/btnTotalCheckout"
-            android:layout_margin="15dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/border"
+            android:background="@drawable/home"
             >
                 <TextView
                     android:text="จำนวนผู้ออกจากตึก"
+                    android:textSize="18dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="30dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="30dp"
                     android:gravity="center"
                 />
                 <TextView
                     android:id="@+id/tv_number_out"
                     android:text="00"
+                    android:textSize="28dp"
                     android:textColor="#F48024"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -107,18 +119,22 @@
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/border"
+            android:background="@drawable/home"
             >
             <TextView
                 android:text="จำนวนผู้ที่ยังอยู่ในตึก"
+                android:textSize="18dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="30dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
                 android:gravity="center"
                 />
             <TextView
                 android:id="@+id/tv_number_stay"
                 android:text="00"
+                android:textSize="28dp"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -132,18 +148,22 @@
             android:layout_margin="15dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/border"
+            android:background="@drawable/home"
             >
             <TextView
                 android:text="จำนวนผู้ที่อยู่เกิน 1 วัน"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:textSize="18dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="30dp"
                 android:gravity="center"
                 />
             <TextView
                 android:id="@+id/tv_number_more_one"
                 android:text="00"
+                android:textSize="28dp"
                 android:textColor="#F48024"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
