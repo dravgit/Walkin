@@ -157,8 +157,7 @@ public class CheckInActivity extends BaseActivity {
         cancleCheckin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
-                CheckInActivity.this.startActivity(intent);
+                CheckInActivity.this.finish();
             }
         });
         okCheckin.setOnClickListener(new View.OnClickListener() {
@@ -185,8 +184,6 @@ public class CheckInActivity extends BaseActivity {
                             .birthDate(tVbirth.getText().toString());
                     CheckInParamModel data = param.build();
                     Log.e("DATA",data.toString());
-                    Intent intent = new Intent(CheckInActivity.this, HomeActivity.class);
-                    CheckInActivity.this.startActivity(intent);
                     NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
                         @Override
                         public void onExpired() {
@@ -202,6 +199,7 @@ public class CheckInActivity extends BaseActivity {
                         public void onResponse(CheckInResponseModel response) {
                             CheckInResponseModel data = response;
                             print(data);
+                            CheckInActivity.this.finish();
                         }
                     }, CheckInResponseModel.class);
                 }else{
@@ -863,43 +861,48 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
             printerParams.setLineHeight(200);
-            printerParams.setBitmap(bitmap);
+            printerParams.setBitmap(PreferenceUtils.getBitmapLogo());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("บริษัท : " + PreferenceUtils.getCompanyName());
-            textList.add(printerParams);
-
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
-            printerParams.setText("ชื่อ-นามสกุล : " + data.getFullname());
+            printerParams.setText("\n\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" ", " "));
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setText("ชื่อ-นามสกุล : " + data.getFullname().replace(" ", " "));
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
@@ -907,6 +910,7 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
             printerParams.setLineHeight(200);
             printerParams.setBitmap(bitmap);
+
             textList.add(printerParams);
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);

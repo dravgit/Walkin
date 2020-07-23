@@ -39,6 +39,7 @@ class CheckOutActivity : BaseActivity() {
                 NetworkUtil.checkOut(tVcode.getText().toString(),object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel>{
                     override fun onResponse(response: CheckOutResponseModel) {
                         Log.e("Status","SUCCESS")
+                        this@CheckOutActivity.finish()
                     }
 
                     override fun onError(errorModel: WalkInErrorModel) {
@@ -51,8 +52,6 @@ class CheckOutActivity : BaseActivity() {
                     }
 
                 }, CheckOutResponseModel::class.java)
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
             }
         }
 
