@@ -69,30 +69,28 @@ class CheckOutActivity : AppCompatActivity() {
                 tVobjective.setText(data.objective())
                 tVcheckintime.setText(data.checkin_time())
                 tVcode.setText(data.contact_code)
-                imgVcar.setBackground(null)
-                imgVperson.setBackground(null)
-                for (i in 0..list.size-1)
-                {
-                    if(list[i].type == "1"){
-                        Glide.with(this@CheckOutActivity)
-                                .load(list[i].url)
-                                .placeholder(android.R.color.background_light)
-                                .error(android.R.color.background_light)
-                                .into(imgVperson)
-                    }else if(list[i].type == "4"){
-                        Glide.with(this@CheckOutActivity)
-                                .load(list[i].url)
-                                .placeholder(android.R.color.background_light)
-                                .error(android.R.color.background_light)
-                                .into(imgVperson)
-                    }
-                    if(list[i].type == "2"){
-                        Glide.with(this@CheckOutActivity)
-                                .load(list[i].url)
-                                .placeholder(android.R.color.background_light)
-                                .error(android.R.color.background_light)
-                                .into(imgVcar)
-                    }
+                if(list[0].url != ""){
+                    imgVperson.setBackground(null)
+                    Glide.with(this@CheckOutActivity)
+                            .load(list[0].url)
+                            .placeholder(android.R.color.background_light)
+                            .error(android.R.color.background_light)
+                            .into(imgVperson)
+                }else if(list[3].url != ""){
+                    imgVperson.setBackground(null)
+                    Glide.with(this@CheckOutActivity)
+                            .load(list[3].url)
+                            .placeholder(android.R.color.background_light)
+                            .error(android.R.color.background_light)
+                            .into(imgVperson)
+                }
+                if(list[1].url != ""){
+                    imgVcar.setBackground(null)
+                    Glide.with(this@CheckOutActivity)
+                            .load(list[1].url)
+                            .placeholder(android.R.color.background_light)
+                            .error(android.R.color.background_light)
+                            .into(imgVcar)
                 }
             }
 
