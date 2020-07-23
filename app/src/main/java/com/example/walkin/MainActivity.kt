@@ -12,6 +12,7 @@ import com.example.walkin.models.LoginResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import com.example.walkin.utils.PreferenceUtils
+import com.example.walkin.utils.Util
 import com.example.walkin.utils.Util.Companion.setContext
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
