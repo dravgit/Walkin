@@ -859,11 +859,6 @@ public class CheckInActivity extends BaseActivity {
 
             List<PrinterParams> textList = new ArrayList<PrinterParams>();
             PrinterParams printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-            printerParams.setText("CHECK-IN");
-            printerParams.setTextSize(20);
-            textList.add(printerParams);
-
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
@@ -873,8 +868,8 @@ public class CheckInActivity extends BaseActivity {
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
-            printerParams.setText("CODE : " + data.getContact_code());
+            printerParams.setTextSize(24);
+            printerParams.setText("บริษัท : " + PreferenceUtils.getCompanyName());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
@@ -885,20 +880,26 @@ public class CheckInActivity extends BaseActivity {
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
+            printerParams.setTextSize(24);
             printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
+            printerParams.setTextSize(24);
             printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
+            printerParams.setTextSize(24);
             printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
@@ -907,20 +908,30 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setLineHeight(200);
             printerParams.setBitmap(bitmap);
             textList.add(printerParams);
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(24);
+            printerParams.setText(data.getContact_code());
+            textList.add(printerParams);
 
             for (int i = 0;i<signature.size();i++){
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-                printerParams.setTextSize(20);
+                printerParams.setTextSize(24);
                 printerParams.setText("\n\n\n\n\n____________________________");
                 textList.add(printerParams);
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
-                printerParams.setLineHeight(30);
-                printerParams.setTextSize(20);
-                printerParams.setText(signature.get(i).getname()+ "\n\n\n\n\n\n");
+                printerParams.setTextSize(24);
+                printerParams.setText("\n" + signature.get(i).getname());
                 textList.add(printerParams);
             }
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(24);
+            printerParams.setText("\n\n\n\n\n");
+            textList.add(printerParams);
 
             printDev.printDatas(textList, callback);
         } catch (Exception e) {
