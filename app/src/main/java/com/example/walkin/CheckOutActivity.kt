@@ -42,6 +42,9 @@ class CheckOutActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        val intent = Intent(this, ScanActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
