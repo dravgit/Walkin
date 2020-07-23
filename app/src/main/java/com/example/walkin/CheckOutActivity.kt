@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager
@@ -14,6 +16,8 @@ import com.example.walkin.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_check_out.*
 
 class CheckOutActivity : BaseActivity() {
+
+    var alreadyOut = false
     override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
     }
 
@@ -34,24 +38,31 @@ class CheckOutActivity : BaseActivity() {
             val intent = Intent(this, ScanActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         }
+        cancleCheckout.setOnClickListener{
+            this@CheckOutActivity.finish()
+        }
         okCheckout.setOnClickListener{
-            if(tVcode != null){
-                NetworkUtil.checkOut(tVcode.getText().toString(),object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel>{
-                    override fun onResponse(response: CheckOutResponseModel) {
-                        Log.e("Status","SUCCESS")
-                        this@CheckOutActivity.finish()
-                    }
+            if(tVcode != null) {
+                if (!alreadyOut) {
+                    NetworkUtil.checkOut(tVcode.getText()
+                                             .toString(), object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel> {
+                        override fun onResponse(response: CheckOutResponseModel) {
+                            Log.e("Status", "SUCCESS")
+                            this@CheckOutActivity.finish()
+                        }
 
-                    override fun onError(errorModel: WalkInErrorModel) {
-                        Log.e("Status","ERROR")
-                        checkError(errorModel)
-                    }
+                        override fun onError(errorModel: WalkInErrorModel) {
+                            Log.e("Status", "ERROR")
+                            checkError(errorModel)
+                        }
 
-                    override fun onExpired() {
-                        okCheckout.callOnClick()
-                    }
-
-                }, CheckOutResponseModel::class.java)
+                        override fun onExpired() {
+                            okCheckout.callOnClick()
+                        }
+                    }, CheckOutResponseModel::class.java)
+                } else {
+                    Toast.makeText(this, "ออกไปแล้ว", Toast.LENGTH_LONG).show()
+                }
             }
         }
 
@@ -74,6 +85,7 @@ class CheckOutActivity : BaseActivity() {
         NetworkUtil.searchByOrder(code, object : NetworkUtil.Companion.NetworkLisener<VisitorResponseModel>{
             override fun onResponse(response: VisitorResponseModel) {
                 var data = response
+                alreadyOut = data.status.equals("1")
                 var list = data.images
                 Log.e("LIST",list.toString())
                 tVname.setText(data.name())
@@ -84,6 +96,16 @@ class CheckOutActivity : BaseActivity() {
                 tVobjective.setText(data.objective())
                 tVcheckintime.setText(data.checkin_time())
                 tVcode.setText(data.contact_code)
+                if (alreadyOut) {
+                    okCheckout.visibility = View.GONE
+                    headtVcheckouttime.visibility = View.VISIBLE
+                    tVcheckouttime.setText(data.checkout_time)
+                } else {
+                    okCheckout.visibility = View.VISIBLE
+                    headtVcheckouttime.visibility = View.GONE
+                    tVcheckouttime.setText("")
+
+                }
                 if(list[0].url != ""){
                     imgVperson.setBackground(null)
                     Glide.with(this@CheckOutActivity)

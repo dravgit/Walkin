@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.example.walkin.models.WalkInErrorModel;
 import com.example.walkin.utils.NetworkUtil;
+import com.example.walkin.utils.PreferenceUtils;
 import com.example.walkin.utils.Util;
 
 public abstract class BaseActivity extends Activity {
@@ -30,6 +31,7 @@ public abstract class BaseActivity extends Activity {
 
     public void checkError(WalkInErrorModel walkInErrorModel) {
         if (walkInErrorModel.getError_code().equals(String.valueOf(NetworkUtil.Companion.getSTATUS_CODE_INVALID_PASSWORD()))) {
+            PreferenceUtils.setLoginFail();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();

@@ -246,6 +246,11 @@ public class PreferenceUtils {
         editor.putBoolean(PREFERENCE_KEY_LOGIN_SUCCESS, true).apply();
     }
 
+    public static void setLoginFail() {
+        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        editor.putBoolean(PREFERENCE_KEY_LOGIN_SUCCESS, false).apply();
+    }
+
     public static boolean isLoginSuccess() {
         return getSharedPreferences().getBoolean(PREFERENCE_KEY_LOGIN_SUCCESS, false);
     }
