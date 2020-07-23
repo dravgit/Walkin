@@ -152,47 +152,51 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
 
             List<PrinterParams> textList = new ArrayList<PrinterParams>();
             PrinterParams printerParams = new PrinterParams();
-            printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
             printerParams.setLineHeight(200);
-            printerParams.setBitmap(bitmap);
+            printerParams.setBitmap(PreferenceUtils.getBitmapLogo());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("บริษัท : " + PreferenceUtils.getCompanyName());
-            textList.add(printerParams);
-
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(20);
-            printerParams.setText("ชื่อ-นามสกุล : " + data.getName());
+            printerParams.setText("\n\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" ", " "));
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setText("ชื่อ-นามสกุล : " + data.name().replace(" ", " "));
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type());
+            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();

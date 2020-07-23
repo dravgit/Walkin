@@ -171,10 +171,14 @@ class NetworkUtil {
         }
 
         private fun hideLoadingDialog() {
-            progressdialog?.let {
-                if (it.isShowing) {
-                    it.dismiss()
+            try {
+                progressdialog?.let {
+                    if (it.isShowing) {
+                        it.dismiss()
+                    }
                 }
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
             }
         }
 
@@ -268,9 +272,9 @@ class NetworkUtil {
                                           }
 
                                           override fun onError(errorModel: WalkInErrorModel) {
-                                              showError(it.errorCode)
-                                              val obj = JSONObject().put("error_code", it.errorCode)
-                                                  .put("msg", it.message)
+                                              showError(errorModel.error_code.toInt())
+                                              val obj = JSONObject().put("error_code", errorModel.error_code)
+                                                  .put("msg", errorModel.msg)
                                               val walkInErrorModel = Gson().fromJson(obj.toString(), WalkInErrorModel::class.java)
                                               listener.onError(walkInErrorModel)
                                           }
@@ -308,6 +312,9 @@ class NetworkUtil {
             val signature = data?.optJSONArray("signature")
             val department = data?.optJSONArray("department")
             val objectiveType = data?.optJSONArray("objective_type")
+            val companyLogo = company?.optString("logo")
+
+            PreferenceUtils.setUriLogo(companyLogo)
             PreferenceUtils.setLoginSuccess()
             PreferenceUtils.setToken(token)
             PreferenceUtils.setUserId(userId)

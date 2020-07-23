@@ -58,7 +58,7 @@ class TotalCheckInActivity : BaseActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
-
+                checkError(errorModel)
             }
 
             override fun onExpired() {

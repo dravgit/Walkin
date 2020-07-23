@@ -62,7 +62,7 @@ class TotalVisitorActivity : BaseActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
-
+                checkError(errorModel)
             }
 
             override fun onExpired() {
