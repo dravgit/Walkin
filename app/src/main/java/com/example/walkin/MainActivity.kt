@@ -17,7 +17,6 @@ import com.example.walkin.models.LoginResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
 import com.example.walkin.utils.PreferenceUtils
-import com.example.walkin.utils.Util
 import com.example.walkin.utils.Util.Companion.setContext
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
@@ -32,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         setContext(this)
         btnLogin = findViewById<View>(R.id.btnLogin) as Button
         btnLogin!!.setOnClickListener {
+            it.isEnabled = false
             login()
         }
         if (PreferenceUtils.isLoginSuccess()) {
@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
+                btnLogin?.isEnabled = true
                 Toast.makeText(this@MainActivity, errorModel.msg, Toast.LENGTH_LONG).show()
             }
 
@@ -113,6 +114,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(anError: ANError?) {
+                btnLogin?.isEnabled = true
                 anError?.let {
                     Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG).show()
                 }

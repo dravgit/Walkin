@@ -50,6 +50,8 @@ public class PreferenceUtils {
     private static final String PREFERENCE_KEY_DEPARTMENT = "department";
     private static final String PREFERENCE_KEY_OBJECTIVE_TYPE = "objective_type";
     private static final String PREFERENCE_KEY_COMPANY_LOGO = "company_logo";
+    private static final String PREFERENCE_KEY_COMPANY_NOTE = "company_note";
+
 
 
     private static Context mAppContext;
@@ -93,6 +95,14 @@ public class PreferenceUtils {
         return getBitmap(path);
     }
 
+    public static void setCompanyNote(String note) {
+        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        editor.putString(PREFERENCE_KEY_COMPANY_NOTE, note).apply();
+    }
+
+    public static String getCompanyNote() {
+        return getSharedPreferences().getString(PREFERENCE_KEY_COMPANY_NOTE, "");
+    }
 
     public static void setUserId(String userId) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
