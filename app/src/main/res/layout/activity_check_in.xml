@@ -46,7 +46,7 @@
             />
 
         <EditText
-            android:hint="ชื่อนามสกุล"
+            android:hint="ชื่อนามสกุล (*)"
             android:textSize="16dp"
             android:id="@+id/edtnameTH"
             android:layout_width="210dp"
@@ -61,7 +61,7 @@
             />
 
         <EditText
-            android:hint="หมายเลขบัตร"
+            android:hint="หมายเลขบัตร (*)"
             android:textSize="16dp"
             android:inputType="numberSigned|textNoSuggestions"
             android:id="@+id/edtidcard"
@@ -240,7 +240,7 @@
             />
 
         <EditText
-            android:hint="มาจากบริษัท"
+            android:hint="มาจากบริษัท (*)"
             android:textSize="16dp"
             android:id="@+id/edtfrom"
             android:layout_width="match_parent"

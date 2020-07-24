@@ -178,16 +178,17 @@ public class CheckInActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String name,department_id,objective_id,images;
-                JSONArray JSONArray = fileImg();
+                JSONArray jsonArray = fileImg();
                 int selectedItemOfDepartment = dropdownDepartment.getSelectedItemPosition();
                 DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
                 ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if(edtnameTH != null && edtfrom != null && JSONArray.length() != 0){
+                if(!edtnameTH.toString().isEmpty() && !edtfrom.toString().isEmpty() && !edtidcard.toString().isEmpty() && jsonArray.length() != 0){
                     name = edtnameTH.getText().toString();
                     department_id = actualPositionOfDepartment.getID();
                     objective_id = actualPositionOfObjective.getID();
                     images = fileImg().toString();
+                    Log.e("BASE64",images);
                     CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
                     Log.e("CHECK",param.toString());
                     param.idcard(edtidcard.getText().toString())
@@ -280,7 +281,7 @@ public class CheckInActivity extends BaseActivity {
         String encoded = "";
         type.invalidate();
         BitmapDrawable drawable = (BitmapDrawable) type.getDrawable();
-        if(drawable != null){
+        if(drawable != null && drawable.getBitmap() != null){
             Bitmap bitmap = drawable.getBitmap();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
