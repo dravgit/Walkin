@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.example.walkin.R
 import com.example.walkin.app.WalkinApplication
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
