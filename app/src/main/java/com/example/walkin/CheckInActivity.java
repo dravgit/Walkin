@@ -625,7 +625,12 @@ public class CheckInActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                iVphoto.setImageBitmap(bmp);
+                WatermarkBuilder
+                        .create(CheckInActivity.this, bmp)
+                        .loadWatermarkText(watermarkText)
+                        .setTileMode(true)
+                        .getWatermark()
+                        .setToImageView(iVphoto);
             }
         });
     }
