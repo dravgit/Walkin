@@ -145,6 +145,7 @@ class NetworkUtil {
                 .addBodyParameter("address", param.address)
                 .addBodyParameter("birth_date", param.birthDate)
                 .addBodyParameter("images", param.images)
+                .addBodyParameter("from", param.from)
                 .setTag("checkIn")
                 .setPriority(Priority.HIGH)
                 .build()
