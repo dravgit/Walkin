@@ -56,6 +56,9 @@ import com.example.walkin.utils.NetworkUtil;
 import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
 import com.example.walkin.utils.PreferenceUtils;
 import com.example.walkin.utils.Util;
+import com.watermark.androidwm_light.WatermarkBuilder;
+import com.watermark.androidwm_light.bean.WatermarkPosition;
+import com.watermark.androidwm_light.bean.WatermarkText;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -73,6 +76,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class CheckInActivity extends BaseActivity {
+    private String watermarkTxt = "ใช้สำหรับงาน รปภ.เท่านั้น";
     private AidlPrinter printDev = null;
     private AidlPrinterStateChangeListener callback = new PrinterCallback();
     private static final int CAMERA_PERM_CODE = 101;
@@ -106,6 +110,7 @@ public class CheckInActivity extends BaseActivity {
     private Spinner dropdownDepartment, dropdownObjective;
     String[] department = new String[]{"","1", "2", "three"};
     String[] objective = new String[]{"","4", "5", "five"};
+    WatermarkText watermarkText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,6 +159,14 @@ public class CheckInActivity extends BaseActivity {
                 cameraCard();
             }
         });
+        watermarkText = new WatermarkText(watermarkTxt)
+                .setPositionX(1)
+                .setPositionY(1)
+                .setRotation(40)
+                .setTextAlpha(255)
+                .setTextSize(6)
+                .setTextColor(Color.WHITE)
+                .setTextShadow(0.05f, 2, 2, Color.BLUE);
         cancleCheckin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -309,19 +322,34 @@ public class CheckInActivity extends BaseActivity {
         if(requestCode == CAMERA_USER_CODE){
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
-                capUser.setImageBitmap(image);
+                WatermarkBuilder
+                        .create(this, image)
+                        .loadWatermarkText(watermarkText)
+                        .setTileMode(true)
+                        .getWatermark()
+                        .setToImageView(capUser);
             }
         }
         if(requestCode == CAMERA_CAR_CODE){
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
-                capCar.setImageBitmap(image);
+                WatermarkBuilder
+                        .create(this, image)
+                        .loadWatermarkText(watermarkText)
+                        .setTileMode(true)
+                        .getWatermark()
+                        .setToImageView(capCar);
             }
         }
         if(requestCode == CAMERA_CARD_CODE){
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
-                capCard.setImageBitmap(image);
+                WatermarkBuilder
+                        .create(this, image)
+                        .loadWatermarkText(watermarkText)
+                        .setTileMode(true)
+                        .getWatermark()
+                        .setToImageView(capCard);
             }
         }
     }
