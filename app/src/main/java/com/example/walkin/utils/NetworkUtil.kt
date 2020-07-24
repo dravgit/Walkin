@@ -313,7 +313,9 @@ class NetworkUtil {
             val department = data?.optJSONArray("department")
             val objectiveType = data?.optJSONArray("objective_type")
             val companyLogo = company?.optString("logo")
+            val companyNote = company?.optString("note")
 
+            PreferenceUtils.setCompanyNote(companyNote)
             PreferenceUtils.setUriLogo(companyLogo)
             PreferenceUtils.setLoginSuccess()
             PreferenceUtils.setToken(token)
