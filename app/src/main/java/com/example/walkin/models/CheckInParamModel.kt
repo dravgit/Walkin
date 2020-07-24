@@ -1,7 +1,7 @@
 package com.example.walkin.models
 
 class CheckInParamModel private constructor(val idcard: String?, val name: String, val vehicleId: String, val temperature: String,
-                                            val departmentId: String, val objectiveId: String, val images: String, val gender: String, val address: String, val birthDate: String) {
+                                            val departmentId: String, val objectiveId: String, val images: String, val gender: String, val address: String, val birthDate: String, val from: String) {
     data class Builder(val name: String, val departmentId: String, val objectiveId: String, val images: String) {
         var idcard: String? = null
             private set
@@ -15,6 +15,8 @@ class CheckInParamModel private constructor(val idcard: String?, val name: Strin
             private set
         var birthDate: String = ""
             private set
+        var from: String = ""
+            private set
 
         fun idcard(idcard: String) = apply { this.idcard = idcard }
         fun vehicleId(vehicleId: String) = apply { this.vehicleId = vehicleId }
@@ -22,7 +24,8 @@ class CheckInParamModel private constructor(val idcard: String?, val name: Strin
         fun gender(gender: String) = apply { this.gender = gender }
         fun address(address: String) = apply { this.address = address }
         fun birthDate(birthDate: String) = apply { this.birthDate = birthDate }
+        fun from(from: String) = apply { this.from = birthDate }
 
-        fun build() = CheckInParamModel(idcard, name, vehicleId, temperature, departmentId, objectiveId, images, gender, address, birthDate)
+        fun build() = CheckInParamModel(idcard, name, vehicleId, temperature, departmentId, objectiveId, images, gender, address, birthDate, from)
     }
 }

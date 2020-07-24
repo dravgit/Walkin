@@ -145,6 +145,7 @@ class NetworkUtil {
                 .addBodyParameter("address", param.address)
                 .addBodyParameter("birth_date", param.birthDate)
                 .addBodyParameter("images", param.images)
+                .addBodyParameter("from", param.from)
                 .setTag("checkIn")
                 .setPriority(Priority.HIGH)
                 .build()
@@ -313,7 +314,9 @@ class NetworkUtil {
             val department = data?.optJSONArray("department")
             val objectiveType = data?.optJSONArray("objective_type")
             val companyLogo = company?.optString("logo")
+            val companyNote = company?.optString("note")
 
+            PreferenceUtils.setCompanyNote(companyNote)
             PreferenceUtils.setUriLogo(companyLogo)
             PreferenceUtils.setLoginSuccess()
             PreferenceUtils.setToken(token)
