@@ -183,7 +183,7 @@ public class CheckInActivity extends BaseActivity {
                 DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
                 ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if(!edtnameTH.toString().isEmpty() && !edtfrom.toString().isEmpty() && !edtidcard.toString().isEmpty() && jsonArray.length() != 0){
+                if(!edtnameTH.getText().toString().isEmpty() && !edtfrom.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty() && jsonArray.length() != 0){
                     name = edtnameTH.getText().toString();
                     department_id = actualPositionOfDepartment.getID();
                     objective_id = actualPositionOfObjective.getID();
