@@ -50,10 +50,13 @@ class CheckOutActivity : BaseActivity() {
             this@CheckOutActivity.finish()
         }
         okCheckout.setOnClickListener{
+            var encode = ""
+            if(!tVencode.getText().toString().isEmpty()){
+                encode = tVencode.getText().toString()
+            }
             if(tVcode != null) {
                 if (!alreadyOut) {
-                    NetworkUtil.checkOut(tVcode.getText()
-                                             .toString(), object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel> {
+                    NetworkUtil.checkOut(tVcode.getText().toString(),encode, object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel> {
                         override fun onResponse(response: CheckOutResponseModel) {
                             Log.e("Status", "SUCCESS")
                             this@CheckOutActivity.finish()
@@ -89,7 +92,7 @@ class CheckOutActivity : BaseActivity() {
         }
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK && data != null) {
-                imgVslip.setImageDrawable(null)
+                imgVslip.setImageBitmap(null)
                 imgVslip.setImageBitmap(data.extras?.get("data") as Bitmap)
                 var encode = Util.encodeImg(imgVslip)
                 tVencode.setText(encode)

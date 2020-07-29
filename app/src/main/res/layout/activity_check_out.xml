@@ -45,7 +45,7 @@
         />
     <ImageView
         android:id="@+id/imgVslip"
-        android:background="@drawable/iconperson"
+        android:background="@drawable/iconslip"
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"
         android:layout_width="100dp"
