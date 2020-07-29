@@ -152,13 +152,14 @@ class NetworkUtil {
                 .getAsJSONObject(getResponseListener(kClass, listener))
         }
 
-        fun checkOut(code: String, listener: NetworkLisener<CheckOutResponseModel>, kClass: Class<CheckOutResponseModel>) {
+        fun checkOut(code: String, image: String, listener: NetworkLisener<CheckOutResponseModel>, kClass: Class<CheckOutResponseModel>) {
             AndroidNetworking.post(URL_CHECK_OUT)
                 .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
                 .addHeaders("Content-type", "application/json")
                 .addHeaders("Accept", "application/json")
                 .addBodyParameter("company_id", PreferenceUtils.getCompanyId())
                 .addBodyParameter("contact_code", code)
+                .addBodyParameter("image", image)
                 .setTag("checkOut")
                 .setPriority(Priority.HIGH)
                 .build()
