@@ -92,6 +92,7 @@ class CheckOutActivity : BaseActivity() {
                 imgVslip.setImageDrawable(null)
                 imgVslip.setImageBitmap(data.extras?.get("data") as Bitmap)
                 var encode = Util.encodeImg(imgVslip)
+                tVencode.setText(encode)
             }else{
                 Toast.makeText(this, "เกิดข้อผิดพลาดบางอย่าง", Toast.LENGTH_SHORT)
             }
