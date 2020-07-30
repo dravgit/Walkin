@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Base64
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -28,12 +29,13 @@ class Util() {
         }
 
         fun toDateFormat(date: String): String {
+            Log.e("toDateFormat", date)
             val parser = SimpleDateFormat("yyyy-MM-dd HH:mm")
             val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm")
             val timeFormatter = SimpleDateFormat("HH:mm")
             val output: String = formatter.format(parser.parse(date))
             val date = toDateTh(output)
-            var hour = date.get(Calendar.HOUR).toString()
+            var hour = date.get(Calendar.HOUR_OF_DAY).toString()
             var minute = date.get(Calendar.MINUTE).toString()
             if (hour.length == 1) {
                 hour = "0"+hour
@@ -42,6 +44,7 @@ class Util() {
                 minute = "0"+minute
             }
             var time = hour + ":" + minute
+            Log.e("toDateFormat", "org : "+date +", time : "+ time)
 
             return ""+date.get(Calendar.DATE)+" "+ getMonth(date)+" "+(date.get(Calendar.YEAR)+543) +" "+ time
         }
