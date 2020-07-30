@@ -26,8 +26,9 @@
             >
             <ImageView
                 android:background="@drawable/logo"
-                android:layout_width="90dp"
-                android:layout_height="30dp"
+                android:layout_width="60dp"
+                android:layout_height="35dp"
+                android:scaleType="centerCrop"
                 android:layout_gravity="center"
                 />
         </FrameLayout>

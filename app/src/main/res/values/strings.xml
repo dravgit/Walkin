@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Walkin</string>
+    <string name="app_name">ipp smartvisitor</string>
     <string name="not_found_company">ไม่พบข้อมูลบริษัท</string>
     <string name="not_found_serial">ไม่พบอุปกรณ์</string>
     <string name="something_error">เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่</string>
