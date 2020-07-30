@@ -167,35 +167,49 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ชื่อ-นามสกุล : " + data.name().replace(" ", " "));
+            printerParams.setText("\nชื่อ-นามสกุล : " + data.name().replace(" ", " "));
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setText("\nเลขบัตรประขาชน : " + data.getIdcard());
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setText("\nต่อต่อแผนก : " + data.getDepartment());
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
+            printerParams.setText("\nวัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setText("\nอุณหภูมิ : " + data.getTemperature());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nจากบริษัท : " + data.getFrom());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nเวลาเข้า : " + data.getCheckin_time());
             printerParams.setBold(true);
             textList.add(printerParams);
 
@@ -215,7 +229,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
                 printerParams.setTextSize(24);
-                printerParams.setText("\n\n\n\n\n____________________________");
+                printerParams.setText("\n\n\n____________________________");
                 textList.add(printerParams);
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
@@ -223,6 +237,12 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 printerParams.setText("\n" + signature.get(i).getname());
                 textList.add(printerParams);
             }
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(24);
+            printerParams.setText("\n\n" + PreferenceUtils.getCompanyNote());
+            textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
