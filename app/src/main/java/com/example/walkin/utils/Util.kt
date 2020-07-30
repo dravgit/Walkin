@@ -2,6 +2,9 @@ package com.example.walkin.utils
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.util.Base64
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.example.walkin.app.WalkinApplication
@@ -9,6 +12,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -66,6 +70,20 @@ class Util() {
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
             return bitmap
+        }
+
+        fun encodeImg(type: ImageView): String? {
+            var encoded: String? = ""
+            type.invalidate()
+            val drawable = type.drawable as BitmapDrawable
+            if (drawable != null && drawable.bitmap != null) {
+                val bitmap = drawable.bitmap
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                val byteArray = byteArrayOutputStream.toByteArray()
+                encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            }
+            return encoded
         }
     }
 }

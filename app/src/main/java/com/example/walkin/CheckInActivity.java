@@ -571,10 +571,7 @@ public class CheckInActivity extends BaseActivity {
                     String gender = jObject.getString("Gender");
                     String address = jObject.getString("Address");
                     String birth = jObject.getString("BirthDate");
-                    Log.e("Address",address);
-                    Log.e("gender",gender);
-                    Log.e("birth",birth);
-                    edtaddress.setText(address);
+                    edtaddress.setText(address.replace("#"," "));
                     tVgender.setText(gender);
                     tVbirth.setText(birth);
                     Toast.makeText(CheckInActivity.this,
