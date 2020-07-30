@@ -199,6 +199,20 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             printerParams.setBold(true);
             textList.add(printerParams);
 
+//            printerParams = new PrinterParams();
+//            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+//            printerParams.setTextSize(24);
+//            printerParams.setText("\nจากบริษัท : " + data.getFrom());
+//            printerParams.setBold(true);
+//            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("เวลาเข้า : " + data.getCheckin_time());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
             printerParams.setDataType(PrinterParams.DATATYPE.IMAGE);
@@ -223,6 +237,12 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                 printerParams.setText("\n" + signature.get(i).getname());
                 textList.add(printerParams);
             }
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(24);
+            printerParams.setText("\n\n" + PreferenceUtils.getCompanyNote());
+            textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
