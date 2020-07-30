@@ -974,7 +974,7 @@ public class CheckInActivity extends BaseActivity {
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
             printerParams.setTextSize(24);
-            printerParams.setText(PreferenceUtils.getCompanyNote());
+            printerParams.setText("\n\n" + PreferenceUtils.getCompanyNote());
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
