@@ -89,8 +89,8 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
         holder.imageView2.setImageResource(0);
         for (ImageModel imageModel : detailListData.getImages()) {
             String type = imageModel.getType();
-            if ("4".equals(type)) {
-                Glide.with(context) //1
+            if ("1".equals(type) && !imageModel.getUrl().isEmpty()) {
+                    Glide.with(context) //1
                         .load(imageModel.getUrl())
                         .placeholder(R.drawable.ic_avatar)
                         .error(R.drawable.ic_avatar)
@@ -98,7 +98,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE) //3
                         .into(holder.imageView1);
-            } else if ("2".equals(type)) {
+            } else if ("2".equals(type) && !imageModel.getUrl().isEmpty()) {
                 Glide.with(context) //1
                         .load(imageModel.getUrl())
                         .placeholder(R.drawable.ic_car)
@@ -107,6 +107,15 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.NONE) //3
                         .into(holder.imageView2);
+            } else if ("4".equals(type) && !imageModel.getUrl().isEmpty()) {
+                Glide.with(context) //1
+                        .load(imageModel.getUrl())
+                        .placeholder(R.drawable.ic_avatar)
+                        .error(R.drawable.ic_avatar)
+                        .skipMemoryCache(true) //2
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE) //3
+                        .into(holder.imageView1);
             }
         }
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {

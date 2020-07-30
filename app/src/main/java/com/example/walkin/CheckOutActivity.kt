@@ -2,7 +2,9 @@ package com.example.walkin
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -13,6 +15,7 @@ import com.example.walkin.models.CheckOutResponseModel
 import com.example.walkin.models.VisitorResponseModel
 import com.example.walkin.models.WalkInErrorModel
 import com.example.walkin.utils.NetworkUtil
+import com.example.walkin.utils.Util
 import kotlinx.android.synthetic.main.activity_check_out.*
 
 class CheckOutActivity : BaseActivity() {
@@ -31,21 +34,29 @@ class CheckOutActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val REQUEST_CODE = 0
+        val SCAN_REQUEST_CODE = 0
+        val SLIP_REQUEST_CODE = 1
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_out)
+        btnSlip.setOnClickListener{
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent, SLIP_REQUEST_CODE)
+        }
         btnScan.setOnClickListener{
             val intent = Intent(this, ScanActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE)
+            startActivityForResult(intent, SCAN_REQUEST_CODE)
         }
         cancleCheckout.setOnClickListener{
             this@CheckOutActivity.finish()
         }
         okCheckout.setOnClickListener{
+            var encode = ""
+            if(!tVencode.getText().toString().isEmpty()){
+                encode = tVencode.getText().toString()
+            }
             if(tVcode != null) {
                 if (!alreadyOut) {
-                    NetworkUtil.checkOut(tVcode.getText()
-                                             .toString(), object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel> {
+                    NetworkUtil.checkOut(tVcode.getText().toString(),encode, object : NetworkUtil.Companion.NetworkLisener<CheckOutResponseModel> {
                         override fun onResponse(response: CheckOutResponseModel) {
                             Log.e("Status", "SUCCESS")
                             this@CheckOutActivity.finish()
@@ -67,7 +78,7 @@ class CheckOutActivity : BaseActivity() {
         }
 
         val intent = Intent(this, ScanActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE)
+        startActivityForResult(intent, SCAN_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -79,7 +90,19 @@ class CheckOutActivity : BaseActivity() {
                 searchData(code)
             }
         }
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                imgVslip.setImageBitmap(null)
+                imgVslip.setImageBitmap(data.extras?.get("data") as Bitmap)
+                var encode = Util.encodeImg(imgVslip)
+                tVencode.setText(encode)
+            }else{
+                Toast.makeText(this, "เกิดข้อผิดพลาดบางอย่าง", Toast.LENGTH_SHORT)
+            }
+        }
     }
+
+
 
     fun searchData(code: String){
         NetworkUtil.searchByOrder(code, object : NetworkUtil.Companion.NetworkLisener<VisitorResponseModel>{

@@ -24,7 +24,7 @@ class CheckInParamModel private constructor(val idcard: String?, val name: Strin
         fun gender(gender: String) = apply { this.gender = gender }
         fun address(address: String) = apply { this.address = address }
         fun birthDate(birthDate: String) = apply { this.birthDate = birthDate }
-        fun from(from: String) = apply { this.from = birthDate }
+        fun from(from: String) = apply { this.from = from }
 
         fun build() = CheckInParamModel(idcard, name, vehicleId, temperature, departmentId, objectiveId, images, gender, address, birthDate, from)
     }

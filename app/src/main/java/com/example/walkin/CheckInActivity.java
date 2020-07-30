@@ -100,7 +100,7 @@ public class CheckInActivity extends BaseActivity {
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
     private ProgressDialog mLoading;
     private MediaPlayer mediaPlayer;
-    private EditText edtnameTH, edtidcard, edtCar, edtTemp;
+    private EditText edtnameTH, edtidcard, edtCar, edtTemp, edtaddress, edtfrom;
     private List<String> months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     private List<String> months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.");
     private ImageView iVphoto;
@@ -125,9 +125,10 @@ public class CheckInActivity extends BaseActivity {
         iVphoto = findViewById(R.id.iVphoto);
         Log.i("C", "Create2");
         bindService();
-        tVaddress = (TextView) findViewById(R.id.tVaddress);
+        edtaddress = (EditText) findViewById(R.id.edtaddress);
         tVgender = (TextView) findViewById(R.id.tVgender);
         tVbirth = (TextView) findViewById(R.id.tVbirth);
+        edtfrom = (EditText) findViewById(R.id.edtfrom);
         edtCar = (EditText) findViewById(R.id.edtCar);
         edtTemp = (EditText) findViewById(R.id.edtTemp);
         capUser = (ImageButton) findViewById(R.id.user);
@@ -177,23 +178,25 @@ public class CheckInActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String name,department_id,objective_id,images;
-                JSONArray JSONArray = fileImg();
+                JSONArray jsonArray = fileImg();
                 int selectedItemOfDepartment = dropdownDepartment.getSelectedItemPosition();
                 DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
                 ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if(edtnameTH != null && JSONArray.length() != 0){
+                if(!edtnameTH.getText().toString().isEmpty() && !edtfrom.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty() && jsonArray.length() != 0){
                     name = edtnameTH.getText().toString();
                     department_id = actualPositionOfDepartment.getID();
                     objective_id = actualPositionOfObjective.getID();
                     images = fileImg().toString();
+                    Log.e("BASE64",images);
                     CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
                     Log.e("CHECK",param.toString());
                     param.idcard(edtidcard.getText().toString())
                             .vehicleId(edtCar.getText().toString())
                             .temperature(edtTemp.getText().toString())
                             .gender(tVgender.getText().toString())
-                            .address(tVaddress.getText().toString())
+                            .address(edtaddress.getText().toString())
+                            .from(edtfrom.getText().toString())
                             .birthDate(tVbirth.getText().toString());
                     CheckInParamModel data = param.build();
                     Log.e("DATA",data.toString());
@@ -278,7 +281,7 @@ public class CheckInActivity extends BaseActivity {
         String encoded = "";
         type.invalidate();
         BitmapDrawable drawable = (BitmapDrawable) type.getDrawable();
-        if(drawable != null){
+        if(drawable != null && drawable.getBitmap() != null){
             Bitmap bitmap = drawable.getBitmap();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
@@ -568,10 +571,7 @@ public class CheckInActivity extends BaseActivity {
                     String gender = jObject.getString("Gender");
                     String address = jObject.getString("Address");
                     String birth = jObject.getString("BirthDate");
-                    Log.e("Address",address);
-                    Log.e("gender",gender);
-                    Log.e("birth",birth);
-                    tVaddress.setText(address);
+                    edtaddress.setText(address.replace("#"," "));
                     tVgender.setText(gender);
                     tVbirth.setText(birth);
                     Toast.makeText(CheckInActivity.this,
@@ -906,35 +906,42 @@ public class CheckInActivity extends BaseActivity {
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ชื่อ-นามสกุล : " + data.getFullname().replace(" ", " "));
+            printerParams.setText("\nชื่อ-นามสกุล : " + data.getFullname().replace(" ", " "));
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("เลขบัตรประขาชน : " + data.getIdcard());
+            printerParams.setText("\nเลขบัตรประขาชน : " + data.getIdcard());
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("ต่อต่อแผนก : " + data.getDepartment());
+            printerParams.setText("\nติดต่อแผนก : " + data.getDepartment());
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("วัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
+            printerParams.setText("\nวัตถุประสงค์ : " + data.getObjective_type().replace(" ", " "));
             printerParams.setBold(true);
             textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("อุณหภูมิ : " + data.getTemperature());
+            printerParams.setText("\nอุณหภูมิ : " + data.getTemperature());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nจากบริษัท : " + data.getFrom());
             printerParams.setBold(true);
             textList.add(printerParams);
 
@@ -955,7 +962,7 @@ public class CheckInActivity extends BaseActivity {
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
                 printerParams.setTextSize(24);
-                printerParams.setText("\n\n\n\n\n____________________________");
+                printerParams.setText("\n\n\n____________________________");
                 textList.add(printerParams);
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
@@ -963,6 +970,12 @@ public class CheckInActivity extends BaseActivity {
                 printerParams.setText("\n" + signature.get(i).getname());
                 textList.add(printerParams);
             }
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.CENTER);
+            printerParams.setTextSize(24);
+            printerParams.setText(PreferenceUtils.getCompanyNote());
+            textList.add(printerParams);
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.CENTER);
