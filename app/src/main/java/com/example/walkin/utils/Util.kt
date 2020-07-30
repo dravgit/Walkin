@@ -26,9 +26,20 @@ class Util() {
         fun toDateFormat(date: String): String {
             val parser = SimpleDateFormat("yyyy-MM-dd HH:mm")
             val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm")
+            val timeFormatter = SimpleDateFormat("HH:mm")
             val output: String = formatter.format(parser.parse(date))
             val date = toDateTh(output)
-            return ""+date.get(Calendar.DATE)+" "+ getMonth(date)+" "+(date.get(Calendar.YEAR)+543) +" "+ date.get(Calendar.HOUR)+":"+date.get(Calendar.MINUTE)
+            var hour = date.get(Calendar.HOUR).toString()
+            var minute = date.get(Calendar.MINUTE).toString()
+            if (hour.length == 1) {
+                hour = "0"+hour
+            }
+            if (minute.length == 1) {
+                minute = "0"+minute
+            }
+            var time = hour + ":" + minute
+
+            return ""+date.get(Calendar.DATE)+" "+ getMonth(date)+" "+(date.get(Calendar.YEAR)+543) +" "+ time
         }
 
         fun getMonth(c: Calendar): String {
