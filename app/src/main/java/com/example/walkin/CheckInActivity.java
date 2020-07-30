@@ -948,7 +948,7 @@ public class CheckInActivity extends BaseActivity {
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("เวลาเข้า : " + data.getCheckin_time());
+            printerParams.setText("\nเวลาเข้า : " + data.getChcekin_time());
             printerParams.setBold(true);
             textList.add(printerParams);
 
