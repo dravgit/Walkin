@@ -100,7 +100,7 @@ public class CheckInActivity extends BaseActivity {
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
     private ProgressDialog mLoading;
     private MediaPlayer mediaPlayer;
-    private EditText edtnameTH, edtidcard, edtCar, edtTemp, edtaddress, edtfrom;
+    private EditText edtnameTH, edtidcard, edtCar, edtTemp, edtaddress, edtfrom, edtperson, edtnote;
     private List<String> months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     private List<String> months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.");
     private ImageView iVphoto;
@@ -131,6 +131,8 @@ public class CheckInActivity extends BaseActivity {
         edtfrom = (EditText) findViewById(R.id.edtfrom);
         edtCar = (EditText) findViewById(R.id.edtCar);
         edtTemp = (EditText) findViewById(R.id.edtTemp);
+        edtperson = (EditText) findViewById(R.id.edtperson);
+        edtnote = (EditText) findViewById(R.id.edtnote);
         capUser = (ImageButton) findViewById(R.id.user);
         capCar = (ImageButton) findViewById(R.id.car);
         capCard = (ImageButton) findViewById(R.id.card);
@@ -192,12 +194,14 @@ public class CheckInActivity extends BaseActivity {
                     CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
                     Log.e("CHECK",param.toString());
                     param.idcard(edtidcard.getText().toString())
-                            .vehicleId(edtCar.getText().toString())
+                            .vehicle_id(edtCar.getText().toString())
                             .temperature(edtTemp.getText().toString())
                             .gender(tVgender.getText().toString())
                             .address(edtaddress.getText().toString())
                             .from(edtfrom.getText().toString())
-                            .birthDate(tVbirth.getText().toString());
+                            .birthDate(tVbirth.getText().toString())
+                            .personContact(edtperson.getText().toString())
+                            .objectiveNote(edtnote.getText().toString());
                     CheckInParamModel data = param.build();
                     Log.e("DATA",data.toString());
                     NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
@@ -942,6 +946,20 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
             printerParams.setText("\nจากบริษัท : " + data.getFrom());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nทะเบียนรถ : " + data.getVehicle_id());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nผู้ที่ขอพบ : " + data.getPerson_contact());
             printerParams.setBold(true);
             textList.add(printerParams);
 
