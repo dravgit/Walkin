@@ -209,6 +209,20 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
+            printerParams.setText("\nทะเบียนรถ : " + data.getVehicle_id());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nผู้ที่ขอพบ : " + data.getPerson_contact());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
             printerParams.setText("\nเวลาเข้า : " + data.getCheckin_time());
             printerParams.setBold(true);
             textList.add(printerParams);

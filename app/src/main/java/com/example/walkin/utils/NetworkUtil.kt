@@ -17,6 +17,7 @@ import kotlin.reflect.KClass
 class NetworkUtil {
     companion object {
         private val STATUS_CODE_SUCCESS = 200
+        private val STATUS_CODE_REQUIRE = 422
         private val STATUS_CODE_COMPANY_NOT_FOUND = 901
         private val STATUS_CODE_SEARIAL_NOT_FOUND = 902
         val STATUS_CODE_INVALID_PASSWORD = 201
@@ -137,7 +138,7 @@ class NetworkUtil {
                 .addBodyParameter("user_id", PreferenceUtils.getUserId())
                 .addBodyParameter("idcard", param.idcard)
                 .addBodyParameter("name", param.name)
-                .addBodyParameter("vehicle_id", param.vehicleId)
+                .addBodyParameter("vehicle_id", param.vehicle_id)
                 .addBodyParameter("temperature", param.temperature)
                 .addBodyParameter("department_id", param.departmentId)
                 .addBodyParameter("objective_id", param.objectiveId)
@@ -341,7 +342,9 @@ class NetworkUtil {
                 Util.showToast(R.string.not_found_company)
             } else if (STATUS_CODE_SEARIAL_NOT_FOUND == status) {
                 Util.showToast(R.string.not_found_serial)
-            } else {
+            } else if(STATUS_CODE_REQUIRE == status){
+                Util.showToast(R.string.not_require_data)
+            } else{
                 Util.showToast(R.string.something_error)
             }
         }
