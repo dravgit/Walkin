@@ -36,7 +36,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation files('libs/CentermPosOverseaLib201810151203.jar')
-    implementation files('libs/SmartPosLib_V3.1.5_20181109.jar')
+    implementation files('libs/SmartPosLib_V3.1.7_overseas_20200409.jar')
     implementation "androidx.core:core-ktx:+"
     implementation 'me.dm7.barcodescanner:zxing:1.9'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

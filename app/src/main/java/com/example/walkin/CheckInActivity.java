@@ -119,12 +119,12 @@ public class CheckInActivity extends BaseActivity {
         mLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoading.setCanceledOnTouchOutside(false);
         mLoading.setMessage("Reading...");
+        bindService();
         mediaPlayer = MediaPlayer.create(this, R.raw.beep_sound);
         edtnameTH = findViewById(R.id.edtnameTH);
         edtidcard = findViewById(R.id.edtidcard);
         iVphoto = findViewById(R.id.iVphoto);
         Log.i("C", "Create2");
-        bindService();
         edtaddress = (EditText) findViewById(R.id.edtaddress);
         tVgender = (TextView) findViewById(R.id.tVgender);
         tVbirth = (TextView) findViewById(R.id.tVbirth);
@@ -837,6 +837,7 @@ public class CheckInActivity extends BaseActivity {
                     magCard.swipeCard(30000, new AidlMagCardListener.Stub() {
                         @Override
                         public void onSwipeCardTimeout() throws RemoteException {
+                            Log.e("SWIPE","time out");
                         }
 
                         @Override
@@ -859,15 +860,24 @@ public class CheckInActivity extends BaseActivity {
 
                         @Override
                         public void onSwipeCardFail() throws RemoteException {
+                            Log.e("SWIPE","ERROR1");
+                            runOnUiThread(new Runnable(){
+                                @Override
+                                public void run() {
+                                    Toast.makeText(CheckInActivity.this, "กรุณาลองใหม่อีกครั้ง", Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
 
                         @Override
                         public void onSwipeCardException(int arg0)
                                 throws RemoteException {
+                            Log.e("SWIPE","Exception");
                         }
 
                         @Override
                         public void onCancelSwipeCard() throws RemoteException {
+                            Log.e("SWIPE","Cancel");
                         }
                     });
                 } catch (Exception e) {
