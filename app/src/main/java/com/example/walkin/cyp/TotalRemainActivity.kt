@@ -1,4 +1,4 @@
-package com.example.walkin
+package com.example.walkin.cyp
 
 import android.os.Bundle
 import android.os.RemoteException
@@ -8,28 +8,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.centerm.smartpos.aidl.printer.AidlPrinter
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.centerm.smartpos.constant.Constant
-import com.example.walkin.models.PartialVisitorResponseModel
-import com.example.walkin.models.WalkInErrorModel
-import com.example.walkin.utils.NetworkUtil
+import com.example.walkin.R
+import com.example.walkin.cyp.models.PartialVisitorResponseModel
+import com.example.walkin.cyp.models.WalkInErrorModel
+import com.example.walkin.cyp.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 
-class TotalCheckInActivity : BaseActivity() {
+class TotalRemainActivity : BaseActivity() {
     lateinit var adapter : DetailAdapter
     private var printDev: AidlPrinter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         val recyclerView = findViewById<View>(R.id.recyclerView) as RecyclerView
-        adapter = DetailAdapter(this@TotalCheckInActivity)
+        adapter = DetailAdapter(this@TotalRemainActivity)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-        tVdetail.setText("จำนวนผู้เข้าตึก")
+        tVdetail.setText("จำนวนผู้ที่ยังอยู่ในตึก")
         btnRefresh.setOnClickListener {
             loadData()
         }
         loadData()
     }
+
 
     override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
         try {
@@ -48,11 +51,10 @@ class TotalCheckInActivity : BaseActivity() {
     }
 
     override fun showMessage(str: String?, black: Int) {
-
     }
 
-    fun loadData() {
-        NetworkUtil.getListByType(NetworkUtil.STATUS_TYPE_IN, object : NetworkUtil.Companion.NetworkLisener<List<PartialVisitorResponseModel>> {
+        fun loadData() {
+        NetworkUtil.getListByType(NetworkUtil.STATUS_TYPE_STAY, object : NetworkUtil.Companion.NetworkLisener<List<PartialVisitorResponseModel>> {
             override fun onResponse(response: List<PartialVisitorResponseModel>) {
                 adapter.setListdata(response)
             }

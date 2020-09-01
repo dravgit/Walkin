@@ -1,18 +1,16 @@
-package com.example.walkin
+package com.example.walkin.cyp
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.centerm.smartpos.aidl.sys.AidlDeviceManager
-import com.example.walkin.models.SummaryModel
-import com.example.walkin.models.WalkInErrorModel
-import com.example.walkin.utils.NetworkUtil
+import com.example.walkin.*
+import com.example.walkin.cyp.models.SummaryModel
+import com.example.walkin.cyp.models.WalkInErrorModel
+import com.example.walkin.cyp.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.list_item.*
 
-class HomeActivity : BaseActivity() {
+class HomeActivity : BaseKioskActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -51,10 +49,6 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    override fun showMessage(str: String?, black: Int) {
-
-    }
-
     override fun onResume() {
         super.onResume()
         loadData()
@@ -67,7 +61,6 @@ class HomeActivity : BaseActivity() {
             }
 
             override fun onError(errorModel: WalkInErrorModel) {
-                checkError(errorModel)
                 Toast.makeText(this@HomeActivity, errorModel.msg, Toast.LENGTH_LONG).show()
             }
 
@@ -83,7 +76,5 @@ class HomeActivity : BaseActivity() {
         tv_number_more_one.setText(response.total_over)
     }
 
-    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {}
-    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {}
-    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {}
+    override fun onBackPressed() {}
 }

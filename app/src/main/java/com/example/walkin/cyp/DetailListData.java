@@ -1,4 +1,4 @@
-package com.example.walkin;
+package com.example.walkin.cyp;
 
 public class DetailListData {
     private String description;

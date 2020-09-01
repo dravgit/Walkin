@@ -1,4 +1,4 @@
-package com.example.walkin.utils
+package com.example.walkin.cyp.utils
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.example.walkin.app.WalkinApplication
+import com.example.walkin.cyp.app.WalkinApplication
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException

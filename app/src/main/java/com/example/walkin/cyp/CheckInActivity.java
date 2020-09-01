@@ -1,4 +1,4 @@
-package com.example.walkin;
+package com.example.walkin.cyp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,20 +44,19 @@ import com.centerm.smartpos.aidl.printer.AidlPrinterStateChangeListener;
 import com.centerm.smartpos.aidl.printer.PrinterParams;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
-import com.centerm.smartpos.constant.DeviceErrorCode;
 import com.centerm.smartpos.util.HexUtil;
-import com.example.walkin.models.CheckInParamModel;
-import com.example.walkin.models.CheckInResponseModel;
-import com.example.walkin.models.DepartmentModel;
-import com.example.walkin.models.ObjectiveTypeModel;
-import com.example.walkin.models.SignatureModel;
-import com.example.walkin.models.WalkInErrorModel;
-import com.example.walkin.utils.NetworkUtil;
-import com.example.walkin.utils.NetworkUtil.Companion.NetworkLisener;
-import com.example.walkin.utils.PreferenceUtils;
-import com.example.walkin.utils.Util;
+import com.example.walkin.R;
+import com.example.walkin.cyp.models.CheckInParamModel;
+import com.example.walkin.cyp.models.CheckInResponseModel;
+import com.example.walkin.cyp.models.DepartmentModel;
+import com.example.walkin.cyp.models.ObjectiveTypeModel;
+import com.example.walkin.cyp.models.SignatureModel;
+import com.example.walkin.cyp.models.WalkInErrorModel;
+import com.example.walkin.cyp.utils.NetworkUtil;
+import com.example.walkin.cyp.utils.NetworkUtil.Companion.NetworkLisener;
+import com.example.walkin.cyp.utils.PreferenceUtils;
+import com.example.walkin.cyp.utils.Util;
 import com.watermark.androidwm_light.WatermarkBuilder;
-import com.watermark.androidwm_light.bean.WatermarkPosition;
 import com.watermark.androidwm_light.bean.WatermarkText;
 
 import org.jetbrains.annotations.NotNull;
@@ -373,7 +372,7 @@ public class CheckInActivity extends BaseActivity {
     }
 
     @Override
-    protected void bindService() {
+    public void bindService() {
         super.bindService();
         Intent intent = new Intent();
         intent.setPackage("com.centerm.centermposoverseaservice");

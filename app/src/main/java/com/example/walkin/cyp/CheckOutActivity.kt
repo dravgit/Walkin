@@ -1,4 +1,4 @@
-package com.example.walkin
+package com.example.walkin.cyp
 
 import android.app.Activity
 import android.content.Intent
@@ -8,14 +8,14 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager
-import com.example.walkin.models.CheckOutResponseModel
-import com.example.walkin.models.VisitorResponseModel
-import com.example.walkin.models.WalkInErrorModel
-import com.example.walkin.utils.NetworkUtil
-import com.example.walkin.utils.Util
+import com.example.walkin.R
+import com.example.walkin.cyp.models.CheckOutResponseModel
+import com.example.walkin.cyp.models.VisitorResponseModel
+import com.example.walkin.cyp.models.WalkInErrorModel
+import com.example.walkin.cyp.utils.NetworkUtil
+import com.example.walkin.cyp.utils.Util
 import kotlinx.android.synthetic.main.activity_check_out.*
 
 class CheckOutActivity : BaseActivity() {

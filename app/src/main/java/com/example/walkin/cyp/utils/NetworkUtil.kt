@@ -1,17 +1,15 @@
-package com.example.walkin.utils
+package com.example.walkin.cyp.utils
 
 import android.app.ProgressDialog
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
-import com.bumptech.glide.Glide
 import com.example.walkin.R
-import com.example.walkin.models.*
+import com.example.walkin.cyp.models.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONObject
-import kotlin.reflect.KClass
 
 
 class NetworkUtil {

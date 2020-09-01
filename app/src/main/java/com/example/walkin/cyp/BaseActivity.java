@@ -1,7 +1,5 @@
-package com.example.walkin;
+package com.example.walkin.cyp;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,12 +11,12 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
-import com.example.walkin.models.WalkInErrorModel;
-import com.example.walkin.utils.NetworkUtil;
-import com.example.walkin.utils.PreferenceUtils;
-import com.example.walkin.utils.Util;
+import com.example.walkin.cyp.models.WalkInErrorModel;
+import com.example.walkin.cyp.utils.NetworkUtil;
+import com.example.walkin.cyp.utils.PreferenceUtils;
+import com.example.walkin.cyp.utils.Util;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends BaseKioskActivity {
 
     protected AidlDeviceManager manager = null;
 
@@ -38,7 +36,7 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    protected void bindService() {
+    public void bindService() {
         Intent intent = new Intent();
         intent.setPackage("com.centerm.smartposservice");
         intent.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");

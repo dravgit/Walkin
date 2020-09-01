@@ -1,8 +1,7 @@
-package com.example.walkin;
+package com.example.walkin.cyp;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,15 +19,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.centerm.smartpos.aidl.printer.AidlPrinter;
 import com.centerm.smartpos.aidl.printer.AidlPrinterStateChangeListener;
 import com.centerm.smartpos.aidl.printer.PrinterParams;
-import com.example.walkin.models.CheckInResponseModel;
-import com.example.walkin.models.ImageModel;
-import com.example.walkin.models.PartialVisitorResponseModel;
-import com.example.walkin.models.SignatureModel;
-import com.example.walkin.models.VisitorResponseModel;
-import com.example.walkin.models.WalkInErrorModel;
-import com.example.walkin.utils.NetworkUtil;
-import com.example.walkin.utils.PreferenceUtils;
-import com.example.walkin.utils.Util;
+import com.example.walkin.R;
+import com.example.walkin.cyp.models.ImageModel;
+import com.example.walkin.cyp.models.PartialVisitorResponseModel;
+import com.example.walkin.cyp.models.SignatureModel;
+import com.example.walkin.cyp.models.VisitorResponseModel;
+import com.example.walkin.cyp.models.WalkInErrorModel;
+import com.example.walkin.cyp.utils.NetworkUtil;
+import com.example.walkin.cyp.utils.PreferenceUtils;
+import com.example.walkin.cyp.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 

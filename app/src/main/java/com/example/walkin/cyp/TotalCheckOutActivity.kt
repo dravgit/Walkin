@@ -1,14 +1,14 @@
-package com.example.walkin
+package com.example.walkin.cyp
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager
-import com.example.walkin.models.PartialVisitorResponseModel
-import com.example.walkin.models.WalkInErrorModel
-import com.example.walkin.utils.NetworkUtil
+import com.example.walkin.R
+import com.example.walkin.cyp.models.PartialVisitorResponseModel
+import com.example.walkin.cyp.models.WalkInErrorModel
+import com.example.walkin.cyp.utils.NetworkUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 
 

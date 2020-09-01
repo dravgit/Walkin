@@ -1,4 +1,4 @@
-package com.example.walkin.utils;
+package com.example.walkin.cyp.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,22 +7,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.ImageViewTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.walkin.R;
-import com.example.walkin.app.WalkinApplication;
-import com.example.walkin.models.DepartmentModel;
-import com.example.walkin.models.LoginResponseModel;
-import com.example.walkin.models.ObjectiveTypeModel;
-import com.example.walkin.models.SignatureModel;
+import com.example.walkin.cyp.app.WalkinApplication;
+import com.example.walkin.cyp.models.DepartmentModel;
+import com.example.walkin.cyp.models.ObjectiveTypeModel;
+import com.example.walkin.cyp.models.SignatureModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

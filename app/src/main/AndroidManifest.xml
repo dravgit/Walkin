@@ -12,30 +12,30 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".app.WalkinApplication"
+        android:name="com.example.walkin.cyp.app.WalkinApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".CheckOutActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".CheckInActivity" />
-        <activity android:name=".ScanActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".cyp.CheckOutActivity" />
+        <activity android:name=".cyp.HomeActivity" />
+        <activity android:name=".cyp.CheckInActivity" />
+        <activity android:name=".cyp.ScanActivity" />
+        <activity android:name=".cyp.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-<!--                <category android:name="android.intent.category.HOME" />-->
+                <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".TotalCheckInActivity" />
-        <activity android:name=".TotalCheckOutActivity" />
-        <activity android:name=".TotalRemainActivity" />
-        <activity android:name=".TotalVisitorActivity" />
+        <activity android:name=".cyp.TotalCheckInActivity" />
+        <activity android:name=".cyp.TotalCheckOutActivity" />
+        <activity android:name=".cyp.TotalRemainActivity" />
+        <activity android:name=".cyp.TotalVisitorActivity" />
     </application>
 
 </manifest>
