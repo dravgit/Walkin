@@ -38,10 +38,10 @@ public abstract class BaseKioskActivity extends Activity {
 
         public void setHomeKeyDisabled(ISystemOperation mSystemOperation) {
             Bundle bundle = new Bundle();
-            bundle.putBoolean(SystemFunctionType.HOME_KEY, false);
-            bundle.putBoolean(SystemFunctionType.FUNCTION_KEY, false);
-            bundle.putBoolean(SystemFunctionType.STATUS_BAR_KEY, false);
-            bundle.putBoolean(SystemFunctionType.POWER_KEY, false);
+            bundle.putBoolean(SystemFunctionType.HOME_KEY, true);
+            bundle.putBoolean(SystemFunctionType.FUNCTION_KEY, true);
+            bundle.putBoolean(SystemFunctionType.STATUS_BAR_KEY, true);
+            bundle.putBoolean(SystemFunctionType.POWER_KEY, true);
             try {
                 mSystemOperation.setSystemFunction(bundle);
             } catch (RemoteException e) {
