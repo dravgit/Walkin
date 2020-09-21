@@ -1,3 +1,3 @@
-package com.example.walkin.models
+package com.example.walkin.cyp.models
 
 open class LoginResponseModel(val status_code: String, val message: String) : BaseResponseModel()

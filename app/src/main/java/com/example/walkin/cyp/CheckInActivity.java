@@ -34,6 +34,10 @@ import android.widget.Toast;
 
 import com.centerm.centermposoversealib.thailand.AidlIdCardTha;
 import com.centerm.centermposoversealib.thailand.AidlIdCardThaListener;
+import com.centerm.centermposoversealib.thailand.ThaiIDSecurityBeen;
+import com.centerm.centermposoversealib.thailand.ThaiIDSecurityListerner;
+import com.centerm.centermposoversealib.thailand.ThaiInfoListerner;
+import com.centerm.centermposoversealib.thailand.ThaiPhotoListerner;
 import com.centerm.centermposoversealib.thailand.ThiaIdInfoBeen;
 import com.centerm.smartpos.aidl.iccard.AidlICCard;
 import com.centerm.smartpos.aidl.magcard.AidlMagCard;
@@ -103,7 +107,6 @@ public class CheckInActivity extends BaseActivity {
     private List<String> months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     private List<String> months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.");
     private ImageView iVphoto;
-    public static String pic;
     private ImageButton capUser, capCar, capCard;
     private Button testBtn, cancleCheckin, okCheckin;
     private Spinner dropdownDepartment, dropdownObjective;
@@ -118,7 +121,6 @@ public class CheckInActivity extends BaseActivity {
         mLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoading.setCanceledOnTouchOutside(false);
         mLoading.setMessage("Reading...");
-        bindService();
         mediaPlayer = MediaPlayer.create(this, R.raw.beep_sound);
         edtnameTH = findViewById(R.id.edtnameTH);
         edtidcard = findViewById(R.id.edtidcard);
@@ -720,37 +722,41 @@ public class CheckInActivity extends BaseActivity {
                                         iVphoto.setImageBitmap(null);
                                         time1 = System.currentTimeMillis();
                                         timestart = time1;
-                                        aidlIdCardTha.searchIDCard(6000, new AidlIdCardThaListener.Stub() {
+                                        aidlIdCardTha.stopSearch();
+                                        aidlIdCardTha.searchIDCardInfo(6000, new ThaiInfoListerner.Stub() {
                                             @Override
-                                            public void onFindIDCard(final ThiaIdInfoBeen been) throws RemoteException {
-                                                Log.e("DATA",been.getLaserNumber());
-                                                String s = been.toJSONString();
-                                                Log.i(TAG, s);
+                                            public void onResult(int i, String s) throws RemoteException {
+                                                Log.e("DATA", "onResult : "+s);
+
                                                 long end = System.currentTimeMillis();
-                                                Bitmap rebmp = Bitmap.createScaledBitmap(been.getPhoto(), 85, 100, false);
-                                                pic = convert(rebmp);
-                                                Log.i(TAG, pic);
-                                                showPhoto(been.getPhoto());
                                                 int b = (int) ((end - time1)/1000);
                                                 int c = (int) (((end - time1)/100)%10);
                                                 showInfo(jsonFormat(s), (b + "." + c));
                                                 mediaPlayer.start();
                                                 mLoading.dismiss();
-                                            }
 
-                                            @Override
-                                            public void onTimeout() throws RemoteException {
-                                                log("TIME OUT");
-                                                mLoading.dismiss();
-                                            }
-
-                                            @Override
-                                            public void onError(int i, String s) throws RemoteException {
-                                                log("ERROR CODE:" + i + " msg:" + s);
-                                                mLoading.dismiss();
                                             }
                                         });
+
+
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                searchPhoto();
+                                            }
+                                        }, 2000);
+
+//                                        aidlIdCardTha.searchIDCardPhoto(6000, new ThaiPhotoListerner.Stub() {
+//                                            @Override
+//                                            public void onResult(int i, Bitmap bitmap) throws RemoteException {
+//                                                Log.e("DATA", "onResult photo");
+//                                                Bitmap rebmp = Bitmap.createScaledBitmap(bitmap, 85, 100, false);
+//                                                showPhoto(rebmp);
+//                                            }
+//                                        });
+
                                     } catch (RemoteException e) {
+                                        Log.e("DATA info", "RemoteException");
                                         e.printStackTrace();
                                     }
 
@@ -769,10 +775,39 @@ public class CheckInActivity extends BaseActivity {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                } finally {
+                    if (mLoading!= null && mLoading.isShowing()) {
+                        mLoading.dismiss();
+                    }
                 }
             }
         };
         scheduledExecutor.scheduleAtFixedRate(job, 1000, 1000, TimeUnit.MILLISECONDS);
+    }
+
+    private void searchPhoto() {
+        try {
+            Log.e("DATA", "searchPhoto");
+            aidlIdCardTha.stopSearch();
+            aidlIdCardTha.searchIDCard(6000, new AidlIdCardThaListener.Stub() {
+                @Override
+                public void onFindIDCard(ThiaIdInfoBeen thiaIdInfoBeen) throws RemoteException {
+                    showPhoto(thiaIdInfoBeen.getPhoto());
+                }
+
+                @Override
+                public void onTimeout() throws RemoteException {
+                    Log.e("DATA", "onTimeout");
+                }
+
+                @Override
+                public void onError(int i, String s) throws RemoteException {
+                    Log.e("DATA", "onError : "+ s);
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void c() {

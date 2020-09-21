@@ -1,4 +1,4 @@
-package com.example.walkin.models
+package com.example.walkin.cyp.models
 
 class CheckInParamModel private constructor(val idcard: String?, val name: String, val vehicle_id: String, val temperature: String,
                                             val departmentId: String, val objectiveId: String, val images: String, val gender: String, val address: String, val birthDate: String, val from: String, val objectiveNote: String, val personContact: String) {

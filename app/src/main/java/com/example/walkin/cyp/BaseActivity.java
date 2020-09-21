@@ -27,6 +27,12 @@ public abstract class BaseActivity extends BaseKioskActivity {
         Util.Companion.setContext(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService();
+    }
+
     public void checkError(WalkInErrorModel walkInErrorModel) {
         if (walkInErrorModel.getError_code().equals(String.valueOf(NetworkUtil.Companion.getSTATUS_CODE_INVALID_PASSWORD()))) {
             PreferenceUtils.setLoginFail();
@@ -51,6 +57,12 @@ public abstract class BaseActivity extends BaseKioskActivity {
         intent.setPackage("com.centerm.smartposservice");
         intent.setAction("com.centerm.smartpos.service.MANAGER_SERVICE");
         bindService(intent, conn2, Context.BIND_AUTO_CREATE);
+    }
+
+    public void unbindService() {
+        unbindService(conn);
+        unbindService(conn1);
+        unbindService(conn2);
     }
 
     public ServiceConnection conn1 = new ServiceConnection() {

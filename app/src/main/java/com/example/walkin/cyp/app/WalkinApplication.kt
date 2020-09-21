@@ -1,8 +1,8 @@
-package com.example.walkin.app
+package com.example.walkin.cyp.app
 
 import android.app.Application
 import android.content.Context
-import com.example.walkin.utils.PreferenceUtils
+import com.example.walkin.cyp.utils.PreferenceUtils
 
 class WalkinApplication: Application() {
 
