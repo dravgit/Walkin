@@ -4,6 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -31,6 +34,25 @@ public abstract class BaseActivity extends BaseKioskActivity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService();
+    }
+
+    private Bitmap rotateImage(Bitmap source, Float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(
+                source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true
+        );
+    }
+
+    public Bitmap rotageBitmap(Bitmap bitmap) {
+        Bitmap bitmap2;
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            bitmap2 = rotateImage(bitmap, 90f);
+        }else {
+            bitmap2 = bitmap;
+        }
+        return bitmap2;
     }
 
     public void checkError(WalkInErrorModel walkInErrorModel) {

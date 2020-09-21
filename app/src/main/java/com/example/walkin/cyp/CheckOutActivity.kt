@@ -93,7 +93,8 @@ class CheckOutActivity : BaseActivity() {
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK && data != null) {
                 imgVslip.setImageBitmap(null)
-                imgVslip.setImageBitmap(data.extras?.get("data") as Bitmap)
+                val bmp = data.extras?.get("data") as Bitmap
+                imgVslip.setImageBitmap(rotageBitmap(bmp))
                 var encode = Util.encodeImg(imgVslip)
                 tVencode.setText(encode)
             }else{
@@ -101,7 +102,6 @@ class CheckOutActivity : BaseActivity() {
             }
         }
     }
-
 
 
     fun searchData(code: String){

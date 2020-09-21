@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
@@ -331,7 +332,7 @@ public class CheckInActivity extends BaseActivity {
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 WatermarkBuilder
-                        .create(this, image)
+                        .create(this, rotageBitmap(image))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
@@ -342,7 +343,7 @@ public class CheckInActivity extends BaseActivity {
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 WatermarkBuilder
-                        .create(this, image)
+                        .create(this, rotageBitmap(image))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
@@ -353,7 +354,7 @@ public class CheckInActivity extends BaseActivity {
             if (resultCode == RESULT_OK && data !=null ) {
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 WatermarkBuilder
-                        .create(this, image)
+                        .create(this, rotageBitmap(image))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
@@ -882,11 +883,11 @@ public class CheckInActivity extends BaseActivity {
                             _name = _name.replace("^", "");
                             final String[] _xname = _name.split("\\$");
                             final String[] _second = hextostring(arg0.getSecondTrackData()).substring(6, hextostring(arg0.getSecondTrackData()).length()).split("=");
-                            char[] _x = _second[0].toUpperCase().toCharArray();
-                            edtidcard.setText(_x[0] + "" + _x[1] + _x[2] + _x[3] + _x[4] + "" + _x[5] + _x[6] + _x[7] + _x[8] + _x[9] + "" + _x[10] + _x[11] + "" + _x[12]);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    char[] _x = _second[0].toUpperCase().toCharArray();
+                                    edtidcard.setText(_x[0] + "" + _x[1] + _x[2] + _x[3] + _x[4] + "" + _x[5] + _x[6] + _x[7] + _x[8] + _x[9] + "" + _x[10] + _x[11] + "" + _x[12]);
                                     edtnameTH.setText(_xname[2] + " " + _xname[1] + " " + _xname[0]);
                                 }
                             });
