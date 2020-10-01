@@ -35,8 +35,8 @@ import android.widget.Toast;
 
 import com.centerm.centermposoversealib.thailand.AidlIdCardTha;
 import com.centerm.centermposoversealib.thailand.AidlIdCardThaListener;
-import com.centerm.centermposoversealib.thailand.ThaiIDSecurityBeen;
-import com.centerm.centermposoversealib.thailand.ThaiIDSecurityListerner;
+//import com.centerm.centermposoversealib.thailand.ThaiIDSecurityBeen;
+//import com.centerm.centermposoversealib.thailand.ThaiIDSecurityListerner;
 import com.centerm.centermposoversealib.thailand.ThaiInfoListerner;
 import com.centerm.centermposoversealib.thailand.ThaiPhotoListerner;
 import com.centerm.centermposoversealib.thailand.ThiaIdInfoBeen;
@@ -790,20 +790,11 @@ public class CheckInActivity extends BaseActivity {
         try {
             Log.e("DATA", "searchPhoto");
             aidlIdCardTha.stopSearch();
-            aidlIdCardTha.searchIDCard(6000, new AidlIdCardThaListener.Stub() {
-                @Override
-                public void onFindIDCard(ThiaIdInfoBeen thiaIdInfoBeen) throws RemoteException {
-                    showPhoto(thiaIdInfoBeen.getPhoto());
-                }
+            aidlIdCardTha.searchIDCardPhoto(6000, new ThaiPhotoListerner.Stub() {
 
                 @Override
-                public void onTimeout() throws RemoteException {
-                    Log.e("DATA", "onTimeout");
-                }
-
-                @Override
-                public void onError(int i, String s) throws RemoteException {
-                    Log.e("DATA", "onError : "+ s);
+                public void onResult(int i, Bitmap bitmap) throws RemoteException {
+                    showPhoto(bitmap);
                 }
             });
         } catch (RemoteException e) {
