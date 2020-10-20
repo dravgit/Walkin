@@ -40,7 +40,6 @@ dependencies {
 
     implementation files('libs/CentermPosOverseaLib201811081508.jar')
     implementation files('libs/SmartPosLib_V3.1.2_20180205.jar')
-
     implementation files('libs/aidl.jar')
     implementation "androidx.core:core-ktx:+"
     implementation 'me.dm7.barcodescanner:zxing:1.9'
