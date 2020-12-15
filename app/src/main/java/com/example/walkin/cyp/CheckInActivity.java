@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -15,7 +16,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -50,6 +53,7 @@ import com.centerm.smartpos.aidl.printer.PrinterParams;
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
 import com.centerm.smartpos.constant.Constant;
 import com.centerm.smartpos.util.HexUtil;
+import com.example.walkin.BuildConfig;
 import com.example.walkin.R;
 import com.example.walkin.cyp.models.CheckInParamModel;
 import com.example.walkin.cyp.models.CheckInResponseModel;
@@ -70,9 +74,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -102,18 +109,24 @@ public class CheckInActivity extends BaseActivity {
     public static long timestart;
     private boolean aidlReady = false;
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-    private ProgressDialog mLoading;
+    private ProgressDialog mLoading, sLoading;
     private MediaPlayer mediaPlayer;
     private EditText edtnameTH, edtidcard, edtCar, edtTemp, edtaddress, edtfrom, edtperson, edtnote;
     private List<String> months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     private List<String> months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.");
     private ImageView iVphoto;
     private ImageButton capUser, capCar, capCard;
+    private Bitmap cardWaterMark, carWaterMark, userWaterMark, face;
     private Button testBtn, cancleCheckin, okCheckin;
+    private Uri uriCarFilePath;
+    private Uri uriCardFilePath;
+    private Uri uriUserFilePath;
+
     private Spinner dropdownDepartment, dropdownObjective;
-    String[] department = new String[]{"","1", "2", "three"};
-    String[] objective = new String[]{"","4", "5", "five"};
+    String[] department = new String[]{"", "1", "2", "three"};
+    String[] objective = new String[]{"", "4", "5", "five"};
     WatermarkText watermarkText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +135,10 @@ public class CheckInActivity extends BaseActivity {
         mLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoading.setCanceledOnTouchOutside(false);
         mLoading.setMessage("Reading...");
+        sLoading = new ProgressDialog(this);
+        sLoading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        sLoading.setCanceledOnTouchOutside(false);
+        sLoading.setMessage("Processing...");
         mediaPlayer = MediaPlayer.create(this, R.raw.beep_sound);
         edtnameTH = findViewById(R.id.edtnameTH);
         edtidcard = findViewById(R.id.edtidcard);
@@ -169,7 +186,7 @@ public class CheckInActivity extends BaseActivity {
                 .setPositionY(1)
                 .setRotation(40)
                 .setTextAlpha(255)
-                .setTextSize(6)
+                .setTextSize(50)
                 .setTextColor(Color.WHITE)
                 .setTextShadow(0.05f, 2, 2, Color.BLUE);
         cancleCheckin.setOnClickListener(new View.OnClickListener() {
@@ -181,20 +198,28 @@ public class CheckInActivity extends BaseActivity {
         okCheckin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name,department_id,objective_id,images;
-                JSONArray jsonArray = fileImg();
+                sLoading.show();
+
+                String name, department_id, objective_id, images = "";
+                JSONArray jsonArray = null;
+                try {
+                    jsonArray = fileImg();
+                    images = jsonArray.toString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 int selectedItemOfDepartment = dropdownDepartment.getSelectedItemPosition();
                 DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
                 ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if(!edtnameTH.getText().toString().isEmpty() && !edtfrom.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty() && jsonArray.length() != 0){
+                if (!edtnameTH.getText().toString().isEmpty() && !edtfrom.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty() && jsonArray.length() != 0) {
                     name = edtnameTH.getText().toString();
                     department_id = actualPositionOfDepartment.getID();
                     objective_id = actualPositionOfObjective.getID();
-                    images = fileImg().toString();
-                    Log.e("BASE64",images);
-                    CheckInParamModel.Builder param = new CheckInParamModel.Builder(name,department_id,objective_id,images);
-                    Log.e("CHECK",param.toString());
+
+                    CheckInParamModel.Builder param = new CheckInParamModel.Builder(name, department_id, objective_id, images);
+                    Log.e("CHECK", param.toString());
                     param.idcard(edtidcard.getText().toString())
                             .vehicle_id(edtCar.getText().toString())
                             .temperature(edtTemp.getText().toString())
@@ -205,27 +230,32 @@ public class CheckInActivity extends BaseActivity {
                             .personContact(edtperson.getText().toString())
                             .objectiveNote(edtnote.getText().toString());
                     CheckInParamModel data = param.build();
-                    Log.e("DATA",data.toString());
-                    NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>(){
+                    Log.e("DATA", data.toString());
+                    NetworkUtil.Companion.checkIn(data, new NetworkLisener<CheckInResponseModel>() {
                         @Override
                         public void onExpired() {
                             okCheckin.callOnClick();
+                            sLoading.dismiss();
                         }
+
                         @Override
                         public void onError(@NotNull WalkInErrorModel errorModel) {
-                            Log.e("CHECK","Error.");
+                            Log.e("CHECK", "Error.");
                             checkError(errorModel);
+                            sLoading.dismiss();
                         }
 
                         @Override
                         public void onResponse(CheckInResponseModel response) {
+                            sLoading.dismiss();
                             CheckInResponseModel data = response;
                             print(data);
                             CheckInActivity.this.finish();
                         }
                     }, CheckInResponseModel.class);
-                }else{
-                    Toast.makeText(getApplicationContext(),"กรุณากรอกข้อมูลให้ครบ",Toast.LENGTH_SHORT).show();
+                } else {
+                    sLoading.dismiss();
+                    Toast.makeText(getApplicationContext(), "กรุณากรอกข้อมูลให้ครบ", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -246,32 +276,37 @@ public class CheckInActivity extends BaseActivity {
         return true;
     }
 
-    private JSONArray fileImg(){
+    private JSONArray fileImg() throws IOException {
         JSONArray jsonArray = new JSONArray();
-        if(iVphoto.getDrawable() != null){
-            String imgIc = encodeImg(iVphoto);
-            JSONObject JObject = addImg(4,imgIc);
+        if (iVphoto.getDrawable() != null) {
+            iVphoto.invalidate();
+            BitmapDrawable drawable = (BitmapDrawable) iVphoto.getDrawable();
+            if (drawable != null && drawable.getBitmap() != null) {
+                face = drawable.getBitmap();
+            }
+            String imgIc = encodeImg(face, face.getWidth(), face.getHeight(), 100);
+            JSONObject JObject = addImg(4, imgIc);
             jsonArray.put(JObject);
         }
-        if(capUser.getDrawable() != null){
-            String imgIc = encodeImg(capUser);
-            JSONObject JObject = addImg(1,imgIc);
+        if (userWaterMark != null) {
+            String imgIc = encodeImg(userWaterMark);
+            JSONObject JObject = addImg(1, imgIc);
             jsonArray.put(JObject);
         }
-        if(capCar.getDrawable() != null){
-            String imgIc = encodeImg(capCar);
-            JSONObject JObject = addImg(2,imgIc);
+        if (carWaterMark != null) {
+            String imgIc = encodeImg(carWaterMark);
+            JSONObject JObject = addImg(2, imgIc);
             jsonArray.put(JObject);
         }
-        if(capCard.getDrawable() != null){
-            String imgIc = encodeImg(capCard);
-            JSONObject JObject = addImg(3,imgIc);
+        if (cardWaterMark != null) {
+            String imgIc = encodeImg(cardWaterMark);
+            JSONObject JObject = addImg(3, imgIc);
             jsonArray.put(JObject);
         }
         return jsonArray;
     }
 
-    private JSONObject addImg(int type,String base64){
+    private JSONObject addImg(int type, String base64) {
         JSONObject img = new JSONObject();
         try {
             img.put("file", base64);
@@ -283,92 +318,135 @@ public class CheckInActivity extends BaseActivity {
         return img;
     }
 
-    private String encodeImg(ImageView type) {
+    private String encodeImg(Bitmap bitmap) throws IOException {
+        return encodeImg(bitmap, bitmap.getWidth()/5, bitmap.getHeight()/5, 70);
+    }
+
+    private String encodeImg(Bitmap bitmap, int width, int height, int quality) throws IOException {
+        Bitmap resize = Bitmap.createScaledBitmap(bitmap, width, height, false);
         String encoded = "";
-        type.invalidate();
-        BitmapDrawable drawable = (BitmapDrawable) type.getDrawable();
-        if(drawable != null && drawable.getBitmap() != null){
-            Bitmap bitmap = drawable.getBitmap();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream .toByteArray();
-            encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        resize.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        byteArrayOutputStream.close();
+
         return encoded;
     }
 
     private void cameraUser() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
-        }else{
-            openCamera(CAMERA_USER_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+        } else {
+            uriUserFilePath = getUriByName("IMG_image_user");
+            openCamera(CAMERA_USER_CODE, uriUserFilePath);
         }
     }
 
     private void cameraCar() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
-        }else{
-            openCamera(CAMERA_CAR_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+        } else {
+            uriCarFilePath = getUriByName("IMG_image_car");
+            openCamera(CAMERA_CAR_CODE, uriCarFilePath);
         }
     }
 
     private void cameraCard() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
-        }else{
-            openCamera(CAMERA_CARD_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
+        } else {
+            uriCardFilePath = getUriByName("IMG_image_card");
+            openCamera(CAMERA_CARD_CODE, uriCardFilePath);
         }
     }
 
-    private void openCamera(int typeCode) {
-        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(camera, typeCode);
+    private Uri getUriByName(String name) {
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES + "/walkin");
+        File photoFile = null;
+        try {
+            photoFile = File.createTempFile("" + name,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", photoFile);
+    }
+
+    private void openCamera(int typeCode, Uri uri) {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            startActivityForResult(cameraIntent, typeCode);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == CAMERA_USER_CODE){
-            if (resultCode == RESULT_OK && data !=null ) {
-                Bitmap image = (Bitmap) data.getExtras().get("data");
-                WatermarkBuilder
-                        .create(this, rotageBitmap(image))
+        if (requestCode == CAMERA_USER_CODE) {
+            if (resultCode == RESULT_OK) {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriUserFilePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                userWaterMark = WatermarkBuilder
+                        .create(this, rotageBitmap(bitmap))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
-                        .setToImageView(capUser);
+                        .getOutputImage();
+                capUser.setImageBitmap(userWaterMark);
             }
         }
-        if(requestCode == CAMERA_CAR_CODE){
-            if (resultCode == RESULT_OK && data !=null ) {
-                Bitmap image = (Bitmap) data.getExtras().get("data");
-                WatermarkBuilder
-                        .create(this, rotageBitmap(image))
+        if (requestCode == CAMERA_CAR_CODE) {
+            if (resultCode == RESULT_OK) {
+
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriCarFilePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                carWaterMark = WatermarkBuilder
+                        .create(this, rotageBitmap(bitmap))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
-                        .setToImageView(capCar);
+                        .getOutputImage();
+                capCar.setImageBitmap(carWaterMark);
             }
         }
-        if(requestCode == CAMERA_CARD_CODE){
-            if (resultCode == RESULT_OK && data !=null ) {
-                Bitmap image = (Bitmap) data.getExtras().get("data");
-                WatermarkBuilder
-                        .create(this, rotageBitmap(image))
+        if (requestCode == CAMERA_CARD_CODE) {
+            if (resultCode == RESULT_OK) {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriCardFilePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                cardWaterMark = WatermarkBuilder
+                        .create(this, rotageBitmap(bitmap))
                         .loadWatermarkText(watermarkText)
                         .setTileMode(true)
                         .getWatermark()
-                        .setToImageView(capCard);
+                        .getOutputImage();
+                capCard.setImageBitmap(cardWaterMark);
             }
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == CAMERA_PERM_CODE){
-            if(grantResults.length < 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == CAMERA_PERM_CODE) {
+            if (grantResults.length < 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-            }else{
+            } else {
                 Toast.makeText(this, "Camera Permission is Required to Use camera", Toast.LENGTH_SHORT).show();
             }
         }
@@ -418,7 +496,6 @@ public class CheckInActivity extends BaseActivity {
         public void onPrintOutOfPaper() throws RemoteException {
         }
     }
-
 
 
     @Override
@@ -577,7 +654,7 @@ public class CheckInActivity extends BaseActivity {
                     String gender = jObject.getString("Gender");
                     String address = jObject.getString("Address");
                     String birth = jObject.getString("BirthDate");
-                    edtaddress.setText(address.replace("#"," "));
+                    edtaddress.setText(address.replace("#", " "));
                     tVgender.setText(gender);
                     tVbirth.setText(birth);
                     Toast.makeText(CheckInActivity.this,
@@ -628,9 +705,17 @@ public class CheckInActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                WatermarkText watermarkText2 = new WatermarkText(watermarkTxt)
+                        .setPositionX(1)
+                        .setPositionY(1)
+                        .setRotation(40)
+                        .setTextAlpha(255)
+                        .setTextSize(6)
+                        .setTextColor(Color.WHITE)
+                        .setTextShadow(0.05f, 2, 2, Color.BLUE);
                 WatermarkBuilder
                         .create(CheckInActivity.this, bmp)
-                        .loadWatermarkText(watermarkText)
+                        .loadWatermarkText(watermarkText2)
                         .setTileMode(true)
                         .getWatermark()
                         .setToImageView(iVphoto);
@@ -727,11 +812,11 @@ public class CheckInActivity extends BaseActivity {
                                         aidlIdCardTha.searchIDCardInfo(6000, new ThaiInfoListerner.Stub() {
                                             @Override
                                             public void onResult(int i, String s) throws RemoteException {
-                                                Log.e("DATA", "onResult : "+s);
+                                                Log.e("DATA", "onResult : " + s);
 
                                                 long end = System.currentTimeMillis();
-                                                int b = (int) ((end - time1)/1000);
-                                                int c = (int) (((end - time1)/100)%10);
+                                                int b = (int) ((end - time1) / 1000);
+                                                int c = (int) (((end - time1) / 100) % 10);
                                                 showInfo(jsonFormat(s), (b + "." + c));
                                                 mediaPlayer.start();
                                                 mLoading.dismiss();
@@ -777,7 +862,7 @@ public class CheckInActivity extends BaseActivity {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
-                    if (mLoading!= null && mLoading.isShowing()) {
+                    if (mLoading != null && mLoading.isShowing()) {
                         mLoading.dismiss();
                     }
                 }
@@ -863,7 +948,7 @@ public class CheckInActivity extends BaseActivity {
                     magCard.swipeCard(30000, new AidlMagCardListener.Stub() {
                         @Override
                         public void onSwipeCardTimeout() throws RemoteException {
-                            Log.e("SWIPE","time out");
+                            Log.e("SWIPE", "time out");
                         }
 
                         @Override
@@ -886,8 +971,8 @@ public class CheckInActivity extends BaseActivity {
 
                         @Override
                         public void onSwipeCardFail() throws RemoteException {
-                            Log.e("SWIPE","ERROR1");
-                            runOnUiThread(new Runnable(){
+                            Log.e("SWIPE", "ERROR1");
+                            runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(CheckInActivity.this, "กรุณาลองใหม่อีกครั้ง", Toast.LENGTH_LONG).show();
@@ -898,12 +983,12 @@ public class CheckInActivity extends BaseActivity {
                         @Override
                         public void onSwipeCardException(int arg0)
                                 throws RemoteException {
-                            Log.e("SWIPE","Exception");
+                            Log.e("SWIPE", "Exception");
                         }
 
                         @Override
                         public void onCancelSwipeCard() throws RemoteException {
-                            Log.e("SWIPE","Cancel");
+                            Log.e("SWIPE", "Cancel");
                         }
                     });
                 } catch (Exception e) {
@@ -1019,7 +1104,7 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setText(data.getContact_code());
             textList.add(printerParams);
 
-            for (int i = 0;i<signature.size();i++){
+            for (int i = 0; i < signature.size(); i++) {
                 printerParams = new PrinterParams();
                 printerParams.setAlign(PrinterParams.ALIGN.CENTER);
                 printerParams.setTextSize(24);
