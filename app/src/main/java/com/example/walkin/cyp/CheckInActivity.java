@@ -1045,6 +1045,27 @@ public class CheckInActivity extends BaseActivity {
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
+            printerParams.setText("\nทะเบียนรถ : " + data.getVehicle_id());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nจากบริษัท : " + data.getFrom());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
+            printerParams.setText("\nผู้ที่ขอพบ : " + data.getPerson_contact());
+            printerParams.setBold(true);
+            textList.add(printerParams);
+
+            printerParams = new PrinterParams();
+            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
+            printerParams.setTextSize(24);
             printerParams.setText("\nติดต่อแผนก : " + data.getDepartment());
             printerParams.setBold(true);
             textList.add(printerParams);
@@ -1060,27 +1081,6 @@ public class CheckInActivity extends BaseActivity {
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
             printerParams.setText("\nอุณหภูมิ : " + data.getTemperature());
-            printerParams.setBold(true);
-            textList.add(printerParams);
-
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(24);
-            printerParams.setText("\nจากบริษัท : " + data.getFrom());
-            printerParams.setBold(true);
-            textList.add(printerParams);
-
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(24);
-            printerParams.setText("\nทะเบียนรถ : " + data.getVehicle_id());
-            printerParams.setBold(true);
-            textList.add(printerParams);
-
-            printerParams = new PrinterParams();
-            printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(24);
-            printerParams.setText("\nผู้ที่ขอพบ : " + data.getPerson_contact());
             printerParams.setBold(true);
             textList.add(printerParams);
 
