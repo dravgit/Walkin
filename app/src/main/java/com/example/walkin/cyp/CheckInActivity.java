@@ -504,13 +504,13 @@ public class CheckInActivity extends BaseActivity {
             IBinder device = deviceManager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_ICCARD);
             if (device != null) {
                 aidlIcCard = AidlICCard.Stub.asInterface(device);
-                if (aidlIcCard != null) {
+                 if (aidlIcCard != null) {
                     Log.e("MY", "IcCard bind success!");
                     //This is the IC card service object!!!!
                     //I am do nothing now and it is not null.
                     //you can do anything by yourselef later.
                     d();
-                } else {
+                }else {
                     Log.e("MY", "IcCard bind fail!");
                 }
             }

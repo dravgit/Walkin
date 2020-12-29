@@ -19,9 +19,8 @@ class NetworkUtil {
         private val STATUS_CODE_COMPANY_NOT_FOUND = 901
         private val STATUS_CODE_SEARIAL_NOT_FOUND = 902
         val STATUS_CODE_INVALID_PASSWORD = 201
-        private val URL_DOMAIN = "https://app-ipp.com"
-//        private val URL_DOMAIN = "http://165.22.250.233"
-        private val URL_KACHEN_DOMAIN = "http://165.22.250.233"
+        private val URL_DOMAIN = "https://cloud.walkinvms.com/"
+        private val URL_KACHEN_DOMAIN = "https://cloud.walkinvms.com/"
         val URL_LOGIN = "$URL_DOMAIN/api/v1/login"
         val URL_CHECK_DEVICE = "$URL_KACHEN_DOMAIN/api/v1/checkdevice"
         val URL_GET_SUMMARY = "$URL_DOMAIN/api/v1/summary"
