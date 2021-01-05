@@ -72,6 +72,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.reactivestreams.Subscription;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -85,6 +86,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class CheckInActivity extends BaseActivity {
     private String watermarkTxt = "ใช้สำหรับงาน รปภ.เท่านั้น";
@@ -126,6 +135,7 @@ public class CheckInActivity extends BaseActivity {
     String[] department = new String[]{"", "1", "2", "three"};
     String[] objective = new String[]{"", "4", "5", "five"};
     WatermarkText watermarkText;
+    Disposable disposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,6 +269,17 @@ public class CheckInActivity extends BaseActivity {
                 }
             }
         });
+
+        disposable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .repeat() //to perform your task every 5 seconds
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        //call load idcard
+                    }
+                });
     }
 
     public boolean isJSONValid(String JSON) {
@@ -909,6 +930,9 @@ public class CheckInActivity extends BaseActivity {
         if (magCard != null) {
             scheduledExecutor.shutdown();
             magCard = null;
+        }
+        if (!disposable.isDisposed()) {
+            disposable.dispose();
         }
     }
 
