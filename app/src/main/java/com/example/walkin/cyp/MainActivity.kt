@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONObjectRequestListener
+import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.example.walkin.R
 import com.example.walkin.cyp.models.LoginResponseModel
 import com.example.walkin.cyp.models.WalkInErrorModel
@@ -21,7 +22,7 @@ import com.example.walkin.cyp.utils.Util.Companion.setContext
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 
-class MainActivity : BaseKioskActivity() {
+class MainActivity : BaseActivity() {
     var btnLogin: Button? = null
     val PERMISSIONS_REQUEST_CODE = 103
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +76,18 @@ class MainActivity : BaseKioskActivity() {
                 }
             }
         }
+    }
+
+    override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
+    }
+
+    override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+    }
+
+    override fun showMessage(str: String?, black: Int) {
     }
 
     fun login() {

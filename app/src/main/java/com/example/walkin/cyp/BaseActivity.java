@@ -14,13 +14,20 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager;
+import com.example.walkin.cyp.app.WalkinApplication;
 import com.example.walkin.cyp.models.WalkInErrorModel;
 import com.example.walkin.cyp.utils.NetworkUtil;
 import com.example.walkin.cyp.utils.PreferenceUtils;
 import com.example.walkin.cyp.utils.Util;
 
+import sunmi.paylib.SunmiPayKernel;
+import sunmi.sunmiui.utils.LogUtil;
+
 public abstract class BaseActivity extends BaseKioskActivity {
 
+    private SunmiPayKernel mSMPayKernel;
+
+    private boolean isDisConnectService = true;
     protected AidlDeviceManager manager = null;
 
     @Override
@@ -28,12 +35,50 @@ public abstract class BaseActivity extends BaseKioskActivity {
         super.onCreate(savedInstanceState);
         bindService();
         Util.Companion.setContext(this);
+        connectPayService();
     }
+
+    private void connectPayService() {
+        mSMPayKernel = SunmiPayKernel.getInstance();
+        mSMPayKernel.initPaySDK(this, mConnectCallback);
+    }
+
+
+    private SunmiPayKernel.ConnectCallback mConnectCallback = new SunmiPayKernel.ConnectCallback() {
+
+        @Override
+        public void onConnectPaySDK() {
+            LogUtil.e(Constant.TAG, "onConnectPaySDK");
+            try {
+                WalkinApplication.mEMVOptV2 = mSMPayKernel.mEMVOptV2;
+                WalkinApplication.mBasicOptV2 = mSMPayKernel.mBasicOptV2;
+                WalkinApplication.mPinPadOptV2 = mSMPayKernel.mPinPadOptV2;
+                WalkinApplication.mReadCardOptV2 = mSMPayKernel.mReadCardOptV2;
+                WalkinApplication.mSecurityOptV2 = mSMPayKernel.mSecurityOptV2;
+                WalkinApplication.mTaxOptV2 = mSMPayKernel.mTaxOptV2;
+                isDisConnectService = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onDisconnectPaySDK() {
+            LogUtil.e(Constant.TAG, "onDisconnectPaySDK");
+            isDisConnectService = true;
+//            showToast(R.string.connect_fail);
+        }
+
+    };
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService();
+        if (mSMPayKernel != null) {
+            mSMPayKernel.destroyPaySDK();
+        }
     }
 
     private Bitmap rotateImage(Bitmap source, Float angle) {
