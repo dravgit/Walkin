@@ -38,6 +38,7 @@ import com.example.walkin.BuildConfig
 import com.example.walkin.R
 import com.example.walkin.cyp.app.WalkinApplication
 import com.example.walkin.cyp.models.*
+import com.example.walkin.cyp.utils.BitmapUtils
 import com.example.walkin.cyp.utils.ByteUtil
 import com.example.walkin.cyp.utils.NetworkUtil.Companion.NetworkLisener
 import com.example.walkin.cyp.utils.NetworkUtil.Companion.checkIn
@@ -46,7 +47,6 @@ import com.example.walkin.cyp.utils.SunmiUtility
 import com.example.walkin.cyp.utils.Util.Companion.createImageFromQRCode
 import com.example.walkin.cyp.wrapper.CheckCardCallbackV2Wrapper
 import com.sunmi.pay.hardware.aidl.AidlConstants
-import com.sunmi.pay.hardware.aidlv2.print.PrinterOptV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
 import com.sunmi.peripheral.printer.InnerResultCallbcak
 import com.sunmi.peripheral.printer.SunmiPrinterService
@@ -914,6 +914,15 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService?.sendRAWData(returnText, null)
     }
 
+    private fun resizeBitmap(cacheBitmap: Bitmap): Bitmap {
+        var cacheBitmap = BitmapUtils.scale(cacheBitmap, cacheBitmap.width / 3, cacheBitmap.height / 3)
+        cacheBitmap = BitmapUtils.replaceBitmapColor(cacheBitmap, Color.TRANSPARENT, Color.WHITE)
+        if (cacheBitmap.width > 384) {
+            val newHeight = (1.0 * cacheBitmap.height * 384 / cacheBitmap.width).toInt()
+            cacheBitmap = BitmapUtils.scale(cacheBitmap, 384, newHeight)
+        }
+       return cacheBitmap
+    }
     private fun printP2(data: CheckInResponseModel) {
         setHeight(0x11)
         sunmiPrinterService!!.clearBuffer()
@@ -921,7 +930,7 @@ class CheckInActivity() : BaseActivity() {
         val bitmap = createImageFromQRCode(data.contact_code)
         val signature = PreferenceUtils.getSignature()
 
-        sunmiPrinterService!!.printBitmap(PreferenceUtils.getBitmapLogo(), innerResultCallbcak)
+        sunmiPrinterService!!.printBitmap(resizeBitmap(PreferenceUtils.getBitmapLogo()), innerResultCallbcak)
 
         sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() + "\nชื่อ-นามสกุล : " + data.fullname.replace(" ",
                                                                                                                                          " ") + "\nเลขบัตรประขาชน : " + data.idcard + "\nทะเบียนรถ : " + data.vehicle_id + "\nจากบริษัท : " + data.from + "\nผู้ที่ขอพบ : " + data.person_contact + "\nติดต่อแผนก : " + data.department + "\nวัตถุประสงค์ : " + data.objective_type.replace(
@@ -1204,13 +1213,13 @@ class CheckInActivity() : BaseActivity() {
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({
-                            val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
-                            showPhoto(bmp)
-                        }, { error ->
-                            error?.message?.let { Log.e("error", error?.message) }
-                            handleResult2()
-                        })
+            .subscribe({
+                           val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
+                           showPhoto(bmp)
+                       }, { error ->
+                           error?.message?.let { Log.e("error", error?.message) }
+                           handleResult2()
+                       })
 
         return userModel
     }
@@ -1220,7 +1229,9 @@ class CheckInActivity() : BaseActivity() {
         WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
         val cmdByte = ByteUtil.hexStringToByte(cmd)
         WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), cmdByte, ByteArray(260))
-        WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), ByteUtil.hexStringToByte("00c00000" + cmd.substring(12)), recv)
+        WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(),
+                                                      ByteUtil.hexStringToByte("00c00000" + cmd.substring(12)),
+                                                      recv)
         return recv
     }
 
@@ -1279,7 +1290,7 @@ class CheckInActivity() : BaseActivity() {
     private fun transmitApduCmdPhoto(cmd: String, hexSize: String): ByteArray? {
         val send = ByteUtil.hexStr2Bytes(cmd)
         val recv = ByteArray(260)
-        val size = Integer.parseInt(hexSize,16)
+        val size = Integer.parseInt(hexSize, 16)
         var xx = ByteArray(size)
         try {
             val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
@@ -1288,7 +1299,7 @@ class CheckInActivity() : BaseActivity() {
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
             } else {
                 val x = ByteUtil.bytes2HexStr(*recv)
-                val x2 = x.substring(0, size*2)
+                val x2 = x.substring(0, size * 2)
                 xx = ByteUtil.hexStr2Bytes(x2)
             }
         } catch (e: RemoteException) {
@@ -1348,16 +1359,23 @@ class CheckInActivity() : BaseActivity() {
                 } else {
                     Log.e("data2", track1 + "////" + track2 + "/////" + track3)
                     runOnUiThread {
-                        val name = track1.replace("^", "").trim().split("$")
-                        edtnameTH!!.setText(name.reversed().toString().replace(",", "").replace("[","").replace("]",""))
+                        val name = track1.replace("^", "")
+                            .trim()
+                            .split("$")
+                        edtnameTH!!.setText(name.reversed()
+                                                .toString()
+                                                .replace(",", "")
+                                                .replace("[", "")
+                                                .replace("]", ""))
                         val list = track2.split("=")
                         val card = list.first()
-                        val idcard = card.substring(card.length-13, card.length)
+                        val idcard = card.substring(card.length - 13, card.length)
                         edtidcard!!.setText(idcard)
                         val birthDate = list.get(1)
-                        tVbirth!!.text = birthDate.substring(birthDate.length-2)+"/"+
-                                birthDate.substring(birthDate.length-4, birthDate.length-2)+"/"+
-                                birthDate.substring(birthDate.length-8, birthDate.length-4)
+                        tVbirth!!.text = birthDate.substring(birthDate.length - 2) + "/" + birthDate.substring(birthDate.length - 4,
+                                                                                                               birthDate.length - 2) + "/" + birthDate.substring(
+                            birthDate.length - 8,
+                            birthDate.length - 4)
                     }
                 }
                 // 继续检卡
