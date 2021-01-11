@@ -46,7 +46,10 @@ import com.example.walkin.cyp.utils.SunmiUtility
 import com.example.walkin.cyp.utils.Util.Companion.createImageFromQRCode
 import com.example.walkin.cyp.wrapper.CheckCardCallbackV2Wrapper
 import com.sunmi.pay.hardware.aidl.AidlConstants
+import com.sunmi.pay.hardware.aidlv2.print.PrinterOptV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
+import com.sunmi.peripheral.printer.InnerResultCallbcak
+import com.sunmi.peripheral.printer.SunmiPrinterService
 import com.watermark.androidwm_light.WatermarkBuilder
 import com.watermark.androidwm_light.bean.WatermarkText
 import io.reactivex.Observable
@@ -124,6 +127,7 @@ class CheckInActivity() : BaseActivity() {
     var objective = arrayOf("", "4", "5", "five")
     var watermarkText: WatermarkText? = null
     var disposable: Disposable? = null
+    private var sunmiPrinterService: SunmiPrinterService? = null
 
 
     internal var baCommandAPDU = byteArrayOf(0x00.toByte(),
@@ -236,7 +240,8 @@ class CheckInActivity() : BaseActivity() {
                     override fun onResponse(response: CheckInResponseModel) {
                         sLoading!!.dismiss()
                         val data = response
-                        print(data)
+//                        print(data)
+                        printP2(data)
                         finish()
                     }
 
@@ -894,6 +899,74 @@ class CheckInActivity() : BaseActivity() {
             }
         }
         scheduledExecutor.scheduleAtFixedRate(job, 1000, 1000, TimeUnit.MILLISECONDS)
+    }
+
+    @Throws(RemoteException::class)
+    fun setHeight(height: Int) {
+        val returnText = ByteArray(3)
+        returnText[0] = 0x1B
+        returnText[1] = 0x33
+        returnText[2] = height.toByte()
+
+        if (sunmiPrinterService == null) {
+            sunmiPrinterService = WalkinApplication.sunmiPrinterService
+        }
+        sunmiPrinterService?.sendRAWData(returnText, null)
+    }
+
+    private fun printP2(data: CheckInResponseModel) {
+        setHeight(0x11)
+        sunmiPrinterService!!.clearBuffer()
+        sunmiPrinterService!!.enterPrinterBuffer(true)
+        val bitmap = createImageFromQRCode(data.contact_code)
+        val signature = PreferenceUtils.getSignature()
+
+        sunmiPrinterService!!.printBitmap(PreferenceUtils.getBitmapLogo(), innerResultCallbcak)
+
+        sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() + "\nชื่อ-นามสกุล : " + data.fullname.replace(" ",
+                                                                                                                                         " ") + "\nเลขบัตรประขาชน : " + data.idcard + "\nทะเบียนรถ : " + data.vehicle_id + "\nจากบริษัท : " + data.from + "\nผู้ที่ขอพบ : " + data.person_contact + "\nติดต่อแผนก : " + data.department + "\nวัตถุประสงค์ : " + data.objective_type.replace(
+            " ",
+            " ") + "\nอุณหภูมิ : " + data.temperature + "\nเวลาเข้า : " + data.chcekin_time, innerResultCallbcak)
+
+        sunmiPrinterService!!.printBitmap(bitmap, innerResultCallbcak)
+        sunmiPrinterService!!.printText(data.contact_code, innerResultCallbcak)
+
+        for (i in signature.indices) {
+            sunmiPrinterService!!.printText("\n\n\n____________________________" + "\n     " + signature.get(i)
+                .getname(), innerResultCallbcak)
+        }
+        sunmiPrinterService!!.printText("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
+
+        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
+        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
+        sunmiPrinterService!!.commitPrinterBuffer()
+    }
+
+    private var `is` = true
+    private val innerResultCallbcak: InnerResultCallbcak = object : InnerResultCallbcak() {
+        override fun onRunResult(isSuccess: Boolean) {
+            LogUtil.e("lxy", "isSuccess:$isSuccess")
+            if (`is`) {
+                try {
+                    sunmiPrinterService!!.lineWrap(6, this)
+                    `is` = false
+                } catch (e: RemoteException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        override fun onReturnString(result: String) {
+            LogUtil.e("lxy", "result:$result")
+        }
+
+        override fun onRaiseException(code: Int, msg: String) {
+            LogUtil.e("lxy", "code:$code,msg:$msg")
+        }
+
+        override fun onPrintResult(code: Int, msg: String) {
+            LogUtil.e("lxy", "code:$code,msg:$msg")
+        }
     }
 
     private fun print(data: CheckInResponseModel) {

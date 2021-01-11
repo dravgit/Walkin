@@ -35,7 +35,7 @@ class WalkinApplication: Application() {
             : EMVOptV2? = null
     var mTaxOptV2 // 获取税控操作模块
             : TaxOptV2? = null
-    var sunmiPrinterService: SunmiPrinterService? = null
+//    var sunmiPrinterService: SunmiPrinterService? = null
     var scanInterface: IScanInterface? = null
     override fun onCreate() {
         super.onCreate()
@@ -84,11 +84,11 @@ class WalkinApplication: Application() {
 
     var innerPrinterCallback: InnerPrinterCallback = object : InnerPrinterCallback() {
         override fun onConnected(service: SunmiPrinterService) {
-            sunmiPrinterService = service
+            setPrintService(service)
         }
 
         override fun onDisconnected() {
-            sunmiPrinterService = null
+//            sunmiPrinterService = null
         }
     }
 
@@ -118,5 +118,10 @@ class WalkinApplication: Application() {
         lateinit var mBasicOptV2: BasicOptV2
         lateinit var mEMVOptV2: EMVOptV2
         lateinit var appContext: Context
+        var sunmiPrinterService: SunmiPrinterService? = null
+
+        fun setPrintService(service: SunmiPrinterService) {
+            sunmiPrinterService = service
+        }
     }
 }
