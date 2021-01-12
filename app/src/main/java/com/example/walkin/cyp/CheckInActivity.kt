@@ -929,22 +929,28 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService!!.enterPrinterBuffer(true)
         val bitmap = createImageFromQRCode(data.contact_code)
         val signature = PreferenceUtils.getSignature()
-
-        sunmiPrinterService!!.printBitmap(resizeBitmap(PreferenceUtils.getBitmapLogo()), innerResultCallbcak)
+        sunmiPrinterService!!.printText("      ",innerResultCallbcak)
+        sunmiPrinterService!!.printBitmap(PreferenceUtils.getBitmapLogo(), innerResultCallbcak)
 
         sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() + "\nชื่อ-นามสกุล : " + data.fullname.replace(" ",
                                                                                                                                          " ") + "\nเลขบัตรประขาชน : " + data.idcard + "\nทะเบียนรถ : " + data.vehicle_id + "\nจากบริษัท : " + data.from + "\nผู้ที่ขอพบ : " + data.person_contact + "\nติดต่อแผนก : " + data.department + "\nวัตถุประสงค์ : " + data.objective_type.replace(
             " ",
             " ") + "\nอุณหภูมิ : " + data.temperature + "\nเวลาเข้า : " + data.chcekin_time, innerResultCallbcak)
-
+        sunmiPrinterService!!.printText("          ",innerResultCallbcak)
         sunmiPrinterService!!.printBitmap(bitmap, innerResultCallbcak)
-        sunmiPrinterService!!.printText(data.contact_code, innerResultCallbcak)
+        sunmiPrinterService!!.printText("\n           " + data.contact_code, innerResultCallbcak)
 
         for (i in signature.indices) {
-            sunmiPrinterService!!.printText("\n\n\n____________________________" + "\n     " + signature.get(i)
-                .getname(), innerResultCallbcak)
+            sunmiPrinterService!!.printText("\n\n\n\n\n  ____________________________", innerResultCallbcak)
+            if(signature.get(i).getname().length <= 3){
+                sunmiPrinterService!!.printText("\n               " + signature.get(i).getname(), innerResultCallbcak)
+            }else if(signature.get(i).getname().length <= 5){
+                sunmiPrinterService!!.printText("\n             " + signature.get(i).getname(), innerResultCallbcak)
+            }else{
+                sunmiPrinterService!!.printText("\n          " + signature.get(i).getname(), innerResultCallbcak)
+            }
         }
-        sunmiPrinterService!!.printText("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
+        sunmiPrinterService!!.printText("\n\n\n\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
 
         sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
         sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
@@ -1173,7 +1179,7 @@ class CheckInActivity() : BaseActivity() {
 
         if (version.startsWith("0003")) {
             base = "80B0"
-            userModel.id = transmitApduCmd("80b0000402000d").substring(0, 12)
+            userModel.id = transmitApduCmd("80b0000402000d").substring(0, 13)
             val data = transmitApduCmd("80b000D902001D")
             val _year_th: String = data.substring(0, 4)
             val _month_th: String = data.substring(4, 6)
@@ -1191,7 +1197,7 @@ class CheckInActivity() : BaseActivity() {
         } else {
             base = "80B1"
             //cid //offset 4 len:13
-            userModel.id = transmitApduCmd("80b1000402000d").substring(0, 12)
+            userModel.id = transmitApduCmd("80b1000402000d").substring(0, 13)
             val data = transmitApduCmd("80b100D902001D")
             val _year_th: String = data.substring(0, 4)
             val _month_th: String = data.substring(4, 6)
@@ -1372,10 +1378,9 @@ class CheckInActivity() : BaseActivity() {
                         val idcard = card.substring(card.length - 13, card.length)
                         edtidcard!!.setText(idcard)
                         val birthDate = list.get(1)
-                        tVbirth!!.text = birthDate.substring(birthDate.length - 2) + "/" + birthDate.substring(birthDate.length - 4,
-                                                                                                               birthDate.length - 2) + "/" + birthDate.substring(
-                            birthDate.length - 8,
-                            birthDate.length - 4)
+                        tVbirth!!.text = birthDate.substring(birthDate.length - 2)+
+                                birthDate.substring(birthDate.length - 4, birthDate.length - 2)+
+                                birthDate.substring(birthDate.length - 8, birthDate.length - 4)
                     }
                 }
                 // 继续检卡
