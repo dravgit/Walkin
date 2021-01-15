@@ -36,14 +36,14 @@ class TotalVisitorActivity : BaseActivity() {
 
 
     override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
-        try {
-            printDev = AidlPrinter.Stub.asInterface(manager!!.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
-            adapter?.let {
-                it.setPrinter(printDev)
-            }
-        } catch (e: RemoteException) {
-            e.printStackTrace()
-        }
+//        try {
+//            printDev = AidlPrinter.Stub.asInterface(manager!!.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
+//            adapter?.let {
+//                it.setPrinter(printDev)
+//            }
+//        } catch (e: RemoteException) {
+//            e.printStackTrace()
+//        }
     }
 
     override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {

@@ -12,11 +12,13 @@ import com.example.walkin.R
 import com.example.walkin.cyp.models.PartialVisitorResponseModel
 import com.example.walkin.cyp.models.WalkInErrorModel
 import com.example.walkin.cyp.utils.NetworkUtil
+import com.sunmi.peripheral.printer.SunmiPrinterService
 import kotlinx.android.synthetic.main.activity_detail.*
 
 class TotalCheckInActivity : BaseActivity() {
     lateinit var adapter : DetailAdapter
     private var printDev: AidlPrinter? = null
+    private var sunmiPrinterService: SunmiPrinterService? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
@@ -28,19 +30,21 @@ class TotalCheckInActivity : BaseActivity() {
         tVdetail.setText("จำนวนผู้เข้าตึก")
         btnRefresh.setOnClickListener {
             loadData()
+
         }
         loadData()
     }
 
     override fun onPrintDeviceConnected(manager: AidlDeviceManager?) {
-        try {
-            printDev = AidlPrinter.Stub.asInterface(manager!!.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
-            adapter?.let {
-                it.setPrinter(printDev)
-            }
-        } catch (e: RemoteException) {
-            e.printStackTrace()
-        }    }
+//        try {
+//            printDev = AidlPrinter.Stub.asInterface(manager!!.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
+//            adapter?.let {
+//                it.setPrinter(printDev)
+//            }
+//        } catch (e: RemoteException) {
+//            e.printStackTrace()
+//        }
+    }
 
     override fun onDeviceConnected(deviceManager: AidlDeviceManager?) {
     }
