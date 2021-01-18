@@ -946,8 +946,10 @@ class CheckInActivity() : BaseActivity() {
                 sunmiPrinterService!!.printText("\n               " + signature.get(i).getname(), innerResultCallbcak)
             }else if(signature.get(i).getname().length <= 5){
                 sunmiPrinterService!!.printText("\n             " + signature.get(i).getname(), innerResultCallbcak)
-            }else{
+            } else if(signature.get(i).getname().length <= 10){
                 sunmiPrinterService!!.printText("\n          " + signature.get(i).getname(), innerResultCallbcak)
+            }else{
+                sunmiPrinterService!!.printText("\n  " + signature.get(i).getname(), innerResultCallbcak)
             }
         }
         sunmiPrinterService!!.printText("\n\n\n\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
