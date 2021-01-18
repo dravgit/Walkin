@@ -353,8 +353,10 @@ class DetailAdapter     // RecyclerView recyclerView;
                 sunmiPrinterService!!.printText("\n               " + signature[i].getname().trimIndent(), innerResultCallbcak)
             }else if(signature.get(i).getname().length <= 5){
                 sunmiPrinterService!!.printText("\n             " + signature[i].getname().trimIndent(), innerResultCallbcak)
-            }else{
+            }else if(signature.get(i).getname().length <= 10){
                 sunmiPrinterService!!.printText("\n          " + signature[i].getname().trimIndent(), innerResultCallbcak)
+            }else{
+                sunmiPrinterService!!.printText("\n  " + signature[i].getname().trimIndent(), innerResultCallbcak)
             }
         }
         sunmiPrinterService!!.printText("\n\n\n\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
