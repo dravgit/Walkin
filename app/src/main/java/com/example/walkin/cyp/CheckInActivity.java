@@ -305,9 +305,11 @@ public class CheckInActivity extends BaseActivity {
             if (drawable != null && drawable.getBitmap() != null) {
                 face = drawable.getBitmap();
             }
-            String imgIc = encodeImg(face, face.getWidth(), face.getHeight(), 100);
-            JSONObject JObject = addImg(4, imgIc);
-            jsonArray.put(JObject);
+            if(face != null){
+                String imgIc = encodeImg(face, face.getWidth(), face.getHeight(), 100);
+                JSONObject JObject = addImg(4, imgIc);
+                jsonArray.put(JObject);
+            }
         }
         if (userWaterMark != null) {
             String imgIc = encodeImg(userWaterMark);
@@ -934,6 +936,8 @@ public class CheckInActivity extends BaseActivity {
         if (!disposable.isDisposed()) {
             disposable.dispose();
         }
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES + "/walkin");
+        deleteRecursive(storageDir);
     }
 
     public void dd() throws InterruptedException, ExecutionException {
@@ -1158,5 +1162,13 @@ public class CheckInActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+    }
+
+    private void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory() && fileOrDirectory.listFiles() != null) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
     }
 }
