@@ -115,7 +115,7 @@ class CheckOutActivity : BaseActivity() {
                 tVidcard.setText(data.idcard())
                 tVcar.setText(data.vehicle_id())
                 tVtemperate.setText(data.temperature())
-                tVdepartment.setText(data.department())
+                tVdepartment.setText(data.person_contact)
                 tVobjective.setText(data.objective())
                 tVcheckintime.setText(data.checkin_time())
                 tVcode.setText(data.contact_code)

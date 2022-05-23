@@ -144,7 +144,7 @@
 
     <TextView
         android:id="@+id/headtVdepartment"
-        android:text="แผนกที่มาติดต่อ : "
+        android:text="ติดต่อบ้านเลขที่ : "
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

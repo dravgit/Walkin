@@ -224,9 +224,9 @@ public class CheckInActivity extends BaseActivity {
                 DepartmentModel actualPositionOfDepartment = (DepartmentModel) dropdownDepartment.getItemAtPosition(selectedItemOfDepartment);
                 int selectedItemOfObjective = dropdownObjective.getSelectedItemPosition();
                 ObjectiveTypeModel actualPositionOfObjective = (ObjectiveTypeModel) dropdownObjective.getItemAtPosition(selectedItemOfObjective);
-                if (!edtnameTH.getText().toString().isEmpty() && !edtfrom.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty() && jsonArray.length() != 0) {
+                if (!edtnameTH.getText().toString().isEmpty() && !edtidcard.getText().toString().isEmpty()) {
                     name = edtnameTH.getText().toString();
-                    department_id = actualPositionOfDepartment.getID();
+                    department_id = "";
                     objective_id = actualPositionOfObjective.getID();
 
                     CheckInParamModel.Builder param = new CheckInParamModel.Builder(name, department_id, objective_id, images);
@@ -305,10 +305,10 @@ public class CheckInActivity extends BaseActivity {
             BitmapDrawable drawable = (BitmapDrawable) iVphoto.getDrawable();
             if (drawable != null && drawable.getBitmap() != null) {
                 face = drawable.getBitmap();
+                String imgIc = encodeImg(face, face.getWidth(), face.getHeight(), 100);
+                JSONObject JObject = addImg(4, imgIc);
+                jsonArray.put(JObject);
             }
-            String imgIc = encodeImg(face, face.getWidth(), face.getHeight(), 100);
-            JSONObject JObject = addImg(4, imgIc);
-            jsonArray.put(JObject);
         }
         if (userWaterMark != null) {
             String imgIc = encodeImg(userWaterMark);
@@ -1049,7 +1049,7 @@ public class CheckInActivity extends BaseActivity {
 
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
-            printerParams.setTextSize(24);
+            printerParams.setTextSize(25);
             printerParams.setText("\n\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" ", " "));
             textList.add(printerParams);
 
@@ -1084,7 +1084,7 @@ public class CheckInActivity extends BaseActivity {
             printerParams = new PrinterParams();
             printerParams.setAlign(PrinterParams.ALIGN.LEFT);
             printerParams.setTextSize(24);
-            printerParams.setText("\nผู้ที่ขอพบ : " + data.getPerson_contact());
+            printerParams.setText("\nติดต่อบ้านเลขที่ : " + data.getPerson_contact());
             printerParams.setBold(true);
             textList.add(printerParams);
 
