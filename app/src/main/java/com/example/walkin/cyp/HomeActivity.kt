@@ -8,12 +8,19 @@ import com.example.walkin.*
 import com.example.walkin.cyp.models.SummaryModel
 import com.example.walkin.cyp.models.WalkInErrorModel
 import com.example.walkin.cyp.utils.NetworkUtil
+import com.example.walkin.cyp.utils.PreferenceUtils
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : BaseKioskActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        logout.setOnClickListener {
+            PreferenceUtils.setLoginFail()
+            val intent = Intent(this@HomeActivity, MainActivity::class.java)
+            this@HomeActivity.startActivity(intent)
+            this@HomeActivity.finish()
+        }
         btnCheckin.setOnClickListener(View.OnClickListener {
             val intent = Intent(this@HomeActivity, CheckInActivity::class.java)
             this@HomeActivity.startActivity(intent)

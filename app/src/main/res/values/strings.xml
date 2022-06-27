@@ -3,6 +3,7 @@
     <string name="not_found_company">ไม่พบข้อมูลบริษัท</string>
     <string name="not_found_serial">ไม่พบอุปกรณ์</string>
     <string name="not_require_data">มีข้อผิดพลาดในการส่งข้อมูล</string>
+    <string name="data_not_found">ไม่พบข้อมูล</string>
     <string name="something_error">เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่</string>
 
 

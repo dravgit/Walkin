@@ -18,6 +18,7 @@ class NetworkUtil {
         private val STATUS_CODE_REQUIRE = 422
         private val STATUS_CODE_COMPANY_NOT_FOUND = 901
         private val STATUS_CODE_SEARIAL_NOT_FOUND = 902
+        private val STATUS_CODE_DATA_NOT_FOUND = 904
         val STATUS_CODE_INVALID_PASSWORD = 201
         private val URL_DOMAIN = "https://cloud.walkinvms.com/"
         private val URL_KACHEN_DOMAIN = "https://cloud.walkinvms.com/"
@@ -114,7 +115,7 @@ class NetworkUtil {
                 .getAsJSONObject(getListResponseListener(listener))
         }
 
-        fun searchByOrder(code: String, listener: NetworkLisener<VisitorResponseModel>, kClass: Class<VisitorResponseModel>) {
+        fun searchByOrder(code: String?, listener: NetworkLisener<VisitorResponseModel>, kClass: Class<VisitorResponseModel>) {
             AndroidNetworking.get(URL_SEARCH)
                 .addHeaders("Authorization", "Bearer " + PreferenceUtils.getToken())
                 .addHeaders("Content-type", "application/json")
@@ -341,7 +342,9 @@ class NetworkUtil {
                 Util.showToast(R.string.not_found_serial)
             } else if(STATUS_CODE_REQUIRE == status){
                 Util.showToast(R.string.not_require_data)
-            } else{
+            } else if (STATUS_CODE_DATA_NOT_FOUND == status) {
+                Util.showToast(R.string.data_not_found)
+            } else {
                 Util.showToast(R.string.something_error)
             }
         }

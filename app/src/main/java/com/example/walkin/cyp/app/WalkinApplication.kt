@@ -48,12 +48,6 @@ class WalkinApplication: Application() {
         bindScannerService()
     }
 
-
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-        super.onConfigurationChanged(newConfig)
-        LogUtil.e(Constant.TAG, "onConfigurationChanged")
-    }
-
     fun getContext(): Context? {
         return appContext
     }

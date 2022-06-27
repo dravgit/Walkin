@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/header"
@@ -26,10 +25,19 @@
 
         <ImageView
             android:background="@drawable/logo"
-            android:layout_width="50dp"
+            android:layout_width="40dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
             />
+        <TextView
+            android:id="@+id/logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:padding="5dp"
+            android:layout_gravity="right"/>
     </FrameLayout>
 
     <TableRow

@@ -104,7 +104,7 @@ class CheckOutActivity : BaseActivity() {
     }
 
 
-    fun searchData(code: String){
+    fun searchData(code: String?){
         NetworkUtil.searchByOrder(code, object : NetworkUtil.Companion.NetworkLisener<VisitorResponseModel>{
             override fun onResponse(response: VisitorResponseModel) {
                 var data = response

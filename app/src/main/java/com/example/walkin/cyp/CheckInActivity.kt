@@ -56,6 +56,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_check_in.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -182,6 +183,10 @@ class CheckInActivity() : BaseActivity() {
         dropdownObjective = findViewById<View>(R.id.dropdownObjective) as Spinner
         val adapterDepartment = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getDepartment())
         val adapterObjective = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getObjectiveType())
+        if (adapterDepartment.count <= 0) {
+            dropdownDepartment!!.visibility = View.GONE
+            txt_department.visibility = View.GONE
+        }
         dropdownDepartment!!.adapter = adapterDepartment
         dropdownObjective!!.adapter = adapterObjective
         capUser!!.setOnClickListener { cameraUser() }
@@ -198,8 +203,8 @@ class CheckInActivity() : BaseActivity() {
         okCheckin!!.setOnClickListener {
             sLoading!!.show()
             val name: String
-            val department_id: String
-            val objective_id: String
+            var department_id = ""
+            var objective_id = ""
             var images: String = ""
             var jsonArray: JSONArray? = null
             try {
@@ -208,21 +213,25 @@ class CheckInActivity() : BaseActivity() {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-            val selectedItemOfDepartment = dropdownDepartment!!.selectedItemPosition
-            val actualPositionOfDepartment = dropdownDepartment!!.getItemAtPosition(selectedItemOfDepartment) as DepartmentModel
-            val selectedItemOfObjective = dropdownObjective!!.selectedItemPosition
-            val actualPositionOfObjective = dropdownObjective!!.getItemAtPosition(selectedItemOfObjective) as ObjectiveTypeModel
+            if (adapterDepartment.count > 0) {
+                val selectedItemOfDepartment = dropdownDepartment!!.selectedItemPosition
+                val actualPositionOfDepartment = dropdownDepartment!!.getItemAtPosition(selectedItemOfDepartment) as DepartmentModel
+                department_id = actualPositionOfDepartment.getID()
+            }
+            if (adapterObjective.count > 0) {
+                val selectedItemOfObjective = dropdownObjective!!.selectedItemPosition
+                val actualPositionOfObjective = dropdownObjective!!.getItemAtPosition(selectedItemOfObjective) as ObjectiveTypeModel
+                objective_id = actualPositionOfObjective.getID()
+            }
             if (!edtnameTH?.getText()
                     .toString()
-                    .isEmpty() && !edtfrom!!.text.toString()
                     .isEmpty() && !edtidcard?.getText()
                     .toString()
-                    .isEmpty() && (jsonArray!!.length() != 0)) {
+                    .isEmpty()) {
                 name = edtnameTH?.getText()
                     .toString()
-                department_id = actualPositionOfDepartment.getID()
-                objective_id = actualPositionOfObjective.getID()
-                val param = CheckInParamModel.Builder(name, department_id, objective_id, (images))
+
+                val param = CheckInParamModel.Builder(name, department_id, objective_id, images)
                 Log.e("CHECK", param.toString())
                 param.idcard(edtidcard?.getText()
                                  .toString())
@@ -929,19 +938,28 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService!!.enterPrinterBuffer(true)
         val bitmap = createImageFromQRCode(data.contact_code)
         val signature = PreferenceUtils.getSignature()
-
+        sunmiPrinterService!!.printText("    ", innerResultCallbcak)
         sunmiPrinterService!!.printBitmap(resizeBitmap(PreferenceUtils.getBitmapLogo()), innerResultCallbcak)
 
-        sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() + "\nชื่อ-นามสกุล : " + data.fullname.replace(" ",
-                                                                                                                                         " ") + "\nเลขบัตรประขาชน : " + data.idcard + "\nทะเบียนรถ : " + data.vehicle_id + "\nจากบริษัท : " + data.from + "\nผู้ที่ขอพบ : " + data.person_contact + "\nติดต่อแผนก : " + data.department + "\nวัตถุประสงค์ : " + data.objective_type.replace(
-            " ",
-            " ") + "\nอุณหภูมิ : " + data.temperature + "\nเวลาเข้า : " + data.chcekin_time, innerResultCallbcak)
+        sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
+                                                "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
+                                                "\nเลขบัตรประขาชน : " + data.idcard +
+                                                "\nทะเบียนรถ : " + data.vehicle_id +
+                                                "\nจากบริษัท : " + data.from +
+                                                "\nผู้ที่ขอพบ : " + data.person_contact +
+                                                "\nติดต่อแผนก : " + data.department +
+                                                "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
+                                                "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
+                                                "\nอุณหภูมิ : " + data.temperature +
+                                                "\nเวลาเข้า : " + data.chcekin_time, innerResultCallbcak)
+
+        sunmiPrinterService!!.printText("\n      ", innerResultCallbcak)
 
         sunmiPrinterService!!.printBitmap(bitmap, innerResultCallbcak)
-        sunmiPrinterService!!.printText(data.contact_code, innerResultCallbcak)
+        sunmiPrinterService!!.printText("\n       "+data.contact_code+"\n\n", innerResultCallbcak)
 
         for (i in signature.indices) {
-            sunmiPrinterService!!.printText("\n\n\n____________________________" + "\n     " + signature.get(i)
+            sunmiPrinterService!!.printText("\n\n\n\n____________________________" + "\n       " + signature.get(i)
                 .getname(), innerResultCallbcak)
         }
         sunmiPrinterService!!.printText("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
@@ -1217,7 +1235,7 @@ class CheckInActivity() : BaseActivity() {
                            val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
                            showPhoto(bmp)
                        }, { error ->
-                           error?.message?.let { Log.e("error", error?.message) }
+                           error?.message?.let { Log.e("error", it) }
                            handleResult2()
                        })
 

@@ -1,7 +1,8 @@
 package com.example.walkin.cyp.models
 
-class VisitorResponseModel(val person_contact: String, val objective_type: String, val department: String, val contact_code: String, val name: String, val idcard: String, val vehicle_id: String, val temperature: String, val checkin_time: String, val checkout_time: String, val status: String, val stauts_name: String, val images: List<ImageModel>, val from: String): BaseResponseModel(){
+class VisitorResponseModel(val person_contact: String, val objective_type: String, val objective_note: String, val department: String, val contact_code: String, val name: String, val idcard: String, val vehicle_id: String, val temperature: String, val checkin_time: String, val checkout_time: String, val status: String, val stauts_name: String, val images: List<ImageModel>, val from: String): BaseResponseModel(){
     fun objective(): String { return objective_type }
+    fun objective_note(): String { return objective_note }
     fun department(): String { return department }
     fun contact_code(): String { return contact_code }
     fun name(): String { return name }
