@@ -1,4 +1,4 @@
-package com.example.walkin;
+package com.cyp.walkin;
 
 import android.content.Context;
 

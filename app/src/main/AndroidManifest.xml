@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.walkin">
+    package="com.cyp.walkin">
 
 
     <uses-permission android:name="com.sunmi.perm.LED" />
@@ -30,7 +30,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.example.walkin.cyp.app.WalkinApplication"
+        android:name="com.cyp.walkin.cyp.app.WalkinApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -49,11 +49,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".cyp.CheckOutActivity" />
-        <activity android:name=".cyp.HomeActivity" />
-        <activity android:name=".cyp.CheckInActivity" />
-        <activity android:name=".cyp.ScanActivity" />
-        <activity android:name=".cyp.MainActivity">
+        <activity android:name="com.cyp.walkin.cyp.CheckOutActivity" />
+        <activity android:name="com.cyp.walkin.cyp.HomeActivity" />
+        <activity android:name="com.cyp.walkin.cyp.CheckInActivity" />
+        <activity android:name="com.cyp.walkin.cyp.ScanActivity" />
+        <activity android:name="com.cyp.walkin.cyp.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,10 +62,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".cyp.TotalCheckInActivity" />
-        <activity android:name=".cyp.TotalCheckOutActivity" />
-        <activity android:name=".cyp.TotalRemainActivity" />
-        <activity android:name=".cyp.TotalVisitorActivity" />
+        <activity android:name="com.cyp.walkin.cyp.TotalCheckInActivity" />
+        <activity android:name="com.cyp.walkin.cyp.TotalCheckOutActivity" />
+        <activity android:name="com.cyp.walkin.cyp.TotalRemainActivity" />
+        <activity android:name="com.cyp.walkin.cyp.TotalVisitorActivity" />
     </application>
 
 </manifest>
