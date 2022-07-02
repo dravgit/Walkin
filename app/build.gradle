@@ -8,7 +8,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.walkin"
+        applicationId "com.jks.walkin"
         minSdkVersion 25
         targetSdkVersion 30
         versionCode 7
