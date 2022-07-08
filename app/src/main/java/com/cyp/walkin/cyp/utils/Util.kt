@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
+import com.vanstone.trans.api.PrinterApi
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -98,6 +99,25 @@ class Util() {
                 encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
             }
             return encoded
+        }
+
+        fun printData(): Int {
+            val ret: Int
+            var Buf: String? = null
+            while (true) {
+                ret = PrinterApi.PrnStart_Api()
+                Log.d("aabb", "PrnStart_Api:$ret")
+                if (ret == 2) {
+                    Buf = "Return:$ret	paper is not enough"
+                } else if (ret == 3) {
+                    Buf = "Return:$ret	too hot"
+                } else if (ret == 4) {
+                    Buf = "Return:$ret	PLS put it back\nPress any key to reprint"
+                } else if (ret == 0) {
+                    return 0
+                }
+                return -1
+            }
         }
     }
 }

@@ -3,15 +3,13 @@ package com.cyp.walkin.cyp
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.os.RemoteException
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,12 +21,20 @@ import com.cyp.walkin.cyp.app.WalkinApplication
 import com.cyp.walkin.cyp.app.WalkinApplication.Companion.sunmiPrinterService
 import com.cyp.walkin.cyp.models.*
 import com.cyp.walkin.cyp.utils.BitmapUtils
+import com.cyp.walkin.cyp.utils.GlobalConstants
 import com.cyp.walkin.cyp.utils.NetworkUtil.Companion.NetworkLisener
 import com.cyp.walkin.cyp.utils.NetworkUtil.Companion.searchByOrder
 import com.cyp.walkin.cyp.utils.PreferenceUtils
+import com.cyp.walkin.cyp.utils.Util
 import com.cyp.walkin.cyp.utils.Util.Companion.createImageFromQRCode
 import com.cyp.walkin.cyp.utils.Util.Companion.toDateFormat
 import com.sunmi.peripheral.printer.InnerResultCallbcak
+import com.vanstone.appsdk.client.ISdkStatue
+import com.vanstone.l2.Common
+import com.vanstone.trans.api.MagCardApi
+import com.vanstone.trans.api.PrinterApi
+import com.vanstone.trans.api.SystemApi
+import com.vanstone.utils.CommonConvert
 import sunmi.sunmiui.utils.LogUtil
 
 class DetailAdapter     // RecyclerView recyclerView;
@@ -107,7 +113,12 @@ class DetailAdapter     // RecyclerView recyclerView;
         searchByOrder(code, object : NetworkLisener<VisitorResponseModel>{
             override  fun onResponse(  response: VisitorResponseModel){
 //                print(response)
-                printP2(response)
+
+                if ("A75".equals(Build.MODEL, true)) {
+                    printA75(response)
+                } else {
+                    printP2(response)
+                }
             }
             override  fun onError(  errorModel: WalkInErrorModel){
                 Log.e("error", errorModel.msg)
@@ -140,6 +151,39 @@ class DetailAdapter     // RecyclerView recyclerView;
         }
         return cacheBitmap
     }
+
+    private fun printA75(data: VisitorResponseModel) {
+        val signature = PreferenceUtils.getSignature()
+        PrinterApi.PrnClrBuff_Api()
+	    PrinterApi.PrnSetGray_Api(15)
+	    PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
+	    PrinterApi.PrnLogo_Api(resizeBitmap(PreferenceUtils.getBitmapLogo()))
+		PrinterApi.PrnFontSet_Api(24, 24, 0)
+        PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
+                                      "\nชื่อ-นามสกุล : " + data.name.replace(" "," ") +
+                                      "\nเลขบัตรประขาชน : " + data.idcard +
+                                      "\nทะเบียนรถ : " + data.vehicle_id +
+                                      "\nจากบริษัท : " + data.from +
+                                      "\nผู้ที่ขอพบ : " + data.person_contact +
+                                      "\nติดต่อแผนก : " + data.department +
+                                      "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
+                                      "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
+                                      "\nอุณหภูมิ : " + data.temperature +
+                                      "\nเวลาเข้า : " + data.checkin_time)
+
+        PrinterApi.PrnStr_Api("\n           ")
+        PrinterApi.printAddQrCode_Api(1, 250, data.contact_code)
+//		PrinterApi.PrnLogo_Api(bitmap)
+		PrinterApi.PrnStr_Api("\n       "+data.contact_code+"\n\n")
+        for (i in signature.indices) {
+            PrinterApi.PrnStr_Api("\n\n\n\n____________________________" + "\n       " + signature.get(i).getname())
+        }
+
+		PrinterApi.PrnStr_Api("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n")
+
+	 	Util.printData()
+    }
+
     private fun printP2(data: VisitorResponseModel) {
         setHeight(0x11)
         sunmiPrinterService!!.clearBuffer()

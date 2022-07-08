@@ -2,13 +2,20 @@ package com.cyp.walkin.cyp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.cyp.walkin.*
+import com.cyp.walkin.R
 import com.cyp.walkin.cyp.models.SummaryModel
 import com.cyp.walkin.cyp.models.WalkInErrorModel
 import com.cyp.walkin.cyp.utils.NetworkUtil
 import com.cyp.walkin.cyp.utils.PreferenceUtils
+import com.vanstone.appsdk.client.ISdkStatue
+import com.vanstone.l2.Common
+import com.vanstone.trans.api.MagCardApi.*
+import com.vanstone.trans.api.SystemApi
+import com.vanstone.trans.api.constants.GlobalConstants
+import com.vanstone.utils.CommonConvert
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : BaseKioskActivity() {

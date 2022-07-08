@@ -3,6 +3,7 @@ package com.cyp.walkin.cyp
 import android.os.Bundle
 import android.os.RemoteException
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.centerm.smartpos.aidl.printer.AidlPrinter
@@ -46,6 +47,9 @@ class TotalCheckInActivity : BaseActivity() {
     }
 
     override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
+    }
+
+    override fun onA75InitSuccess() {
     }
 
     override fun showMessage(str: String?, black: Int) {

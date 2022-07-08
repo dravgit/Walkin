@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -18,6 +20,11 @@ import com.cyp.walkin.cyp.models.WalkInErrorModel;
 import com.cyp.walkin.cyp.utils.NetworkUtil;
 import com.cyp.walkin.cyp.utils.PreferenceUtils;
 import com.cyp.walkin.cyp.utils.Util;
+import com.vanstone.appsdk.client.ISdkStatue;
+import com.vanstone.l2.Common;
+import com.vanstone.trans.api.SystemApi;
+import com.vanstone.trans.api.constants.GlobalConstants;
+import com.vanstone.utils.CommonConvert;
 
 import sunmi.paylib.SunmiPayKernel;
 import sunmi.sunmiui.utils.LogUtil;
@@ -32,10 +39,38 @@ public abstract class BaseActivity extends BaseKioskActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bindService();
         Util.Companion.setContext(this);
-        connectPayService();
+        if (!"A75".equals(Build.MODEL)) {
+            bindService();
+            connectPayService();
+        } else if ("A75".equals(Build.MODEL)) {
+            new Thread() {
+                public void run() {
+                    SystemApi.SystemInit_Api(0, CommonConvert.StringToBytes(GlobalConstants.CurAppDir + "/" + "\\0"), BaseActivity.this,
+                            new ISdkStatue() {
+                                @Override
+                                public void sdkInitSuccessed() {
+                                    Common.Init_Api();
+                                    onA75InitSuccess();
+                                }
+
+                                @Override
+                                public void sdkInitFailed() {
+                                    Toast.makeText(BaseActivity.this, "sdkInitFailed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                }
+            }.start();
+        }
     }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+    }
+
 
     private void connectPayService() {
         mSMPayKernel = SunmiPayKernel.getInstance();
@@ -74,10 +109,11 @@ public abstract class BaseActivity extends BaseKioskActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (!"A75".equals(Build.MODEL)) {
         unbindService();
         if (mSMPayKernel != null) {
             mSMPayKernel.destroyPaySDK();
-        }
+        }}
     }
 
     private Bitmap rotateImage(Bitmap source, Float angle) {
@@ -184,6 +220,7 @@ public abstract class BaseActivity extends BaseKioskActivity {
     protected abstract void onPrintDeviceConnected(AidlDeviceManager manager);
     public abstract void onDeviceConnected(AidlDeviceManager deviceManager);
     public abstract void onDeviceConnectedSwipe(AidlDeviceManager manager);
+    public abstract void onA75InitSuccess();
 
     protected abstract void showMessage(String str, int black);
 }
