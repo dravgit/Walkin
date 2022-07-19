@@ -11,8 +11,8 @@ android {
         applicationId "com.cyp.walkin"
         minSdkVersion 25
         targetSdkVersion 30
-        versionCode 7
-        versionName "7.0.0"
+        versionCode 8
+        versionName "8.0.0"
         //WalkinKeyStore3 password : 123456
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -99,12 +99,12 @@ dependencies {
     implementation files('libs/PayLib-release-1.4.37-sources.jar')
     implementation files('libs/PayLib-release-1.4.37.aar')
 
-    implementation files('libs/AppSdkAidl.jar')
+    implementation files('libs/AppSdkAidl_buildBy_20210713.jar')
     implementation files('libs/Common.jar')
     implementation files('libs/EMV.jar')
     implementation files('libs/PayPass.jar')
     implementation files('libs/PayWave.jar')
-    implementation files('libs/vanstoneSdkClient-noemv.jar')
+    implementation files('libs/vanstoneSdkClient-noemv_20210713.jar')
 
 }
 repositories {

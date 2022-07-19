@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
+import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +22,6 @@ import com.cyp.walkin.cyp.app.WalkinApplication
 import com.cyp.walkin.cyp.app.WalkinApplication.Companion.sunmiPrinterService
 import com.cyp.walkin.cyp.models.*
 import com.cyp.walkin.cyp.utils.BitmapUtils
-import com.cyp.walkin.cyp.utils.GlobalConstants
 import com.cyp.walkin.cyp.utils.NetworkUtil.Companion.NetworkLisener
 import com.cyp.walkin.cyp.utils.NetworkUtil.Companion.searchByOrder
 import com.cyp.walkin.cyp.utils.PreferenceUtils
@@ -29,12 +29,7 @@ import com.cyp.walkin.cyp.utils.Util
 import com.cyp.walkin.cyp.utils.Util.Companion.createImageFromQRCode
 import com.cyp.walkin.cyp.utils.Util.Companion.toDateFormat
 import com.sunmi.peripheral.printer.InnerResultCallbcak
-import com.vanstone.appsdk.client.ISdkStatue
-import com.vanstone.l2.Common
-import com.vanstone.trans.api.MagCardApi
 import com.vanstone.trans.api.PrinterApi
-import com.vanstone.trans.api.SystemApi
-import com.vanstone.utils.CommonConvert
 import sunmi.sunmiui.utils.LogUtil
 
 class DetailAdapter     // RecyclerView recyclerView;
@@ -155,15 +150,24 @@ class DetailAdapter     // RecyclerView recyclerView;
     private fun printA75(data: VisitorResponseModel) {
         val signature = PreferenceUtils.getSignature()
         PrinterApi.PrnClrBuff_Api()
+        val bundle = Bundle()
+        bundle.putBoolean(PrinterApi.USE_DRIVER_PRINT, true)
+        PrinterApi.PrnSetParams_Api(bundle)
+
+        PrinterApi.PrnSpeedSet_Api(22)
+
+        PrinterApi.SetLang_Api(PrinterApi.LANG_PERSIAN, PrinterApi.ENCODING_UTF8)
 	    PrinterApi.PrnSetGray_Api(15)
-	    PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
-	    PrinterApi.PrnLogo_Api(resizeBitmap(PreferenceUtils.getBitmapLogo()))
+	    PrinterApi.PrnLineSpaceSet_Api(8.toShort(), 0)
+        val logo = resizeBitmap(PreferenceUtils.getBitmapLogo())
+        PrinterApi.PrnLeftIndSet_Api(((384 - logo.width) / 2).toShort()) // if you want to set align when calling PrinterApi.PrnLogo_Api(bitmap), you need to use this api to set it
+        PrinterApi.PrnLogo_Api(logo)
 		PrinterApi.PrnFontSet_Api(24, 24, 0)
         PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
                                       "\nชื่อ-นามสกุล : " + data.name.replace(" "," ") +
                                       "\nเลขบัตรประขาชน : " + data.idcard +
                                       "\nทะเบียนรถ : " + data.vehicle_id +
-                                      "\nจากบริษัท : " + data.from +
+                                      "\nจากบริษัท : " + data.from() +
                                       "\nผู้ที่ขอพบ : " + data.person_contact +
                                       "\nติดต่อแผนก : " + data.department +
                                       "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
@@ -173,7 +177,6 @@ class DetailAdapter     // RecyclerView recyclerView;
 
         PrinterApi.PrnStr_Api("\n           ")
         PrinterApi.printAddQrCode_Api(1, 250, data.contact_code)
-//		PrinterApi.PrnLogo_Api(bitmap)
 		PrinterApi.PrnStr_Api("\n       "+data.contact_code+"\n\n")
         for (i in signature.indices) {
             PrinterApi.PrnStr_Api("\n\n\n\n____________________________" + "\n       " + signature.get(i).getname())

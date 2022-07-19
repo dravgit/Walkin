@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -74,7 +75,9 @@ public abstract class BaseKioskActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        bindService();
+        if (!"A75".equals(Build.MODEL)) {
+            bindService();
+        }
     }
 
     @Override
@@ -85,10 +88,12 @@ public abstract class BaseKioskActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try{
-            this.unbindService(conn);
-        }catch (Exception e){
-            Log.e("Exception","No regis");
+        if (!"A75".equals(Build.MODEL)) {
+            try {
+                this.unbindService(conn);
+            } catch (Exception e) {
+                Log.e("Exception", "No regis");
+            }
         }
     }
 

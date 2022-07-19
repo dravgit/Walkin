@@ -45,18 +45,16 @@ import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
 import com.sunmi.peripheral.printer.InnerResultCallbcak
 import com.sunmi.peripheral.printer.SunmiPrinterService
-import com.vanstone.appsdk.client.ISdkStatue
-import com.vanstone.l2.Common
 import com.vanstone.trans.api.IcApi
 import com.vanstone.trans.api.MagCardApi
 import com.vanstone.trans.api.PrinterApi
-import com.vanstone.trans.api.SystemApi
 import com.vanstone.trans.api.struct.ApduResp
 import com.vanstone.trans.api.struct.ApduSend
 import com.vanstone.utils.ByteUtils
 import com.vanstone.utils.CommonConvert
 import com.watermark.androidwm_light.WatermarkBuilder
 import com.watermark.androidwm_light.bean.WatermarkText
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -133,9 +131,11 @@ class CheckInActivity() : BaseActivity() {
     var disposable: Disposable? = null
     private var sunmiPrinterService: SunmiPrinterService? = null
     var disposablePhoto: Disposable? = null
-    var disposableCheck: Disposable? = null
     var disposableMagCard: Disposable? = null
+    var obserReadIcCard: Flowable<Unit>? = null
     var task: Thread? = null
+    var taskCheckCard: Thread? = null
+    var taskReadIcCard: Thread? = null
     internal var baCommandAPDU = byteArrayOf(0x00.toByte(),
                                              0xA4.toByte(),
                                              0x04.toByte(),
@@ -258,7 +258,11 @@ class CheckInActivity() : BaseActivity() {
                         val data = response
 //                        print(data)
 //                        printP2(data)
-                        printA75(data)
+                        try {
+                            printA75(data)
+                        } catch (e: java.lang.IllegalArgumentException) {
+                            e.printStackTrace()
+                        }
                         finish()
                     }
 
@@ -525,8 +529,8 @@ class CheckInActivity() : BaseActivity() {
         MagCardApi.MagClose_Api()
         MagCardApi.MagOpen_Api()
         MagCardApi.MagReset_Api()
-        readCardForA75()
-        readMag2()
+        readCardForA75New()
+        observReadMag2()
     }
     override fun onDeviceConnectedSwipe(deviceManager: AidlDeviceManager) {
         try {
@@ -829,8 +833,6 @@ class CheckInActivity() : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         disposable?.dispose()
-        disposablePhoto?.dispose()
-        disposableCheck?.dispose()
         disposableMagCard?.dispose()
         MagCardApi.MagClose_Api()
         IcApi.IccPowerOff_Api(0)
@@ -987,18 +989,21 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService!!.commitPrinterBuffer()
     }
 
+    @Throws(java.lang.IllegalArgumentException::class)
     private fun printA75(data: CheckInResponseModel) {
         val signature = PreferenceUtils.getSignature()
         PrinterApi.PrnClrBuff_Api()
 	    PrinterApi.PrnSetGray_Api(15)
-	    PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
-	    PrinterApi.PrnLogo_Api(resizeBitmap(PreferenceUtils.getBitmapLogo()))
-		PrinterApi.PrnFontSet_Api(24, 24, 0)
+	    PrinterApi.PrnLineSpaceSet_Api(8.toShort(), 0)
+        val logo = resizeBitmap(PreferenceUtils.getBitmapLogo())
+        PrinterApi.PrnLeftIndSet_Api(((384 - logo.width) / 2).toShort()) // if you want to set align when calling PrinterApi.PrnLogo_Api(bitmap), you need to use this api to set it
+        PrinterApi.PrnLogo_Api(logo)
+        PrinterApi.PrnFontSet_Api(24, 24, 0)
         PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
                                       "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
                                       "\nเลขบัตรประขาชน : " + data.idcard +
                                       "\nทะเบียนรถ : " + data.vehicle_id +
-                                      "\nจากบริษัท : " + data.from +
+                                      "\nจากบริษัท : " + data.from() +
                                       "\nผู้ที่ขอพบ : " + data.person_contact +
                                       "\nติดต่อแผนก : " + data.department +
                                       "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
@@ -1551,198 +1556,55 @@ class CheckInActivity() : BaseActivity() {
         }
     }
 
-    fun readMag2() {
-        var sloted_card = true
-       task = Thread {
-           val CardData = ByteArray(1024)
-           val usCardLenAddr = ByteArray(4)
-           Log.e("test", "start fromCallable2")
+    fun observReadMag2() {
+        disposableMagCard?.dispose()
+        disposableMagCard = Flowable.just("").map {
+            val CardData = ByteArray(1024)
+            val usCardLenAddr = ByteArray(4)
 
-           while (sloted_card) {
-               if (MagCardApi.MagRead_Api(CardData, usCardLenAddr) == 0x31 && Card.GetTrackData(CardData) == 0) {
-                   GlobalConstants.PosCom.stTrans.ucSwipedFlag = DefConstants.MASK_INCARDNO_MAGCARD
+            while (!(this@CheckInActivity).isFinishing) {
+                if (MagCardApi.MagRead_Api(CardData, usCardLenAddr) == 0x31 && Card.GetTrackData(CardData) == 0) {
+                    GlobalConstants.PosCom.stTrans.ucSwipedFlag = DefConstants.MASK_INCARDNO_MAGCARD
 
-                   Card.GetCardFromTrack(
-                       GlobalConstants.PosCom.stTrans.MainAcc, GlobalConstants.PosCom.Track2, GlobalConstants.PosCom.Track3
-                                        )
+                    Card.GetCardFromTrack(
+                        GlobalConstants.PosCom.stTrans.MainAcc, GlobalConstants.PosCom.Track2, GlobalConstants.PosCom.Track3
+                                         )
 
-                   val rawName = String(CardData, Charset.forName("utf-8"))
-                   val startIndex = rawName.indexOf("^", 0)
-                   val lastIndex = rawName.indexOf("^^", 0)
-                   val rawIdcard = String(GlobalConstants.PosCom.stTrans.MainAcc, Charset.forName("utf-8"))
-                   val idcardLength = rawIdcard.length
-                   if (startIndex != -1 && lastIndex != -1 && idcardLength >= 13) {
-                       val nameRevert = rawName.substring( startIndex+ 1, lastIndex)
-                       val names = nameRevert.split("\\$".toRegex()).toTypedArray()
-                       var name = ""
-                       if (names.size == 3) {
-                           name = names[2] + names[1] + " " + names[0]
-                       } else if (names.size == 2) {
-                           name = names[1] + " " + names[0]
-                       }
-                       val idCard = rawIdcard.substring(idcardLength - 13)
-                       runOnUiThread {
-                           edtnameTH!!.setText(name)
-                           edtidcard!!.setText(idCard)
-                       }
-                       sloted_card = false
-                   } else {
-                       runOnUiThread {
-                           Toast.makeText(this@CheckInActivity, "กรุณาทำใหม่อีกครั้ง", Toast.LENGTH_LONG).show()
-                       }
-                   }
-               }
-           }
-        }
-        task?.start()
-
-    }
-
-    fun readMag() {
-        Log.e("test", "start readMag")
-        var sloted_card = true
-        disposableMagCard = Observable.fromCallable {
-                    Log.e("test", "start fromCallable")
-                    val CardData = ByteArray(1024)
-                    val usCardLenAddr = ByteArray(4)
-                    Log.e("test", "start fromCallable2")
-
-                    while (sloted_card) {
-                        if (MagCardApi.MagRead_Api(CardData, usCardLenAddr) == 0x31 && Card.GetTrackData(CardData) == 0) {
-                            GlobalConstants.PosCom.stTrans.ucSwipedFlag = DefConstants.MASK_INCARDNO_MAGCARD
-
-                                Card.GetCardFromTrack(
-                                    GlobalConstants.PosCom.stTrans.MainAcc, GlobalConstants.PosCom.Track2, GlobalConstants.PosCom.Track3
-                                                     )
-
-                            val rawName = String(CardData, Charset.forName("utf-8"))
-                            val startIndex = rawName.indexOf("^", 0)
-                            val lastIndex = rawName.indexOf("^^", 0)
-                            val rawIdcard = String(GlobalConstants.PosCom.stTrans.MainAcc, Charset.forName("utf-8"))
-                            val idcardLength = rawIdcard.length
-                            if (startIndex != -1 && lastIndex != -1 && idcardLength >= 13) {
-                                val nameRevert = rawName.substring( startIndex+ 1, lastIndex)
-                                val names = nameRevert.split("\\$".toRegex()).toTypedArray()
-                                var name = ""
-                                if (names.size == 3) {
-                                     name = names[2] + names[1] + " " + names[0]
-                                } else if (names.size == 2) {
-                                     name = names[1] + " " + names[0]
-                                }
-                                val idCard = rawIdcard.substring(idcardLength - 13)
-                                runOnUiThread {
-                                    edtnameTH!!.setText(name)
-                                    edtidcard!!.setText(idCard)
-                                }
-                                sloted_card = false
-                            } else {
-                                runOnUiThread {
-                                    Toast.makeText(this@CheckInActivity, "กรุณาทำใหม่อีกครั้ง", Toast.LENGTH_LONG).show()
-                                }
-                            }
+                    val rawName = String(CardData, Charset.forName("utf-8"))
+                    val startIndex = rawName.indexOf("^", 0)
+                    val lastIndex = rawName.indexOf("^^", 0)
+                    val rawIdcard = String(GlobalConstants.PosCom.stTrans.MainAcc, Charset.forName("utf-8"))
+                    val idcardLength = rawIdcard.length
+                    if (startIndex != -1 && lastIndex != -1 && idcardLength >= 13) {
+                        val nameRevert = rawName.substring( startIndex+ 1, lastIndex)
+                        val names = nameRevert.split("\\$".toRegex()).toTypedArray()
+                        var name = ""
+                        if (names.size == 3) {
+                            name = names[2] + names[1] + " " + names[0]
+                        } else if (names.size == 2) {
+                            name = names[1] + " " + names[0]
+                        }
+                        val idCard = rawIdcard.substring(idcardLength - 13)
+                        runOnUiThread {
+                            edtnameTH!!.setText(name)
+                            edtidcard!!.setText(idCard)
+                        }
+                    } else {
+                        runOnUiThread {
+                            Toast.makeText(this@CheckInActivity, "กรุณาทำใหม่อีกครั้ง", Toast.LENGTH_LONG).show()
                         }
                     }
                 }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                           disposableMagCard?.dispose()
-                            Log.e("test", "mag success")
-                       },
-                       {
-                           it.printStackTrace()
-                       },
-                       {
-                            Log.e("test", "mag on complete")
-                       })
-    }
-
-    @SuppressLint("CheckResult")
-    fun readCardForA75(): UserModel {
-        val userModel = UserModel()
-        var base = ""
-        disposable?.dispose()
-        disposable = Observable.fromCallable {
-            while (true) {
-                if (IcApi.IccDetect_Api(0) == 0x00){
-                    val cardTypeApi: Int = IcApi.IccGetCardType_Api()
-                    Log.e("testA2", "cardTypeApi : $cardTypeApi")
-                    break
-                }
             }
-            checkCardA75()
-
         }
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                           val RstBuf = ByteArray(256)
-                           val Rlen = ByteArray(4)
-                           val ret: Int = IcApi.IccInit_Api(0, 0x03, RstBuf, Rlen)
-                           Log.e("testA75", "ret = $ret") //ERR_ICCRESET
-                           if (ret != 0){
-                               Log.e("testA75 ret", "" + ret) //ERR_ICCRESET
-                           } else {
-                               val version = readData("80b0000002", "0004")
-                               Log.e("testA75", "data version: " + version)
-                               if (version.startsWith("0003")) {
-                                   base = "80B0"
-                                   userModel.id = readData("80b0000402", "000d").substring(0, 12)
-                                   val data = readData("80b000D902", "001D")
-                                   val _year_th: String = data.substring(0, 4)
-                                   val _month_th: String = data.substring(4, 6)
-                                   val _day: String = data.substring(6, 8)
-                                   val sex: String = data.substring(8, 9)
-                                   userModel.birthDate = _day + _month_th + _year_th
-                                   if ("1" == sex) {
-                                       userModel.gender = "M"
-                                   } else {
-                                       userModel.gender = "F"
-                                   }
-                                   userModel.nameTH = readData("80b0001102", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.nameEN = readData("80b0007502", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.address = readData("80b0157902", "00A0").replace("#", " ").substring(0, 100).trimEnd()
-                               } else {
-                                   base = "80B1"
-                                   userModel.id = readData("80b1000402", "000d").substring(0, 12)
-                                   val data = readData("80b100D902", "001D")
-                                   val _year_th: String = data.substring(0, 4)
-                                   val _month_th: String = data.substring(4, 6)
-                                   val _day: String = data.substring(6, 8)
-                                   val sex: String = data.substring(8, 9)
-                                   userModel.birthDate = _day + _month_th + _year_th
-                                   if ("1" == sex) {
-                                       userModel.gender = "M"
-                                   } else {
-                                       userModel.gender = "F"
-                                   }
-                                   userModel.nameTH = readData("80b1001102", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.nameEN = readData("80b1007502", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.address = readData("80b0000402", "0096").replace("#", " ").substring(0, 50)
-                               }
-                           }
-                Log.e("testA75", "userModel.nameTH" + userModel.nameTH )
-                            if (userModel.id.isNullOrEmpty()){
-                                readCardForA75()
-                            } else {
-                                if (!this@CheckInActivity.isFinishing) {
-                               runOnUiThread {
-                                   val data = userModel
-                                   edtnameTH!!.setText(data.nameTH)
-                                   edtidcard!!.setText(data.id)
-                                   edtaddress!!.setText(data.address?.replace("#", " "))
-                                   tVgender!!.text = data.gender
-                                   tVbirth!!.text = data.birthDate
+            .subscribe()
 
-                                   observePhoto()
-                               }
-                           }
-                            }
-                       }, { error ->
-                           error?.message?.let { Log.e("error", it) }
-                       })
+    }
 
-
-        return userModel
-}
+    fun playSound() {
+        mediaPlayer!!.start()
+    }
 
     fun observePhoto() {
         disposablePhoto?.dispose()
@@ -1780,7 +1642,6 @@ class CheckInActivity() : BaseActivity() {
                        }, { error ->
                            error?.message?.let { Log.e("error", it) }
                        })
-//        LogUtil.e(TAG, "panya isDisposed"+ disposablePhoto?.isDisposed)
 
       }
 
@@ -1854,22 +1715,141 @@ class CheckInActivity() : BaseActivity() {
         }
     }
 
-    fun checkCardA75() {
-        disposableCheck?.dispose()
-        disposableCheck = Observable.fromCallable {
-            while (true){
-                if (IcApi.IccDetect_Api(0) != 0x00) {
-                    break
-                }
-            }
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                            disposable?.dispose()
-                            disposablePhoto?.dispose()
-                           readCardForA75()
+    @SuppressLint("CheckResult")
+    fun readCardForA75New() {
+        disposable?.dispose()
+        obserReadIcCard = obserbIcCard()
+        disposable = obserReadIcCard?.subscribe({
+                           Log.d("testA75", "onNext" )
                        }, { error ->
-                            error.printStackTrace()
+                            Log.d("testA75", "onError" )
+                            error?.message?.let { Log.e("error", it) }
+
+                               if (!(this@CheckInActivity).isFinishing) {
+                                   if (mLoading != null && mLoading!!.isShowing) {
+                                       mLoading!!.dismiss()
+                                   }
+                               }
+                       }, {
+                           Log.d("testA75", "onComplete" )
                        })
     }
+    fun obserbIcCard(): Flowable<Unit>? {
+        return Flowable.just("").map {
+            var sloted_card = true
+            val userModel = UserModel()
+            while (!(this@CheckInActivity).isFinishing) {
+                if (IcApi.IccDetect_Api(0) == 0x00 && sloted_card) {
+//                    val cardTypeApi: Int = IcApi.IccGetCardType_Api()
+                    runOnUiThread {
+                        if (!(this@CheckInActivity).isFinishing) {
+                            mLoading?.let {
+                                try {
+                                    if(!it.isShowing) {
+                                        it.show()
+                                    } else {
+
+                                    }
+                                } catch (e: BadTokenException) {
+                                    Log.e("WindowManagerBad ", "BadTokenException")
+                                }
+                            }
+                        }
+                    }
+                    var beforeTime = System.currentTimeMillis()
+                    val RstBuf = ByteArray(256)
+                    val Rlen = ByteArray(4)
+                    var photoBase = ""
+                    val ret: Int = IcApi.IccInit_Api(0, 0x03, RstBuf, Rlen)
+                    Log.d("testA75", "ret = $ret") //ERR_ICCRESET
+                    if (ret == 0) {
+                        val version = readData("80b0000002", "0004")
+                        if (version.startsWith("0003")) {
+                            photoBase = "80B0"
+                            userModel.id = readData("80b0000402", "000d").substring(0, 12)
+                            val data = readData("80b000D902", "001D")
+                            val _year_th: String = data.substring(0, 4)
+                            val _month_th: String = data.substring(4, 6)
+                            val _day: String = data.substring(6, 8)
+                            val sex: String = data.substring(8, 9)
+                            userModel.birthDate = _day + _month_th + _year_th
+                            if ("1" == sex) {
+                                userModel.gender = "M"
+                            } else {
+                                userModel.gender = "F"
+                            }
+                            userModel.nameTH = readData("80b0001102", "0064").replace(" ", "").replace("#", " ").substring(0, 50)
+                            userModel.nameEN = readData("80b0007502", "0064").replace(" ", "").replace("#", " ").substring(0, 50)
+                            userModel.address = readData("80b0157902", "00A0").replace(" ", "").replace("#", " ").substring(0, 100).trimEnd()
+                        } else {
+                            photoBase = "80B1"
+                            userModel.id = readData("80b1000402", "000d").substring(0, 12)
+                            val data = readData("80b100D902", "001D")
+                            val _year_th: String = data.substring(0, 4)
+                            val _month_th: String = data.substring(4, 6)
+                            val _day: String = data.substring(6, 8)
+                            val sex: String = data.substring(8, 9)
+                            userModel.birthDate = _day + _month_th + _year_th
+                            if ("1" == sex) {
+                                userModel.gender = "M"
+                            } else {
+                                userModel.gender = "F"
+                            }
+                            userModel.nameTH = readData("80b1001102", "0064").replace(" ", "").replace("#", " ").substring(0, 50)
+                            userModel.nameEN = readData("80b1007502", "0064").replace(" ", "").replace("#", " ").substring(0, 50)
+                            userModel.address = readData("80b0000402", "0096").replace(" ", "").replace("#", " ").substring(0, 50)
+                        }
+
+                        if (userModel.id.isNullOrEmpty() || userModel.nameTH.isNullOrEmpty() || userModel.address.isNullOrEmpty()) {
+
+                        } else {
+                            playSound()
+                            sloted_card = false
+                            if (!this@CheckInActivity.isFinishing) {
+                                runOnUiThread {
+                                    mLoading?.let {
+                                        if (it.isShowing) {
+                                            mLoading!!.dismiss()
+                                        }
+                                    }
+
+                                    val data = userModel
+                                    edtnameTH!!.setText(data.nameTH)
+                                    edtidcard!!.setText(data.id)
+                                    edtaddress!!.setText(data.address?.replace("#", " "))
+                                    tVgender!!.text = data.gender
+                                    tVbirth!!.text = data.birthDate
+                                }
+                                sendCommandForPhotoA75(photoBase)
+                                runOnUiThread {
+                                    photoBytes?.let {
+                                        val bmp = BitmapFactory.decodeByteArray(it, 0, it.size)
+                                        bmp?.let {
+                                            showPhoto(bmp)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (!this@CheckInActivity.isFinishing) {
+                            runOnUiThread {
+                                mLoading?.let {
+                                    if (it.isShowing) {
+                                        mLoading!!.dismiss()
+                                    }
+                                }
+                            }
+                    }
+                }
+
+                if (IcApi.IccDetect_Api(0) != 0x00) {
+                    sloted_card = true
+                }
+            }
+
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
 }
