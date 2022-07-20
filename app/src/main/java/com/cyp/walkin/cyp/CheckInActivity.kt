@@ -993,8 +993,15 @@ class CheckInActivity() : BaseActivity() {
     private fun printA75(data: CheckInResponseModel) {
         val signature = PreferenceUtils.getSignature()
         PrinterApi.PrnClrBuff_Api()
-	    PrinterApi.PrnSetGray_Api(15)
-	    PrinterApi.PrnLineSpaceSet_Api(8.toShort(), 0)
+        val bundle = Bundle()
+        bundle.putBoolean(PrinterApi.USE_DRIVER_PRINT, true)
+        PrinterApi.PrnSetParams_Api(bundle)
+
+        PrinterApi.PrnSpeedSet_Api(22)
+
+        PrinterApi.SetLang_Api(PrinterApi.LANG_PERSIAN, PrinterApi.ENCODING_UTF8)
+        PrinterApi.PrnSetGray_Api(15)
+        PrinterApi.PrnLineSpaceSet_Api(8.toShort(), 0)
         val logo = resizeBitmap(PreferenceUtils.getBitmapLogo())
         PrinterApi.PrnLeftIndSet_Api(((384 - logo.width) / 2).toShort()) // if you want to set align when calling PrinterApi.PrnLogo_Api(bitmap), you need to use this api to set it
         PrinterApi.PrnLogo_Api(logo)
