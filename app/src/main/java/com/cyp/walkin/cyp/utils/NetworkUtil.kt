@@ -22,7 +22,7 @@ class NetworkUtil {
         val STATUS_CODE_INVALID_PASSWORD = 201
         private val URL_DOMAIN_IPP = "https://app-ipp.com"
         private val URL_DOMAIN_VMS = "https://cloud.walkinvms.com/"
-        private val URL_DOMAIN = URL_DOMAIN_VMS
+        private val URL_DOMAIN = URL_DOMAIN_IPP
         private val URL_KACHEN_DOMAIN = "https://cloud.walkinvms.com/"
         val URL_LOGIN = "$URL_DOMAIN/api/v1/login"
         val URL_CHECK_DEVICE = "$URL_KACHEN_DOMAIN/api/v1/checkdevice"

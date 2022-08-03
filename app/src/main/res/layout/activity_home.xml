@@ -168,16 +168,16 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 />
+
             <TextView
                 android:id="@+id/tv_number_more_one"
-                android:text="00"
-                android:textSize="28dp"
-                android:textColor="#F48024"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="75dp"
                 android:gravity="center"
-                />
+                android:text="00"
+                android:textColor="#F48024"
+                android:textSize="28dp" />
         </RelativeLayout>
 
     </TableRow>
