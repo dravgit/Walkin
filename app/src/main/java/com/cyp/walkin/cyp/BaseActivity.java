@@ -40,10 +40,6 @@ public abstract class BaseActivity extends BaseKioskActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Util.Companion.setContext(this);
-        if (!"A75".equals(Build.MODEL)) {
-            bindService();
-            connectPayService();
-        } else if ("A75".equals(Build.MODEL)) {
             new Thread() {
                 public void run() {
                     SystemApi.SystemInit_Api(0, CommonConvert.StringToBytes(GlobalConstants.CurAppDir + "/" + "\\0"), BaseActivity.this,
@@ -62,7 +58,6 @@ public abstract class BaseActivity extends BaseKioskActivity {
 
                 }
             }.start();
-        }
     }
 
     @Override
@@ -109,11 +104,6 @@ public abstract class BaseActivity extends BaseKioskActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!"A75".equals(Build.MODEL)) {
-        unbindService();
-        if (mSMPayKernel != null) {
-            mSMPayKernel.destroyPaySDK();
-        }}
     }
 
     private Bitmap rotateImage(Bitmap source, Float angle) {

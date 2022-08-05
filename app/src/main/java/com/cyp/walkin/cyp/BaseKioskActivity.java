@@ -75,9 +75,6 @@ public abstract class BaseKioskActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!"A75".equals(Build.MODEL)) {
-            bindService();
-        }
     }
 
     @Override
@@ -88,13 +85,6 @@ public abstract class BaseKioskActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!"A75".equals(Build.MODEL)) {
-            try {
-                this.unbindService(conn);
-            } catch (Exception e) {
-                Log.e("Exception", "No regis");
-            }
-        }
     }
 
 }

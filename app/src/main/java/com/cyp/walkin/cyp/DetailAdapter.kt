@@ -109,13 +109,7 @@ class DetailAdapter     // RecyclerView recyclerView;
     private  fun search(  code: String){
         searchByOrder(code, object : NetworkLisener<VisitorResponseModel>{
             override  fun onResponse(  response: VisitorResponseModel){
-//                print(response)
-
-                if ("A75".equals(Build.MODEL, true)) {
-                    printA75(response)
-                } else {
-                    printP2(response)
-                }
+                printA75(response)
             }
             override  fun onError(  errorModel: WalkInErrorModel){
                 Log.e("error", errorModel.msg)

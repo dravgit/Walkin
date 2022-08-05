@@ -282,10 +282,6 @@ class CheckInActivity() : BaseActivity() {
                     .show()
             }
         }
-
-        if (!"A75".equals(Build.MODEL, true)) {
-            checkCard()
-        }
     }
 
     fun isJSONValid(JSON: String?): Boolean {
