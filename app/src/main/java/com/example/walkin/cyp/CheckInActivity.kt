@@ -34,6 +34,7 @@ import com.centerm.smartpos.aidl.printer.PrinterParams
 import com.centerm.smartpos.aidl.sys.AidlDeviceManager
 import com.centerm.smartpos.constant.Constant
 import com.centerm.smartpos.util.HexUtil
+import com.cyp.walkin.BuildConfig
 import com.example.walkin.BuildConfig
 import com.example.walkin.R
 import com.example.walkin.cyp.app.WalkinApplication
