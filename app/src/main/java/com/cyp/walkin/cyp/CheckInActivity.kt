@@ -997,22 +997,23 @@ class CheckInActivity() : BaseActivity() {
 
         PrinterApi.SetLang_Api(PrinterApi.LANG_PERSIAN, PrinterApi.ENCODING_UTF8)
         PrinterApi.PrnSetGray_Api(15)
-        PrinterApi.PrnLineSpaceSet_Api(10.toShort(), 0)
+//        PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
+        PrinterApi.PrnLineSpaceSet_Api(0.toShort(), 0)
         val logo = resizeBitmap(PreferenceUtils.getBitmapLogo())
         PrinterApi.PrnLeftIndSet_Api(((384 - logo.width) / 2).toShort()) // if you want to set align when calling PrinterApi.PrnLogo_Api(bitmap), you need to use this api to set it
         PrinterApi.PrnLogo_Api(logo)
         PrinterApi.PrnFontSet_Api(32, 20, 0)
         PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" "," ") +
                                       "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
-                                      "\nเลขบัตรประขาชน : " + data.idcard +
-                                      "\nทะเบียนรถ : " + data.vehicle_id +
-                                      "\nจากบริษัท : " + data.from() +
-                                      "\nผู้ที่ขอพบ : " + data.person_contact +
-                                      "\nติดต่อแผนก : " + data.department +
+                                      "\nเลขบัตรประขาชน : " + data.idcard.replace(" "," ") +
+                                      "\nทะเบียนรถ : " + data.vehicle_id.replace(" "," ") +
+                                      "\nจากบริษัท : " + data.from().toString().replace(" "," ") +
+                                      "\nผู้ที่ขอพบ : " + data.person_contact.replace(" "," ") +
+                                      "\nติดต่อแผนก : " + data.department.replace(" "," ") +
                                       "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
                                       "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
-                                      "\nอุณหภูมิ : " + data.temperature +
-                                      "\nเวลาเข้า:" + data.chcekin_time.replace(" "," "))
+                                      "\nอุณหภูมิ : " + data.temperature.replace(" "," ") +
+                                      "\nเวลาเข้า : " + data.chcekin_time.replace(" "," "))
         PrinterApi.PrnStr_Api("\n\n")
         PrinterApi.printAddQrCode_Api(1, 180, data.contact_code)
         PrinterApi.printSetAlign_Api(1)
@@ -1023,7 +1024,7 @@ class CheckInActivity() : BaseActivity() {
             PrinterApi.printSetAlign_Api(1)
             PrinterApi.PrnFontSet_Api(32, 24, 0)
             PrinterApi.PrnLineSpaceSet_Api(10.toShort(), 0)
-            PrinterApi.PrnStr_Api("\n\n\n")
+            PrinterApi.PrnStr_Api("\n\n")
             PrinterApi.PrnStr_Api("___________________________\n")
             val x = signature.get(i).getname()
             PrinterApi.PrnStr_Api("-"+x+"-")
@@ -1031,9 +1032,9 @@ class CheckInActivity() : BaseActivity() {
         PrinterApi.printSetAlign_Api(1)
         PrinterApi.PrnFontSet_Api(32, 20, 0)
         if(PreferenceUtils.getCompanyNote().isEmpty()) {
-            PrinterApi.PrnStr_Api("\n\n\n")
+            PrinterApi.PrnStr_Api("\n\n")
         } else {
-            PrinterApi.PrnStr_Api("\n\n" + "**"+PreferenceUtils.getCompanyNote()+"**" + "\n\n\n")
+            PrinterApi.PrnStr_Api("\n" + "**"+PreferenceUtils.getCompanyNote().replace(" "," ")+"**" + "\n\n\n")
         }
 
 	 	Util.printData()
