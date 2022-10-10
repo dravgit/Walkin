@@ -940,13 +940,16 @@ class CheckInActivity() : BaseActivity() {
     }
 
     private fun resizeBitmap(cacheBitmap: Bitmap): Bitmap {
-        var cacheBitmap = BitmapUtils.scale(cacheBitmap, cacheBitmap.width / 3, cacheBitmap.height / 3)
+//        var cacheBitmap = BitmapUtils.scale(cacheBitmap, cacheBitmap.width / 3, cacheBitmap.height / 3)
+//        cacheBitmap = BitmapUtils.replaceBitmapColor(cacheBitmap, Color.TRANSPARENT, Color.WHITE)
+//        if (cacheBitmap.width > 384) {
+//            val newHeight = (1.0 * cacheBitmap.height * 384 / cacheBitmap.width).toInt()
+//            cacheBitmap = BitmapUtils.scale(cacheBitmap, 384, newHeight)
+//        }
+//       return cacheBitmap
+        var cacheBitmap = BitmapUtils.scale(cacheBitmap, 200, cacheBitmap.height * 200 / cacheBitmap.width)
         cacheBitmap = BitmapUtils.replaceBitmapColor(cacheBitmap, Color.TRANSPARENT, Color.WHITE)
-        if (cacheBitmap.width > 384) {
-            val newHeight = (1.0 * cacheBitmap.height * 384 / cacheBitmap.width).toInt()
-            cacheBitmap = BitmapUtils.scale(cacheBitmap, 384, newHeight)
-        }
-       return cacheBitmap
+        return cacheBitmap
     }
     private fun printP2(data: CheckInResponseModel) {
         setHeight(0x11)
@@ -997,13 +1000,12 @@ class CheckInActivity() : BaseActivity() {
 
         PrinterApi.SetLang_Api(PrinterApi.LANG_PERSIAN, PrinterApi.ENCODING_UTF8)
         PrinterApi.PrnSetGray_Api(15)
-//        PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
         PrinterApi.PrnLineSpaceSet_Api(0.toShort(), 0)
         val logo = resizeBitmap(PreferenceUtils.getBitmapLogo())
         PrinterApi.PrnLeftIndSet_Api(((384 - logo.width) / 2).toShort()) // if you want to set align when calling PrinterApi.PrnLogo_Api(bitmap), you need to use this api to set it
         PrinterApi.PrnLogo_Api(logo)
         PrinterApi.PrnFontSet_Api(32, 20, 0)
-        PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" "," ") +
+        PrinterApi.PrnStr_Api("\nบริษัท : " + PreferenceUtils.getCompanyName().replace(" "," ") +
                                       "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
                                       "\nเลขบัตรประขาชน : " + data.idcard.replace(" "," ") +
                                       "\nทะเบียนรถ : " + data.vehicle_id.replace(" "," ") +
@@ -1014,17 +1016,16 @@ class CheckInActivity() : BaseActivity() {
                                       "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
                                       "\nอุณหภูมิ : " + data.temperature.replace(" "," ") +
                                       "\nเวลาเข้า : " + data.chcekin_time.replace(" "," "))
-        PrinterApi.PrnStr_Api("\n\n")
         PrinterApi.printAddQrCode_Api(1, 180, data.contact_code)
         PrinterApi.printSetAlign_Api(1)
-        PrinterApi.PrnFontSet_Api(32, 24, 0)
+        PrinterApi.PrnFontSet_Api(32, 20, 0)
         PrinterApi.PrnLineSpaceSet_Api(10.toShort(), 0)
         PrinterApi.PrnStr_Api(data.contact_code)
         for (i in signature.indices) {
             PrinterApi.printSetAlign_Api(1)
-            PrinterApi.PrnFontSet_Api(32, 24, 0)
+            PrinterApi.PrnFontSet_Api(32, 20, 0)
             PrinterApi.PrnLineSpaceSet_Api(10.toShort(), 0)
-            PrinterApi.PrnStr_Api("\n\n")
+            PrinterApi.PrnStr_Api("\n")
             PrinterApi.PrnStr_Api("___________________________\n")
             val x = signature.get(i).getname()
             PrinterApi.PrnStr_Api("-"+x+"-")
@@ -1032,9 +1033,9 @@ class CheckInActivity() : BaseActivity() {
         PrinterApi.printSetAlign_Api(1)
         PrinterApi.PrnFontSet_Api(32, 20, 0)
         if(PreferenceUtils.getCompanyNote().isEmpty()) {
-            PrinterApi.PrnStr_Api("\n\n")
+            PrinterApi.PrnStr_Api("\n\n\n")
         } else {
-            PrinterApi.PrnStr_Api("\n" + "**"+PreferenceUtils.getCompanyNote().replace(" "," ")+"**" + "\n\n\n")
+            PrinterApi.PrnStr_Api("**"+PreferenceUtils.getCompanyNote().replace(" "," ")+"**" + "\n\n\n")
         }
 
 	 	Util.printData()
