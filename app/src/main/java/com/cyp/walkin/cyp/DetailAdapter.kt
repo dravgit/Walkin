@@ -108,8 +108,8 @@ class DetailAdapter     // RecyclerView recyclerView;
     }
     private  fun search(  code: String){
         searchByOrder(code, object : NetworkLisener<VisitorResponseModel>{
-            override  fun onResponse(  response: VisitorResponseModel){
-                printA75(response)
+            override  fun onResponse(response: VisitorResponseModel){
+                print(response)
             }
             override  fun onError(  errorModel: WalkInErrorModel){
                 Log.e("error", errorModel.msg)
@@ -236,7 +236,7 @@ class DetailAdapter     // RecyclerView recyclerView;
         sunmiPrinterService!!.commitPrinterBuffer()
     }
 
-    private   fun print(  data: VisitorResponseModel){
+    private fun print(  data: VisitorResponseModel){
         try {
               val  bitmap = createImageFromQRCode(data.contact_code)
               val  signature = PreferenceUtils.getSignature()
