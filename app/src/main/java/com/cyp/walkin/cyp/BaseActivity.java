@@ -39,31 +39,13 @@ public abstract class BaseActivity extends BaseKioskActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bindService();
         Util.Companion.setContext(this);
-            new Thread() {
-                public void run() {
-                    SystemApi.SystemInit_Api(0, CommonConvert.StringToBytes(GlobalConstants.CurAppDir + "/" + "\\0"), BaseActivity.this,
-                            new ISdkStatue() {
-                                @Override
-                                public void sdkInitSuccessed() {
-                                    Common.Init_Api();
-                                    onA75InitSuccess();
-                                }
-
-                                @Override
-                                public void sdkInitFailed() {
-                                    Toast.makeText(BaseActivity.this, "sdkInitFailed", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                }
-            }.start();
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
     }
 
 
@@ -100,12 +82,6 @@ public abstract class BaseActivity extends BaseKioskActivity {
 
     };
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     private Bitmap rotateImage(Bitmap source, Float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
@@ -132,6 +108,12 @@ public abstract class BaseActivity extends BaseKioskActivity {
             startActivity(intent);
             finish();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService();
     }
 
     public void bindService() {

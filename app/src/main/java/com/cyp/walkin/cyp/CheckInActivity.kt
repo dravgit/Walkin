@@ -256,13 +256,7 @@ class CheckInActivity() : BaseActivity() {
                     override fun onResponse(response: CheckInResponseModel) {
                         sLoading!!.dismiss()
                         val data = response
-//                        print(data)
-//                        printP2(data)
-                        try {
-                            printA75(data)
-                        } catch (e: java.lang.IllegalArgumentException) {
-                            e.printStackTrace()
-                        }
+                        print(data)
                         finish()
                     }
 
@@ -773,14 +767,7 @@ class CheckInActivity() : BaseActivity() {
                                         }
                                     })
                                     Handler().postDelayed({ searchPhoto() }, 2000)
-//                                        aidlIdCardTha.searchIDCardPhoto(6000, new ThaiPhotoListerner.Stub() {
-//                                            @Override
-//                                            public void onResult(int i, Bitmap bitmap) throws RemoteException {
-//                                                Log.e("DATA", "onResult photo");
-//                                                Bitmap rebmp = Bitmap.createScaledBitmap(bitmap, 85, 100, false);
-//                                                showPhoto(rebmp);
-//                                            }
-//                                        });
+
                                 } catch (e: RemoteException) {
                                     Log.e("DATA info", "RemoteException")
                                     e.printStackTrace()
