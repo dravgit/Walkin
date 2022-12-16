@@ -52,9 +52,6 @@ class TotalVisitorActivity : BaseActivity() {
     override fun onDeviceConnectedSwipe(manager: AidlDeviceManager?) {
     }
 
-    override fun onA75InitSuccess() {
-    }
-
     override fun showMessage(str: String?, black: Int) {
     }
 
