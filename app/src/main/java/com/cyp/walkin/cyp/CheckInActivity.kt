@@ -45,16 +45,6 @@ import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
 import com.sunmi.peripheral.printer.InnerResultCallbcak
 import com.sunmi.peripheral.printer.SunmiPrinterService
-import com.vanstone.appsdk.client.ISdkStatue
-import com.vanstone.l2.Common
-import com.vanstone.trans.api.IcApi
-import com.vanstone.trans.api.MagCardApi
-import com.vanstone.trans.api.PrinterApi
-import com.vanstone.trans.api.SystemApi
-import com.vanstone.trans.api.struct.ApduResp
-import com.vanstone.trans.api.struct.ApduSend
-import com.vanstone.utils.ByteUtils
-import com.vanstone.utils.CommonConvert
 import com.watermark.androidwm_light.WatermarkBuilder
 import com.watermark.androidwm_light.bean.WatermarkText
 import io.reactivex.Observable
@@ -257,8 +247,8 @@ class CheckInActivity() : BaseActivity() {
                         sLoading!!.dismiss()
                         val data = response
 //                        print(data)
-//                        printP2(data)
-                        printA75(data)
+                        printP2(data)
+//                        printA75(data)
                         finish()
                     }
 
@@ -521,13 +511,6 @@ class CheckInActivity() : BaseActivity() {
         }
     }
 
-    override fun onA75InitSuccess() {
-        MagCardApi.MagClose_Api()
-        MagCardApi.MagOpen_Api()
-        MagCardApi.MagReset_Api()
-        readCardForA75()
-        readMag2()
-    }
     override fun onDeviceConnectedSwipe(deviceManager: AidlDeviceManager) {
         try {
             magCard = AidlMagCard.Stub.asInterface(deviceManager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_MAGCARD))
@@ -832,8 +815,6 @@ class CheckInActivity() : BaseActivity() {
         disposablePhoto?.dispose()
         disposableCheck?.dispose()
         disposableMagCard?.dispose()
-        MagCardApi.MagClose_Api()
-        IcApi.IccPowerOff_Api(0)
         scheduledExecutor.shutdownNow()
         if (aidlIcCard != null) {
             try {
@@ -985,38 +966,6 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
         sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
         sunmiPrinterService!!.commitPrinterBuffer()
-    }
-
-    private fun printA75(data: CheckInResponseModel) {
-        val signature = PreferenceUtils.getSignature()
-        PrinterApi.PrnClrBuff_Api()
-	    PrinterApi.PrnSetGray_Api(15)
-	    PrinterApi.PrnLineSpaceSet_Api(5.toShort(), 0)
-	    PrinterApi.PrnLogo_Api(resizeBitmap(PreferenceUtils.getBitmapLogo()))
-		PrinterApi.PrnFontSet_Api(24, 24, 0)
-        PrinterApi.PrnStr_Api("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
-                                      "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
-                                      "\nเลขบัตรประขาชน : " + data.idcard +
-                                      "\nทะเบียนรถ : " + data.vehicle_id +
-                                      "\nจากบริษัท : " + data.from +
-                                      "\nผู้ที่ขอพบ : " + data.person_contact +
-                                      "\nติดต่อแผนก : " + data.department +
-                                      "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
-                                      "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
-                                      "\nอุณหภูมิ : " + data.temperature +
-                                      "\nเวลาเข้า : " + data.chcekin_time)
-
-        PrinterApi.PrnStr_Api("\n           ")
-        PrinterApi.printAddQrCode_Api(1, 250, data.contact_code)
-//		PrinterApi.PrnLogo_Api(bitmap)
-		PrinterApi.PrnStr_Api("\n       "+data.contact_code+"\n\n")
-        for (i in signature.indices) {
-            PrinterApi.PrnStr_Api("\n\n\n\n____________________________" + "\n       " + signature.get(i).getname())
-        }
-
-		PrinterApi.PrnStr_Api("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n")
-
-	 	Util.printData()
     }
 
     private var `is` = true
@@ -1235,11 +1184,12 @@ class CheckInActivity() : BaseActivity() {
     }
 
     fun sendAPDUkOnClick(): UserModel {
+//        getDataAllCard()
         val version = transmitApduCmd(_req_version).trim { it <= ' ' }
         val userModel = UserModel()
         var base = ""
 
-        if (version.startsWith("0003")) {
+        if (version.startsWith("0003") || version.startsWith("0004")) {
             base = "80B0"
             userModel.id = transmitApduCmd("80b0000402000d").substring(0, 12)
             val data = transmitApduCmd("80b000D902001D")
@@ -1310,6 +1260,36 @@ class CheckInActivity() : BaseActivity() {
         return Arrays.copyOfRange(data, 0, data.size - 2)
     }
 
+    private fun getDataAllCard() {
+        var i = 0x0000
+        while (i <= 0xffff) {
+            // Convert the integer value to a hexadecimal string
+            val hexString = i.toString(16)
+            // pad the hex string with leading zeros if it's less than 8 characters long
+            val paddedHexString = hexString.padStart(4, '0')
+            // do something with the hex string here
+            println()
+            getDataTest("80b0"+paddedHexString+"0200FF")
+            i++
+        }
+    }
+    private fun getDataTest(cmd: String) {
+        val send = ByteUtil.hexStr2Bytes(cmd)
+        val recv = ByteArray(260)
+        var data = ""
+        try {
+            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
+            val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
+            if (len < 0) {
+                LogUtil.e(TAG, "transmitApdu failed,code:$len")
+            } else {
+                data = String(recv, _UTF8_CHARSET)
+                LogUtil.e(TAG, cmd + ": ,recv data :" + data)
+            }
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+    }
     private fun transmitApduCmd(cmd: String): String {
         LogUtil.e(TAG, "panya transmitApduCmd" + cmd)
 
@@ -1367,35 +1347,6 @@ class CheckInActivity() : BaseActivity() {
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
             } else {
                 val x = ByteUtil.bytes2HexStr(*recv)
-                val x2 = x.substring(0, size * 2)
-                xx = ByteUtil.hexStr2Bytes(x2)
-            }
-        } catch (e: RemoteException) {
-            e.printStackTrace()
-        }
-        return xx
-    }
-
-    private fun transmitApduCmdPhotoA75(command: String, dataIn: String, hexSize: String): ByteArray {
-        val size = Integer.parseInt(hexSize, 16)
-        var xx = ByteArray(size)
-        try {
-            val apduSend = ApduSend()
-            val apduResp = ApduResp()
-
-        ByteUtils.memcpy(apduSend.Command, CommonConvert.ascStringToBCD(command), 4);
-        ByteUtils.memcpy(apduSend.DataIn, CommonConvert.ascStringToBCD(dataIn), 2);
-
-        apduSend.Lc = 2
-        apduSend.Le = 0
-        IcApi.IccIsoCommand_Api(0, apduSend, apduResp)
-
-            val len = apduResp.lenOut
-            if (len < 0) {
-                LogUtil.e(TAG, "panya failed,code:$len")
-                Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
-            } else {
-                val x = ByteUtil.bytes2HexStr(*apduResp.dataOut)
                 val x2 = x.substring(0, size * 2)
                 xx = ByteUtil.hexStr2Bytes(x2)
             }
@@ -1549,327 +1500,5 @@ class CheckInActivity() : BaseActivity() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
         }
-    }
-
-    fun readMag2() {
-        var sloted_card = true
-       task = Thread {
-           val CardData = ByteArray(1024)
-           val usCardLenAddr = ByteArray(4)
-           Log.e("test", "start fromCallable2")
-
-           while (sloted_card) {
-               if (MagCardApi.MagRead_Api(CardData, usCardLenAddr) == 0x31 && Card.GetTrackData(CardData) == 0) {
-                   GlobalConstants.PosCom.stTrans.ucSwipedFlag = DefConstants.MASK_INCARDNO_MAGCARD
-
-                   Card.GetCardFromTrack(
-                       GlobalConstants.PosCom.stTrans.MainAcc, GlobalConstants.PosCom.Track2, GlobalConstants.PosCom.Track3
-                                        )
-
-                   val rawName = String(CardData, Charset.forName("utf-8"))
-                   val startIndex = rawName.indexOf("^", 0)
-                   val lastIndex = rawName.indexOf("^^", 0)
-                   val rawIdcard = String(GlobalConstants.PosCom.stTrans.MainAcc, Charset.forName("utf-8"))
-                   val idcardLength = rawIdcard.length
-                   if (startIndex != -1 && lastIndex != -1 && idcardLength >= 13) {
-                       val nameRevert = rawName.substring( startIndex+ 1, lastIndex)
-                       val names = nameRevert.split("\\$".toRegex()).toTypedArray()
-                       var name = ""
-                       if (names.size == 3) {
-                           name = names[2] + names[1] + " " + names[0]
-                       } else if (names.size == 2) {
-                           name = names[1] + " " + names[0]
-                       }
-                       val idCard = rawIdcard.substring(idcardLength - 13)
-                       runOnUiThread {
-                           edtnameTH!!.setText(name)
-                           edtidcard!!.setText(idCard)
-                       }
-                       sloted_card = false
-                   } else {
-                       runOnUiThread {
-                           Toast.makeText(this@CheckInActivity, "กรุณาทำใหม่อีกครั้ง", Toast.LENGTH_LONG).show()
-                       }
-                   }
-               }
-           }
-        }
-        task?.start()
-
-    }
-
-    fun readMag() {
-        Log.e("test", "start readMag")
-        var sloted_card = true
-        disposableMagCard = Observable.fromCallable {
-                    Log.e("test", "start fromCallable")
-                    val CardData = ByteArray(1024)
-                    val usCardLenAddr = ByteArray(4)
-                    Log.e("test", "start fromCallable2")
-
-                    while (sloted_card) {
-                        if (MagCardApi.MagRead_Api(CardData, usCardLenAddr) == 0x31 && Card.GetTrackData(CardData) == 0) {
-                            GlobalConstants.PosCom.stTrans.ucSwipedFlag = DefConstants.MASK_INCARDNO_MAGCARD
-
-                                Card.GetCardFromTrack(
-                                    GlobalConstants.PosCom.stTrans.MainAcc, GlobalConstants.PosCom.Track2, GlobalConstants.PosCom.Track3
-                                                     )
-
-                            val rawName = String(CardData, Charset.forName("utf-8"))
-                            val startIndex = rawName.indexOf("^", 0)
-                            val lastIndex = rawName.indexOf("^^", 0)
-                            val rawIdcard = String(GlobalConstants.PosCom.stTrans.MainAcc, Charset.forName("utf-8"))
-                            val idcardLength = rawIdcard.length
-                            if (startIndex != -1 && lastIndex != -1 && idcardLength >= 13) {
-                                val nameRevert = rawName.substring( startIndex+ 1, lastIndex)
-                                val names = nameRevert.split("\\$".toRegex()).toTypedArray()
-                                var name = ""
-                                if (names.size == 3) {
-                                     name = names[2] + names[1] + " " + names[0]
-                                } else if (names.size == 2) {
-                                     name = names[1] + " " + names[0]
-                                }
-                                val idCard = rawIdcard.substring(idcardLength - 13)
-                                runOnUiThread {
-                                    edtnameTH!!.setText(name)
-                                    edtidcard!!.setText(idCard)
-                                }
-                                sloted_card = false
-                            } else {
-                                runOnUiThread {
-                                    Toast.makeText(this@CheckInActivity, "กรุณาทำใหม่อีกครั้ง", Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        }
-                    }
-                }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                           disposableMagCard?.dispose()
-                            Log.e("test", "mag success")
-                       },
-                       {
-                           it.printStackTrace()
-                       },
-                       {
-                            Log.e("test", "mag on complete")
-                       })
-    }
-
-    @SuppressLint("CheckResult")
-    fun readCardForA75(): UserModel {
-        val userModel = UserModel()
-        var base = ""
-        disposable?.dispose()
-        disposable = Observable.fromCallable {
-            while (true) {
-                if (IcApi.IccDetect_Api(0) == 0x00){
-                    val cardTypeApi: Int = IcApi.IccGetCardType_Api()
-                    Log.e("testA2", "cardTypeApi : $cardTypeApi")
-                    break
-                }
-            }
-            checkCardA75()
-
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                           val RstBuf = ByteArray(256)
-                           val Rlen = ByteArray(4)
-                           val ret: Int = IcApi.IccInit_Api(0, 0x03, RstBuf, Rlen)
-                           Log.e("testA75", "ret = $ret") //ERR_ICCRESET
-                           if (ret != 0){
-                               Log.e("testA75 ret", "" + ret) //ERR_ICCRESET
-                           } else {
-                               val version = readData("80b0000002", "0004")
-                               Log.e("testA75", "data version: " + version)
-                               if (version.startsWith("0003")) {
-                                   base = "80B0"
-                                   userModel.id = readData("80b0000402", "000d").substring(0, 12)
-                                   val data = readData("80b000D902", "001D")
-                                   val _year_th: String = data.substring(0, 4)
-                                   val _month_th: String = data.substring(4, 6)
-                                   val _day: String = data.substring(6, 8)
-                                   val sex: String = data.substring(8, 9)
-                                   userModel.birthDate = _day + _month_th + _year_th
-                                   if ("1" == sex) {
-                                       userModel.gender = "M"
-                                   } else {
-                                       userModel.gender = "F"
-                                   }
-                                   userModel.nameTH = readData("80b0001102", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.nameEN = readData("80b0007502", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.address = readData("80b0157902", "00A0").replace("#", " ").substring(0, 100).trimEnd()
-                               } else {
-                                   base = "80B1"
-                                   userModel.id = readData("80b1000402", "000d").substring(0, 12)
-                                   val data = readData("80b100D902", "001D")
-                                   val _year_th: String = data.substring(0, 4)
-                                   val _month_th: String = data.substring(4, 6)
-                                   val _day: String = data.substring(6, 8)
-                                   val sex: String = data.substring(8, 9)
-                                   userModel.birthDate = _day + _month_th + _year_th
-                                   if ("1" == sex) {
-                                       userModel.gender = "M"
-                                   } else {
-                                       userModel.gender = "F"
-                                   }
-                                   userModel.nameTH = readData("80b1001102", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.nameEN = readData("80b1007502", "0064").replace("#", " ").substring(0, 50)
-                                   userModel.address = readData("80b0000402", "0096").replace("#", " ").substring(0, 50)
-                               }
-                           }
-                Log.e("testA75", "userModel.nameTH" + userModel.nameTH )
-                            if (userModel.id.isNullOrEmpty()){
-                                readCardForA75()
-                            } else {
-                                if (!this@CheckInActivity.isFinishing) {
-                               runOnUiThread {
-                                   val data = userModel
-                                   edtnameTH!!.setText(data.nameTH)
-                                   edtidcard!!.setText(data.id)
-                                   edtaddress!!.setText(data.address?.replace("#", " "))
-                                   tVgender!!.text = data.gender
-                                   tVbirth!!.text = data.birthDate
-
-                                   observePhoto()
-                               }
-                           }
-                            }
-                       }, { error ->
-                           error?.message?.let { Log.e("error", it) }
-                       })
-
-
-        return userModel
-}
-
-    fun observePhoto() {
-        disposablePhoto?.dispose()
-        disposablePhoto = Observable.fromCallable {
-            while (true){
-                if (IcApi.IccDetect_Api(0) == 0x00){
-                    val cardTypeApi: Int = IcApi.IccGetCardType_Api()
-                    Log.e("testA2", "cardTypeApi : $cardTypeApi")
-                    break
-                }
-            }
-            var photoBase = ""
-            val RstBuf = ByteArray(256)
-            val Rlen = ByteArray(4)
-            val ret: Int = IcApi.IccInit_Api(0, 0x03, RstBuf, Rlen)
-            Log.e("testA75", "ret = $ret") //ERR_ICCRESET
-            if (ret != 0){
-                Log.e("testA75 ret", "" + ret) //ERR_ICCRESET
-            } else {
-                val version = readData("80b0000002", "0004")
-                Log.e("testA75", "photo version: " + version)
-                if (version.startsWith("0003")) {
-                    photoBase = "80B0"
-                } else {
-                    photoBase = "80B1"
-                }
-                sendCommandForPhotoA75(photoBase)
-            }
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                           val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
-                           showPhoto(bmp)
-                       }, { error ->
-                           error?.message?.let { Log.e("error", it) }
-                       })
-//        LogUtil.e(TAG, "panya isDisposed"+ disposablePhoto?.isDisposed)
-
-      }
-
-    fun readData(command: String, dataIn: String): String {
-        val apduSend = ApduSend()
-        val apduResp = ApduResp()
-        //0
-        ByteUtils.memcpy(apduSend.Command, CommonConvert.ascStringToBCD("00A40400"), 4);
-        ByteUtils.memcpy(apduSend.DataIn, CommonConvert.ascStringToBCD("A000000054480001"), 8);
-        apduSend.Lc = 8
-        apduSend.Le = 0
-        IcApi.IccIsoCommand_Api(0, apduSend, apduResp)
-
-        ByteUtils.memcpy(apduSend.Command, CommonConvert.ascStringToBCD(command), 4);
-        ByteUtils.memcpy(apduSend.DataIn, CommonConvert.ascStringToBCD(dataIn), 2);
-
-        apduSend.Lc = 2
-        apduSend.Le = 0
-        IcApi.IccIsoCommand_Api(0, apduSend, apduResp)
-
-      return String(apduResp.getDataOut(), Charset.forName("TIS-620"))
-    }
-
-    fun sendCommandForPhotoA75(base: String) {
-    try {
-        val apduSend = ApduSend()
-        val apduResp = ApduResp()
-        ByteUtils.memcpy(apduSend.Command, CommonConvert.ascStringToBCD("00A40400"), 4);
-        ByteUtils.memcpy(apduSend.DataIn, CommonConvert.ascStringToBCD("A000000054480001"), 8);
-        apduSend.Lc = 8
-        apduSend.Le = 0
-        IcApi.IccIsoCommand_Api(0, apduSend, apduResp)
-
-    ByteUtils.memcpy(apduSend.Command, CommonConvert.ascStringToBCD(base + "0179"), 4);
-    ByteUtils.memcpy(apduSend.DataIn, CommonConvert.ascStringToBCD("0002"), 2);
-    apduSend.Lc = 2
-    apduSend.Le = 256
-    IcApi.IccIsoCommand_Api(0, apduSend, apduResp)
-
-            val length = r(apduResp.dataOut)
-            val iLength = ByteUtil.bytes2short(length)
-            val out = ByteArrayOutputStream(iLength)//137B
-            LogUtil.e(TAG, "panya iLength $iLength")
-            val cnt = iLength / 250
-            val lastData = iLength % 250
-            for (i in 0 until cnt + 1) {
-                val xwd: Int
-                val xof = i * 250 + 379
-                xwd = if (i == cnt) lastData else 250
-                if (xwd == 0) {
-                    break
-                }
-                val sp2 = e(xof shr 8 and 0xff)
-                val sp3 = e(xof and 0xff)
-                val sp6 = e(xwd and 0xff)
-                val cmdx = base + sp2 + sp3 + "0200" + sp6
-
-                val _xx = transmitApduCmdPhotoA75(base + sp2 + sp3, "00" + sp6, cmdx.substring(cmdx.length - 2))
-
-                if (_xx != null) {
-                    out.write(_xx, 0, _xx.size)
-                } else {
-                    break
-                }
-            }
-            photoBytes = out.toByteArray()
-            out.close()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            photoBytes = null
-        }
-    }
-
-    fun checkCardA75() {
-        disposableCheck?.dispose()
-        disposableCheck = Observable.fromCallable {
-            while (true){
-                if (IcApi.IccDetect_Api(0) != 0x00) {
-                    break
-                }
-            }
-        }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                            disposable?.dispose()
-                            disposablePhoto?.dispose()
-                           readCardForA75()
-                       }, { error ->
-                            error.printStackTrace()
-                       })
     }
 }
