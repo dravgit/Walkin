@@ -1258,10 +1258,11 @@ class CheckInActivity() : BaseActivity() {
 
     fun sendAPDUkOnClick(): UserModel {
         val version = transmitApduCmd(_req_version).trim { it <= ' ' }
+//        println("=== === === $version")
         val userModel = UserModel()
         var base = ""
 
-        if (version.startsWith("0003")) {
+        if (version.startsWith("0003") || version.startsWith("0004")) {
             base = "80B0"
             userModel.id = transmitApduCmd("80b0000402000d").substring(0, 12)
             val data = transmitApduCmd("80b000D902001D")
@@ -1346,6 +1347,7 @@ class CheckInActivity() : BaseActivity() {
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
             } else {
 //                LogUtil.e(TAG, "transmitApdu success,recv:" + ByteUtil.bytes2HexStr(*recv))
+//                println("=== === === $recv")
                 data = String(recv, _UTF8_CHARSET)
 //                LogUtil.e(TAG, "transmitApdu success,recv x :" + data)
             }
@@ -1643,7 +1645,7 @@ class CheckInActivity() : BaseActivity() {
             } else {
                 val version = readData("80b0000002", "0004")
                 Log.e("testA75", "photo version: " + version)
-                if (version.startsWith("0003")) {
+                if (version.startsWith("0003") || version.startsWith("0004")) {
                     photoBase = "80B0"
                 } else {
                     photoBase = "80B1"
@@ -1781,7 +1783,7 @@ class CheckInActivity() : BaseActivity() {
                     Log.d("testA75", "ret = $ret") //ERR_ICCRESET
                     if (ret == 0) {
                         val version = readData("80b0000002", "0004")
-                        if (version.startsWith("0003")) {
+                        if (version.startsWith("0003") || version.startsWith("0004")) {
                             photoBase = "80B0"
                             userModel.id = readData("80b0000402", "000d").substring(0, 12)
                             val data = readData("80b000D902", "001D")
