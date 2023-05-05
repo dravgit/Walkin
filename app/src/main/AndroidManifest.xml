@@ -58,7 +58,8 @@
         <activity android:name="com.cyp.walkin.cyp.HomeActivity" />
         <activity android:name="com.cyp.walkin.cyp.CheckInActivity" />
         <activity android:name="com.cyp.walkin.cyp.ScanActivity" />
-        <activity android:name="com.cyp.walkin.cyp.MainActivity">
+        <activity android:name="com.cyp.walkin.cyp.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
