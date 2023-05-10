@@ -4,15 +4,15 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.example.walkin"
         minSdkVersion 25
-        targetSdkVersion 30
-        versionCode 7
-        versionName "7.0.0"
+        targetSdkVersion 33
+        versionCode 8
+        versionName "8.0.0"
         //WalkinKeyStore3 password : 123456
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,7 +25,7 @@ android {
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
             v1SigningEnabled true
-            v2SigningEnabled false
+            v2SigningEnabled true
         }
     }
     buildTypes {

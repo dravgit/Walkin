@@ -1189,7 +1189,7 @@ class CheckInActivity() : BaseActivity() {
         val userModel = UserModel()
         var base = ""
 
-        if (version.startsWith("0003")) {
+        if (version.startsWith("0003") || version.startsWith("0004")) {
             base = "80B0"
             userModel.id = transmitApduCmd("80b0000402000d").substring(0, 12)
             val data = transmitApduCmd("80b000D902001D")
