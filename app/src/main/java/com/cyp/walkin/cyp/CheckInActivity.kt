@@ -230,8 +230,7 @@ class CheckInActivity() : BaseActivity() {
 
                 val param = CheckInParamModel.Builder(name, department_id, objective_id, images)
                 Log.e("CHECK", param.toString())
-                param.idcard(edtidcard?.getText()
-                                 .toString())
+                param.idcard(edtidcard?.getText().toString())
                     .vehicle_id(edtCar!!.text.toString())
                     .temperature(edtTemp!!.text.toString())
                     .gender(tVgender!!.text.toString())
