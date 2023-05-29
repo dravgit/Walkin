@@ -132,52 +132,71 @@ class DetailAdapter     // RecyclerView recyclerView;
     }
 
     private fun resizeBitmap(cacheBitmap: Bitmap): Bitmap {
-        var cacheBitmap = BitmapUtils.scale(cacheBitmap, cacheBitmap.width / 3, cacheBitmap.height / 3)
-        cacheBitmap = BitmapUtils.replaceBitmapColor(cacheBitmap, Color.TRANSPARENT, Color.WHITE)
-        if (cacheBitmap.width > 384) {
-            val newHeight = (1.0 * cacheBitmap.height * 384 / cacheBitmap.width).toInt()
-            cacheBitmap = BitmapUtils.scale(cacheBitmap, 384, newHeight)
-        }
-        return cacheBitmap
+        val currentWidth = cacheBitmap.width
+        val currentHeight = cacheBitmap.height
+
+        val desiredWidth = 200
+        val scaleRatio = desiredWidth.toDouble() / currentWidth
+        val desiredHeight = (currentHeight * scaleRatio).toInt()
+
+        var resizedBitmap = BitmapUtils.scale(cacheBitmap, desiredWidth, desiredHeight)
+        resizedBitmap =
+            BitmapUtils.replaceBitmapColor(resizedBitmap, Color.TRANSPARENT, Color.WHITE)
+
+        return resizedBitmap
     }
+
     private fun printP2(data: VisitorResponseModel) {
         setHeight(0x11)
-        sunmiPrinterService!!.clearBuffer()
-        sunmiPrinterService!!.enterPrinterBuffer(true)
         val bitmap = createImageFromQRCode(data.contact_code)
         val signature = PreferenceUtils.getSignature()
-        sunmiPrinterService!!.printText("    ", innerResultCallbcak)
-        sunmiPrinterService!!.printBitmap(resizeBitmap(PreferenceUtils.getBitmapLogo()), innerResultCallbcak)
-        var from = data.from
-        if (from.isNullOrEmpty()) {
-            from = ""
-        }
-        sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
-                                                "\nชื่อ-นามสกุล : " + data.name.replace(" "," ") +
-                                                "\nเลขบัตรประขาชน : " + data.idcard +
-                                                "\nทะเบียนรถ : " + data.vehicle_id +
-                                                "\nจากบริษัท : " + from +
-                                                "\nผู้ที่ขอพบ : " + data.person_contact +
-                                                "\nติดต่อแผนก : " + data.department +
-                                                "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
-                                                "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
-                                                "\nอุณหภูมิ : " + data.temperature +
-                                                "\nเวลาเข้า : " + data.checkin_time, innerResultCallbcak)
 
-        sunmiPrinterService!!.printText("\n      ", innerResultCallbcak)
-
+        sunmiPrinterService!!.clearBuffer()
+        sunmiPrinterService!!.enterPrinterBuffer(true)
+        //Set Center
+        sunmiPrinterService!!.setAlignment(1, innerResultCallbcak)
+        //Logo
+        sunmiPrinterService!!.printBitmap(
+            resizeBitmap(PreferenceUtils.getBitmapLogo()),
+            innerResultCallbcak
+        )
+        sunmiPrinterService!!.printText("\n", innerResultCallbcak)
+        //Set Left
+        sunmiPrinterService!!.setAlignment(0, innerResultCallbcak)
+        sunmiPrinterService!!.printText(
+            "บริษัท : " + PreferenceUtils.getCompanyName() +
+                    "\nชื่อ-นามสกุล : " + (data.name ?: " ").replace(" ", " ") +
+                    "\nเลขบัตรประขาชน : " + (data.idcard ?: " ") +
+                    "\nทะเบียนรถ : " + (data.vehicle_id ?: " ") +
+                    "\nจากบริษัท : " + (data.from ?: " ") +
+                    "\nผู้ที่ขอพบ : " + (data.person_contact ?: " ") +
+                    "\nติดต่อแผนก : " + (data.department ?: " ") +
+                    "\nวัตถุประสงค์ : " + (data.objective_type ?: " ").replace(" ", " ") +
+                    "\nรายละเอียด : " + (data.objective_note ?: " ").replace(" ", " ") +
+                    "\nอุณหภูมิ : " + (data.temperature ?: " ") +
+                    "\nเวลาเข้า : " + (data.checkin_time ?: " ") + "\n", innerResultCallbcak
+        )
+        //Set Center
+        sunmiPrinterService!!.setAlignment(1, innerResultCallbcak)
+        //QRCode
         sunmiPrinterService!!.printBitmap(bitmap, innerResultCallbcak)
-        sunmiPrinterService!!.printText("\n       "+data.contact_code+"\n\n", innerResultCallbcak)
-
+        sunmiPrinterService!!.printText("\n" + data.contact_code + "\n", innerResultCallbcak)
+        //Signature
         for (i in signature.indices) {
-            sunmiPrinterService!!.printText("\n\n\n\n____________________________" + "\n" + signature.get(i)
-                .getname(), innerResultCallbcak)
+            sunmiPrinterService!!.printText(
+                "\n\n\n\n\n____________________________\n",
+                innerResultCallbcak
+            )
+            sunmiPrinterService!!.printText(signature[i].getname(), innerResultCallbcak)
         }
-        sunmiPrinterService!!.printText("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
-
-        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
-        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
-        sunmiPrinterService!!.commitPrinterBuffer()
+        sunmiPrinterService!!.printText("\n\n", innerResultCallbcak)
+        sunmiPrinterService!!.setAlignment(0, innerResultCallbcak)
+        sunmiPrinterService!!.printText(
+            PreferenceUtils.getCompanyNote() + "\n\n\n\n\n\n\n\n\n",
+            innerResultCallbcak
+        )
+        //Print
+        sunmiPrinterService!!.commitPrinterBufferWithCallback(innerResultCallbcak)
     }
 
     private   fun print(  data: VisitorResponseModel){
