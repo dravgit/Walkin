@@ -99,8 +99,34 @@ class CheckInActivity() : BaseActivity() {
     private var edtfrom: EditText? = null
     private var edtperson: EditText? = null
     private var edtnote: EditText? = null
-    private val months_eng = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-    private val months_th = Arrays.asList("ม.ค.", "ก.พ.", "มี.ค.", "เม.ษ.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.")
+    private val months_eng = Arrays.asList(
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+    )
+    private val months_th = Arrays.asList(
+        "ม.ค.",
+        "ก.พ.",
+        "มี.ค.",
+        "เม.ษ.",
+        "พ.ค.",
+        "มิ.ย.",
+        "ก.ค.",
+        "ส.ค.",
+        "ก.ย.",
+        "ต.ค.",
+        "พ.ย.",
+        "ธ.ค."
+    )
     private var iVphoto: ImageView? = null
     private var capUser: ImageButton? = null
     private var capCar: ImageButton? = null
@@ -126,19 +152,21 @@ class CheckInActivity() : BaseActivity() {
     var disposableCheck: Disposable? = null
     var disposableMagCard: Disposable? = null
     var task: Thread? = null
-    internal var baCommandAPDU = byteArrayOf(0x00.toByte(),
-                                             0xA4.toByte(),
-                                             0x04.toByte(),
-                                             0x00.toByte(),
-                                             0x08.toByte(),
-                                             0xA0.toByte(),
-                                             0x00.toByte(),
-                                             0x00.toByte(),
-                                             0x00.toByte(),
-                                             0x54.toByte(),
-                                             0x48.toByte(),
-                                             0x00.toByte(),
-                                             0x01.toByte())
+    internal var baCommandAPDU = byteArrayOf(
+        0x00.toByte(),
+        0xA4.toByte(),
+        0x04.toByte(),
+        0x00.toByte(),
+        0x08.toByte(),
+        0xA0.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x54.toByte(),
+        0x48.toByte(),
+        0x00.toByte(),
+        0x01.toByte()
+    )
     private val _UTF8_CHARSET = Charset.forName("TIS-620")
     private val _req_version = "80b00000020004"
     private val handler = Handler()
@@ -176,8 +204,16 @@ class CheckInActivity() : BaseActivity() {
         okCheckin = findViewById<View>(R.id.okCheckin) as Button
         dropdownDepartment = findViewById<View>(R.id.dropdownDepartment) as Spinner
         dropdownObjective = findViewById<View>(R.id.dropdownObjective) as Spinner
-        val adapterDepartment = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getDepartment())
-        val adapterObjective = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, PreferenceUtils.getObjectiveType())
+        val adapterDepartment = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            PreferenceUtils.getDepartment()
+        )
+        val adapterObjective = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            PreferenceUtils.getObjectiveType()
+        )
         if (adapterDepartment.count <= 0) {
             dropdownDepartment!!.visibility = View.GONE
             txt_department.visibility = View.GONE
@@ -212,19 +248,22 @@ class CheckInActivity() : BaseActivity() {
             }
             if (adapterDepartment.count > 0) {
                 val selectedItemOfDepartment = dropdownDepartment!!.selectedItemPosition
-                val actualPositionOfDepartment = dropdownDepartment!!.getItemAtPosition(selectedItemOfDepartment) as DepartmentModel
+                val actualPositionOfDepartment =
+                    dropdownDepartment!!.getItemAtPosition(selectedItemOfDepartment) as DepartmentModel
                 department_id = actualPositionOfDepartment.getID()
             }
             if (adapterObjective.count > 0) {
                 val selectedItemOfObjective = dropdownObjective!!.selectedItemPosition
-                val actualPositionOfObjective = dropdownObjective!!.getItemAtPosition(selectedItemOfObjective) as ObjectiveTypeModel
+                val actualPositionOfObjective =
+                    dropdownObjective!!.getItemAtPosition(selectedItemOfObjective) as ObjectiveTypeModel
                 objective_id = actualPositionOfObjective.getID()
             }
             if (!edtnameTH?.getText()
                     .toString()
                     .isEmpty() && !edtidcard?.getText()
                     .toString()
-                    .isEmpty()) {
+                    .isEmpty()
+            ) {
                 name = edtnameTH?.getText()
                     .toString()
 
@@ -332,7 +371,12 @@ class CheckInActivity() : BaseActivity() {
     }
 
     @Throws(IOException::class)
-    private fun encodeImg(bitmap: Bitmap?, width: Int = bitmap!!.width / 5, height: Int = bitmap!!.height / 5, quality: Int = 70): String {
+    private fun encodeImg(
+        bitmap: Bitmap?,
+        width: Int = bitmap!!.width / 5,
+        height: Int = bitmap!!.height / 5,
+        quality: Int = 70,
+    ): String {
         val resize = Bitmap.createScaledBitmap((bitmap)!!, width, height, false)
         var encoded = ""
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -344,8 +388,16 @@ class CheckInActivity() : BaseActivity() {
     }
 
     private fun cameraUser() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERM_CODE)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERM_CODE
+            )
         } else {
             uriUserFilePath = getUriByName("IMG_image_user")
             openCamera(CAMERA_USER_CODE, uriUserFilePath)
@@ -353,8 +405,16 @@ class CheckInActivity() : BaseActivity() {
     }
 
     private fun cameraCar() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERM_CODE)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERM_CODE
+            )
         } else {
             uriCarFilePath = getUriByName("IMG_image_car")
             openCamera(CAMERA_CAR_CODE, uriCarFilePath)
@@ -362,8 +422,16 @@ class CheckInActivity() : BaseActivity() {
     }
 
     private fun cameraCard() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERM_CODE)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERM_CODE
+            )
         } else {
             uriCardFilePath = getUriByName("IMG_image_card")
             openCamera(CAMERA_CARD_CODE, uriCardFilePath)
@@ -374,13 +442,19 @@ class CheckInActivity() : BaseActivity() {
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES + "/walkin")
         var photoFile: File? = null
         try {
-            photoFile = File.createTempFile("" + name,  /* prefix */
-                                            ".jpg",  /* suffix */
-                                            storageDir /* directory */)
+            photoFile = File.createTempFile(
+                "" + name,  /* prefix */
+                ".jpg",  /* suffix */
+                storageDir /* directory */
+            )
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", (photoFile)!!)
+        return FileProvider.getUriForFile(
+            this,
+            BuildConfig.APPLICATION_ID + ".fileprovider",
+            (photoFile)!!
+        )
     }
 
     private fun openCamera(typeCode: Int, uri: Uri?) {
@@ -396,7 +470,8 @@ class CheckInActivity() : BaseActivity() {
             if (resultCode == RESULT_OK) {
                 var bitmap: Bitmap? = null
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriUserFilePath)
+                    bitmap =
+                        MediaStore.Images.Media.getBitmap(this.contentResolver, uriUserFilePath)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -424,7 +499,8 @@ class CheckInActivity() : BaseActivity() {
             if (resultCode == RESULT_OK) {
                 var bitmap: Bitmap? = null
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriCardFilePath)
+                    bitmap =
+                        MediaStore.Images.Media.getBitmap(this.contentResolver, uriCardFilePath)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -436,11 +512,19 @@ class CheckInActivity() : BaseActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray,
+    ) {
         if (requestCode == CAMERA_PERM_CODE) {
             if (grantResults.size < 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             } else {
-                Toast.makeText(this, "Camera Permission is Required to Use camera", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    this,
+                    "Camera Permission is Required to Use camera",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
@@ -464,7 +548,8 @@ class CheckInActivity() : BaseActivity() {
 
     override fun onPrintDeviceConnected(manager: AidlDeviceManager) {
         try {
-            printDev = AidlPrinter.Stub.asInterface(manager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
+            printDev =
+                AidlPrinter.Stub.asInterface(manager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_PRINTERDEV))
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
@@ -500,7 +585,8 @@ class CheckInActivity() : BaseActivity() {
                     Log.e("MY", "IcCard bind fail!")
                 }
             }
-            device = deviceManager.getDevice(com.centerm.centermposoversealib.constant.Constant.OVERSEA_DEVICE_CODE.OVERSEA_DEVICE_TYPE_THAILAND_ID)
+            device =
+                deviceManager.getDevice(com.centerm.centermposoversealib.constant.Constant.OVERSEA_DEVICE_CODE.OVERSEA_DEVICE_TYPE_THAILAND_ID)
             if (device != null) {
                 aidlIdCardTha = AidlIdCardTha.Stub.asInterface(device)
                 aidlReady = aidlIdCardTha != null
@@ -512,7 +598,8 @@ class CheckInActivity() : BaseActivity() {
 
     override fun onDeviceConnectedSwipe(deviceManager: AidlDeviceManager) {
         try {
-            magCard = AidlMagCard.Stub.asInterface(deviceManager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_MAGCARD))
+            magCard =
+                AidlMagCard.Stub.asInterface(deviceManager.getDevice(Constant.DEVICE_TYPE.DEVICE_TYPE_MAGCARD))
         } catch (e: RemoteException) {
             e.printStackTrace()
         } finally {
@@ -533,6 +620,7 @@ class CheckInActivity() : BaseActivity() {
     private var invokStart: Long = 0
     private var invokCount = 0
     private var totalTime: Long = 0
+
     @Throws(RemoteException::class)
     private fun startStabilityTest() {
         invokStart = System.currentTimeMillis()
@@ -625,7 +713,11 @@ class CheckInActivity() : BaseActivity() {
                 edtaddress!!.setText(address.replace("#", " "))
                 tVgender!!.text = gender
                 tVbirth!!.text = birth
-                Toast.makeText(this@CheckInActivity, "time running is " + second + "s", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    this@CheckInActivity,
+                    "time running is " + second + "s",
+                    Toast.LENGTH_LONG
+                )
                     .show()
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -669,11 +761,13 @@ class CheckInActivity() : BaseActivity() {
         if (!this@CheckInActivity.isFinishing) {
             runOnUiThread {
                 val watermarkText2 =
-                    WatermarkText(watermarkTxt).setPositionX(1.0).setPositionY(1.0).setRotation(40.0).setTextAlpha(255).setTextSize(6.0)
+                    WatermarkText(watermarkTxt).setPositionX(1.0).setPositionY(1.0)
+                        .setRotation(40.0).setTextAlpha(255).setTextSize(6.0)
                         .setTextColor(Color.WHITE).setTextShadow(0.05f, 2f, 2f, Color.BLUE)
-                WatermarkBuilder.create(this@CheckInActivity, bmp).loadWatermarkText(watermarkText2).setTileMode(true).watermark.setToImageView(
+                WatermarkBuilder.create(this@CheckInActivity, bmp).loadWatermarkText(watermarkText2)
+                    .setTileMode(true).watermark.setToImageView(
                         iVphoto
-                                                                                                                                               )
+                    )
             }
         }
     }
@@ -705,6 +799,7 @@ class CheckInActivity() : BaseActivity() {
                     jsonForMatStr.append(c.toString() + "\n")
                     level++
                 }
+
                 ',' -> jsonForMatStr.append(c.toString() + "\n")
                 '}', ']' -> {
                     jsonForMatStr.append("\n")
@@ -712,6 +807,7 @@ class CheckInActivity() : BaseActivity() {
                     jsonForMatStr.append(getLevelStr(level))
                     jsonForMatStr.append(c)
                 }
+
                 else -> jsonForMatStr.append(c)
             }
         }
@@ -726,7 +822,8 @@ class CheckInActivity() : BaseActivity() {
                 try {
                     aidlIcCard!!.open()
                     if (aidlIcCard!!.status()
-                            .toInt() == 1) {
+                            .toInt() == 1
+                    ) {
                         if (!_read) {
                             _read = true
                             runOnUiThread {
@@ -742,18 +839,20 @@ class CheckInActivity() : BaseActivity() {
                                     time1 = System.currentTimeMillis()
                                     timestart = time1
                                     aidlIdCardTha!!.stopSearch()
-                                    aidlIdCardTha!!.searchIDCardInfo(6000, object : ThaiInfoListerner.Stub() {
-                                        @Throws(RemoteException::class)
-                                        override fun onResult(i: Int, s: String) {
-                                            Log.e("DATA", "onResult : $s")
-                                            val end = System.currentTimeMillis()
-                                            val b = ((end - time1) / 1000).toInt()
-                                            val c = (((end - time1) / 100) % 10).toInt()
-                                            showInfo(jsonFormat(s), ("$b.$c"))
-                                            mediaPlayer!!.start()
-                                            mLoading!!.dismiss()
-                                        }
-                                    })
+                                    aidlIdCardTha!!.searchIDCardInfo(
+                                        6000,
+                                        object : ThaiInfoListerner.Stub() {
+                                            @Throws(RemoteException::class)
+                                            override fun onResult(i: Int, s: String) {
+                                                Log.e("DATA", "onResult : $s")
+                                                val end = System.currentTimeMillis()
+                                                val b = ((end - time1) / 1000).toInt()
+                                                val c = (((end - time1) / 100) % 10).toInt()
+                                                showInfo(jsonFormat(s), ("$b.$c"))
+                                                mediaPlayer!!.start()
+                                                mLoading!!.dismiss()
+                                            }
+                                        })
                                     Handler().postDelayed({ searchPhoto() }, 2000)
 //                                        aidlIdCardTha.searchIDCardPhoto(6000, new ThaiPhotoListerner.Stub() {
 //                                            @Override
@@ -870,7 +969,10 @@ class CheckInActivity() : BaseActivity() {
                             _name = _name.replace("^", "")
                             val _xname = _name.split("\\$".toRegex())
                                 .toTypedArray()
-                            val _second = hextostring(arg0.secondTrackData)!!.substring(6, hextostring(arg0.secondTrackData)!!.length)
+                            val _second = hextostring(arg0.secondTrackData)!!.substring(
+                                6,
+                                hextostring(arg0.secondTrackData)!!.length
+                            )
                                 .split("=".toRegex())
                                 .toTypedArray()
                             runOnUiThread {
@@ -885,7 +987,11 @@ class CheckInActivity() : BaseActivity() {
                         override fun onSwipeCardFail() {
                             Log.e("SWIPE", "ERROR1")
                             runOnUiThread(Runnable {
-                                Toast.makeText(this@CheckInActivity, "กรุณาลองใหม่อีกครั้ง", Toast.LENGTH_LONG)
+                                Toast.makeText(
+                                    this@CheckInActivity,
+                                    "กรุณาลองใหม่อีกครั้ง",
+                                    Toast.LENGTH_LONG
+                                )
                                     .show()
                             })
                         }
@@ -921,50 +1027,73 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService?.sendRAWData(returnText, null)
     }
 
+
     private fun resizeBitmap(cacheBitmap: Bitmap): Bitmap {
-        var cacheBitmap = BitmapUtils.scale(cacheBitmap, cacheBitmap.width / 3, cacheBitmap.height / 3)
-        cacheBitmap = BitmapUtils.replaceBitmapColor(cacheBitmap, Color.TRANSPARENT, Color.WHITE)
-        if (cacheBitmap.width > 384) {
-            val newHeight = (1.0 * cacheBitmap.height * 384 / cacheBitmap.width).toInt()
-            cacheBitmap = BitmapUtils.scale(cacheBitmap, 384, newHeight)
-        }
-       return cacheBitmap
+        val currentWidth = cacheBitmap.width
+        val currentHeight = cacheBitmap.height
+
+        val desiredWidth = 200
+        val scaleRatio = desiredWidth.toDouble() / currentWidth
+        val desiredHeight = (currentHeight * scaleRatio).toInt()
+
+        var resizedBitmap = BitmapUtils.scale(cacheBitmap, desiredWidth, desiredHeight)
+        resizedBitmap =
+            BitmapUtils.replaceBitmapColor(resizedBitmap, Color.TRANSPARENT, Color.WHITE)
+
+        return resizedBitmap
     }
+
     private fun printP2(data: CheckInResponseModel) {
         setHeight(0x11)
-        sunmiPrinterService!!.clearBuffer()
-        sunmiPrinterService!!.enterPrinterBuffer(true)
         val bitmap = createImageFromQRCode(data.contact_code)
         val signature = PreferenceUtils.getSignature()
-        sunmiPrinterService!!.printText("    ", innerResultCallbcak)
-        sunmiPrinterService!!.printBitmap(resizeBitmap(PreferenceUtils.getBitmapLogo()), innerResultCallbcak)
 
-        sunmiPrinterService!!.printText("\n\nบริษัท : " + PreferenceUtils.getCompanyName() +
-                                                "\nชื่อ-นามสกุล : " + data.fullname.replace(" "," ") +
-                                                "\nเลขบัตรประขาชน : " + data.idcard +
-                                                "\nทะเบียนรถ : " + data.vehicle_id +
-                                                "\nจากบริษัท : " + data.from +
-                                                "\nผู้ที่ขอพบ : " + data.person_contact +
-                                                "\nติดต่อแผนก : " + data.department +
-                                                "\nวัตถุประสงค์ : " + data.objective_type.replace(" "," ") +
-                                                "\nรายละเอียด : " + data.objective_note.replace(" "," ") +
-                                                "\nอุณหภูมิ : " + data.temperature +
-                                                "\nเวลาเข้า : " + data.chcekin_time, innerResultCallbcak)
-
-        sunmiPrinterService!!.printText("\n      ", innerResultCallbcak)
-
+        sunmiPrinterService!!.clearBuffer()
+        sunmiPrinterService!!.enterPrinterBuffer(true)
+        //Set Center
+        sunmiPrinterService!!.setAlignment(1, innerResultCallbcak)
+        //Logo
+        sunmiPrinterService!!.printBitmap(
+            resizeBitmap(PreferenceUtils.getBitmapLogo()),
+            innerResultCallbcak
+        )
+        sunmiPrinterService!!.printText("\n", innerResultCallbcak)
+        //Set Left
+        sunmiPrinterService!!.setAlignment(0, innerResultCallbcak)
+        sunmiPrinterService!!.printText(
+            "บริษัท : " + (PreferenceUtils.getCompanyName() ?: " ") +
+                    "\nชื่อ-นามสกุล : " + (data.fullname ?: " ").replace(" ", " ") +
+                    "\nเลขบัตรประขาชน : " + (data.idcard ?: " ") +
+                    "\nทะเบียนรถ : " + (data.vehicle_id ?: " ") +
+                    "\nจากบริษัท : " + (data.from ?: " ") +
+                    "\nผู้ที่ขอพบ : " + (data.person_contact ?: " ") +
+                    "\nติดต่อแผนก : " + (data.department ?: " ") +
+                    "\nวัตถุประสงค์ : " + (data.objective_type ?: " ").replace(" ", " ") +
+                    "\nรายละเอียด : " + (data.objective_note ?: " ").replace(" ", " ") +
+                    "\nอุณหภูมิ : " + (data.temperature ?: " ") +
+                    "\nเวลาเข้า : " + (data.chcekin_time ?: " ") + "\n", innerResultCallbcak
+        )
+        //Set Center
+        sunmiPrinterService!!.setAlignment(1, innerResultCallbcak)
+        //QRCode
         sunmiPrinterService!!.printBitmap(bitmap, innerResultCallbcak)
-        sunmiPrinterService!!.printText("\n       "+data.contact_code+"\n\n", innerResultCallbcak)
-
+        sunmiPrinterService!!.printText("\n" + data.contact_code + "\n", innerResultCallbcak)
+        //Signature
         for (i in signature.indices) {
-            sunmiPrinterService!!.printText("\n\n\n\n____________________________" + "\n       " + signature.get(i)
-                .getname(), innerResultCallbcak)
+            sunmiPrinterService!!.printText(
+                "\n\n\n\n\n____________________________\n",
+                innerResultCallbcak
+            )
+            sunmiPrinterService!!.printText(signature[i].getname(), innerResultCallbcak)
         }
-        sunmiPrinterService!!.printText("\n\n" + PreferenceUtils.getCompanyNote() + "\n\n\n\n\n", innerResultCallbcak)
-
-        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
-        sunmiPrinterService!!.printText("\n\n ", innerResultCallbcak)
-        sunmiPrinterService!!.commitPrinterBuffer()
+        sunmiPrinterService!!.printText("\n\n", innerResultCallbcak)
+        sunmiPrinterService!!.setAlignment(0, innerResultCallbcak)
+        sunmiPrinterService!!.printText(
+            PreferenceUtils.getCompanyNote() + "\n\n\n\n\n\n\n\n\n",
+            innerResultCallbcak
+        )
+        //Print
+        sunmiPrinterService!!.commitPrinterBufferWithCallback(innerResultCallbcak)
     }
 
     private var `is` = true
@@ -1108,7 +1237,8 @@ class CheckInActivity() : BaseActivity() {
 
     private fun checkCard() {
         try {
-            val allType = (AidlConstants.CardType.MAGNETIC.getValue() or AidlConstants.CardType.IC.value)
+            val allType =
+                (AidlConstants.CardType.MAGNETIC.getValue() or AidlConstants.CardType.IC.value)
             WalkinApplication.mReadCardOptV2.checkCard(allType, mCheckCardCallback2, 60)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -1226,29 +1356,39 @@ class CheckInActivity() : BaseActivity() {
         }
 
         disposable = Observable.fromCallable {
-                sendCommandForPhoto(base)
-            }
+            sendCommandForPhoto(base)
+        }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                           val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
-                           showPhoto(bmp)
-                       }, { error ->
-                           error?.message?.let { Log.e("error", it) }
-                           handleResult2()
-                       })
+                val bmp = BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes!!.size)
+                showPhoto(bmp)
+            }, { error ->
+                error?.message?.let { Log.e("error", it) }
+                handleResult2()
+            })
 
         return userModel
     }
 
     private fun getThaiIdDataByte(cmd: String): ByteArray {
         val recv = ByteArray(260)
-        WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
+        WalkinApplication.mReadCardOptV2.transmitApdu(
+            AidlConstants.CardType.IC.getValue(),
+            baCommandAPDU,
+            ByteArray(260)
+        )
         val cmdByte = ByteUtil.hexStringToByte(cmd)
-        WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), cmdByte, ByteArray(260))
-        WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(),
-                                                      ByteUtil.hexStringToByte("00c00000" + cmd.substring(12)),
-                                                      recv)
+        WalkinApplication.mReadCardOptV2.transmitApdu(
+            AidlConstants.CardType.IC.getValue(),
+            cmdByte,
+            ByteArray(260)
+        )
+        WalkinApplication.mReadCardOptV2.transmitApdu(
+            AidlConstants.CardType.IC.getValue(),
+            ByteUtil.hexStringToByte("00c00000" + cmd.substring(12)),
+            recv
+        )
         return recv
     }
 
@@ -1268,17 +1408,26 @@ class CheckInActivity() : BaseActivity() {
             val paddedHexString = hexString.padStart(4, '0')
             // do something with the hex string here
             println()
-            getDataTest("80b0"+paddedHexString+"0200FF")
+            getDataTest("80b0" + paddedHexString + "0200FF")
             i++
         }
     }
+
     private fun getDataTest(cmd: String) {
         val send = ByteUtil.hexStr2Bytes(cmd)
         val recv = ByteArray(260)
         var data = ""
         try {
-            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
-            val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
+            WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                baCommandAPDU,
+                ByteArray(260)
+            )
+            val len = WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                send,
+                recv
+            )
             if (len < 0) {
                 LogUtil.e(TAG, "transmitApdu failed,code:$len")
             } else {
@@ -1289,6 +1438,7 @@ class CheckInActivity() : BaseActivity() {
             e.printStackTrace()
         }
     }
+
     private fun transmitApduCmd(cmd: String): String {
         LogUtil.e(TAG, "panya transmitApduCmd" + cmd)
 
@@ -1296,8 +1446,16 @@ class CheckInActivity() : BaseActivity() {
         val recv = ByteArray(260)
         var data = ""
         try {
-            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
-            val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
+            WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                baCommandAPDU,
+                ByteArray(260)
+            )
+            val len = WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                send,
+                recv
+            )
             if (len < 0) {
                 LogUtil.e(TAG, "transmitApdu failed,code:$len")
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
@@ -1318,7 +1476,11 @@ class CheckInActivity() : BaseActivity() {
         val recv = ByteArray(260)
         try {
 //            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
-            val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
+            val len = WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                send,
+                recv
+            )
             if (len < 0) {
 //                LogUtil.d(TAG, "transmitApduPhoto failed,code:$len")
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
@@ -1340,7 +1502,11 @@ class CheckInActivity() : BaseActivity() {
         val size = Integer.parseInt(hexSize, 16)
         var xx = ByteArray(size)
         try {
-            val len = WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), send, recv)
+            val len = WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                send,
+                recv
+            )
             if (len < 0) {
                 LogUtil.e(TAG, "panya failed,code:$len")
                 Toast.makeText(this@CheckInActivity, "Read data failed", Toast.LENGTH_LONG).show()
@@ -1391,15 +1557,19 @@ class CheckInActivity() : BaseActivity() {
                 val code1 = bundle.getInt("track1ErrorCode")
                 val code2 = bundle.getInt("track2ErrorCode")
                 val code3 = bundle.getInt("track3ErrorCode")
-                LogUtil.e(TAG,
-                          String.format(Locale.getDefault(),
-                                        "track1ErrorCode:%d,track1:%s\ntrack2ErrorCode:%d,track2:%s\ntrack3ErrorCode:%d,track3:%s",
-                                        code1,
-                                        track1,
-                                        code2,
-                                        track2,
-                                        code3,
-                                        track3))
+                LogUtil.e(
+                    TAG,
+                    String.format(
+                        Locale.getDefault(),
+                        "track1ErrorCode:%d,track1:%s\ntrack2ErrorCode:%d,track2:%s\ntrack3ErrorCode:%d,track3:%s",
+                        code1,
+                        track1,
+                        code2,
+                        track2,
+                        code3,
+                        track3
+                    )
+                )
                 if ((code1 != 0 && code1 != -1) || (code2 != 0 && code2 != -1) || (code3 != 0 && code3 != -1)) {
 //                showResult(false, track1, track2, track3);
                     Log.e("data", track1 + "" + track2 + "" + track3)
@@ -1409,20 +1579,26 @@ class CheckInActivity() : BaseActivity() {
                         val name = track1.replace("^", "")
                             .trim()
                             .split("$")
-                        edtnameTH!!.setText(name.reversed()
-                                                .toString()
-                                                .replace(",", "")
-                                                .replace("[", "")
-                                                .replace("]", ""))
+                        edtnameTH!!.setText(
+                            name.reversed()
+                                .toString()
+                                .replace(",", "")
+                                .replace("[", "")
+                                .replace("]", "")
+                        )
                         val list = track2.split("=")
                         val card = list.first()
                         val idcard = card.substring(card.length - 13, card.length)
                         edtidcard!!.setText(idcard)
                         val birthDate = list.get(1)
-                        tVbirth!!.text = birthDate.substring(birthDate.length - 2) + "/" + birthDate.substring(birthDate.length - 4,
-                                                                                                               birthDate.length - 2) + "/" + birthDate.substring(
-                            birthDate.length - 8,
-                            birthDate.length - 4)
+                        tVbirth!!.text =
+                            birthDate.substring(birthDate.length - 2) + "/" + birthDate.substring(
+                                birthDate.length - 4,
+                                birthDate.length - 2
+                            ) + "/" + birthDate.substring(
+                                birthDate.length - 8,
+                                birthDate.length - 4
+                            )
                     }
                 }
                 // 继续检卡
@@ -1440,7 +1616,11 @@ class CheckInActivity() : BaseActivity() {
     private fun sendCommandForPhoto(base: String) {
         try {
             //base  offset  fix    length
-            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
+            WalkinApplication.mReadCardOptV2.transmitApdu(
+                AidlConstants.CardType.IC.getValue(),
+                baCommandAPDU,
+                ByteArray(260)
+            )
             val length = r(transmitApduCmdPhotoLength(base + "0179020002"))
             val iLength = ByteUtil.bytes2short(length)
             val out = ByteArrayOutputStream(iLength)//137B
@@ -1458,7 +1638,10 @@ class CheckInActivity() : BaseActivity() {
                 val sp3 = e(xof and 0xff)
                 val sp6 = e(xwd and 0xff)
                 val cmdx = base + sp2 + sp3 + "0200" + sp6
-                val _xx = transmitApduCmdPhoto(base + sp2 + sp3 + "0200" + sp6, cmdx.substring(cmdx.length - 2))
+                val _xx = transmitApduCmdPhoto(
+                    base + sp2 + sp3 + "0200" + sp6,
+                    cmdx.substring(cmdx.length - 2)
+                )
                 if (_xx != null) {
                     out.write(_xx, 0, _xx.size)
                 } else {
