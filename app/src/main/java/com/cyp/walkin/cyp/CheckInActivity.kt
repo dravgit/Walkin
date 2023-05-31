@@ -67,7 +67,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class CheckInActivity() : BaseActivity() {
+class CheckInActivity : BaseActivity() {
     private val watermarkTxt = "ใช้สำหรับงาน รปภ.เท่านั้น"
     private var printDev: AidlPrinter? = null
     private val callback: AidlPrinterStateChangeListener = PrinterCallback()
@@ -258,18 +258,18 @@ class CheckInActivity() : BaseActivity() {
                     dropdownObjective!!.getItemAtPosition(selectedItemOfObjective) as ObjectiveTypeModel
                 objective_id = actualPositionOfObjective.getID()
             }
-            if (!edtnameTH?.getText()
+            if (!edtnameTH?.text
                     .toString()
-                    .isEmpty() && !edtidcard?.getText()
+                    .isEmpty() && !edtidcard?.text
                     .toString()
                     .isEmpty()
             ) {
-                name = edtnameTH?.getText()
+                name = edtnameTH?.text
                     .toString()
 
                 val param = CheckInParamModel.Builder(name, department_id, objective_id, images)
                 Log.e("CHECK", param.toString())
-                param.idcard(edtidcard?.getText().toString())
+                param.idcard(edtidcard?.text.toString())
                     .vehicle_id(edtCar!!.text.toString())
                     .temperature(edtTemp!!.text.toString())
                     .gender(tVgender!!.text.toString())
@@ -332,7 +332,7 @@ class CheckInActivity() : BaseActivity() {
         val jsonArray = JSONArray()
         if (iVphoto!!.drawable != null) {
             iVphoto!!.invalidate()
-            val drawable: BitmapDrawable? = iVphoto!!.drawable as BitmapDrawable
+            val drawable: BitmapDrawable = iVphoto!!.drawable as BitmapDrawable
             if (drawable != null && drawable.bitmap != null) {
                 face = drawable.bitmap
             }
@@ -555,7 +555,7 @@ class CheckInActivity() : BaseActivity() {
         }
     }
 
-    private inner class PrinterCallback() : AidlPrinterStateChangeListener.Stub() {
+    private inner class PrinterCallback : AidlPrinterStateChangeListener.Stub() {
         @Throws(RemoteException::class)
         override fun onPrintError(arg0: Int) {
             // showMessage("打印机异常" + arg0, Color.RED);
@@ -678,11 +678,7 @@ class CheckInActivity() : BaseActivity() {
     private var jsonStr: String? = null
     private fun checkInfo(info: ThiaIdInfoBeen): Boolean {
         if (save) {
-            return if ((jsonStr == info.toJSONString())) {
-                true
-            } else {
-                false
-            }
+            return (jsonStr == info.toJSONString())
         } else {
             save = true
             jsonStr = info.toJSONString()
@@ -976,10 +972,10 @@ class CheckInActivity() : BaseActivity() {
                                 .split("=".toRegex())
                                 .toTypedArray()
                             runOnUiThread {
-                                val _x = _second[0].toUpperCase()
+                                val _x = _second[0].uppercase(Locale.getDefault())
                                     .toCharArray()
                                 edtidcard!!.setText(_x[0].toString() + "" + _x[1] + _x[2] + _x[3] + _x[4] + "" + _x[5] + _x[6] + _x[7] + _x[8] + _x[9] + "" + _x[10] + _x[11] + "" + _x[12])
-                                edtnameTH!!.setText(_xname.get(2) + " " + _xname[1] + " " + _xname[0])
+                                edtnameTH!!.setText(_xname[2] + " " + _xname[1] + " " + _xname[0])
                             }
                         }
 
@@ -1062,16 +1058,16 @@ class CheckInActivity() : BaseActivity() {
         sunmiPrinterService!!.setAlignment(0, innerResultCallbcak)
         sunmiPrinterService!!.printText(
             "บริษัท : " + (PreferenceUtils.getCompanyName() ?: " ") +
-                    "\nชื่อ-นามสกุล : " + (data.fullname ?: " ").replace(" ", " ") +
-                    "\nเลขบัตรประขาชน : " + (data.idcard ?: " ") +
-                    "\nทะเบียนรถ : " + (data.vehicle_id ?: " ") +
-                    "\nจากบริษัท : " + (data.from ?: " ") +
-                    "\nผู้ที่ขอพบ : " + (data.person_contact ?: " ") +
-                    "\nติดต่อแผนก : " + (data.department ?: " ") +
-                    "\nวัตถุประสงค์ : " + (data.objective_type ?: " ").replace(" ", " ") +
-                    "\nรายละเอียด : " + (data.objective_note ?: " ").replace(" ", " ") +
-                    "\nอุณหภูมิ : " + (data.temperature ?: " ") +
-                    "\nเวลาเข้า : " + (data.chcekin_time ?: " ") + "\n", innerResultCallbcak
+                    "\nชื่อ-นามสกุล : " + data.fullname.replace(" ", " ") +
+                    "\nเลขบัตรประขาชน : " + data.idcard +
+                    "\nทะเบียนรถ : " + data.vehicle_id +
+                    "\nจากบริษัท : " + data.from +
+                    "\nผู้ที่ขอพบ : " + data.person_contact +
+                    "\nติดต่อแผนก : " + data.department +
+                    "\nวัตถุประสงค์ : " + data.objective_type.replace(" ", " ") +
+                    "\nรายละเอียด : " + data.objective_note.replace(" ", " ") +
+                    "\nอุณหภูมิ : " + data.temperature +
+                    "\nเวลาเข้า : " + data.chcekin_time + "\n", innerResultCallbcak
         )
         //Set Center
         sunmiPrinterService!!.setAlignment(1, innerResultCallbcak)
@@ -1238,7 +1234,7 @@ class CheckInActivity() : BaseActivity() {
     private fun checkCard() {
         try {
             val allType =
-                (AidlConstants.CardType.MAGNETIC.getValue() or AidlConstants.CardType.IC.value)
+                (AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value)
             WalkinApplication.mReadCardOptV2.checkCard(allType, mCheckCardCallback2, 60)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -1374,18 +1370,18 @@ class CheckInActivity() : BaseActivity() {
     private fun getThaiIdDataByte(cmd: String): ByteArray {
         val recv = ByteArray(260)
         WalkinApplication.mReadCardOptV2.transmitApdu(
-            AidlConstants.CardType.IC.getValue(),
+            AidlConstants.CardType.IC.value,
             baCommandAPDU,
             ByteArray(260)
         )
         val cmdByte = ByteUtil.hexStringToByte(cmd)
         WalkinApplication.mReadCardOptV2.transmitApdu(
-            AidlConstants.CardType.IC.getValue(),
+            AidlConstants.CardType.IC.value,
             cmdByte,
             ByteArray(260)
         )
         WalkinApplication.mReadCardOptV2.transmitApdu(
-            AidlConstants.CardType.IC.getValue(),
+            AidlConstants.CardType.IC.value,
             ByteUtil.hexStringToByte("00c00000" + cmd.substring(12)),
             recv
         )
@@ -1419,12 +1415,12 @@ class CheckInActivity() : BaseActivity() {
         var data = ""
         try {
             WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 baCommandAPDU,
                 ByteArray(260)
             )
             val len = WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 send,
                 recv
             )
@@ -1447,12 +1443,12 @@ class CheckInActivity() : BaseActivity() {
         var data = ""
         try {
             WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 baCommandAPDU,
                 ByteArray(260)
             )
             val len = WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 send,
                 recv
             )
@@ -1471,13 +1467,13 @@ class CheckInActivity() : BaseActivity() {
     }
 
 
-    private fun transmitApduCmdPhotoLength(cmd: String): ByteArray? {
+    private fun transmitApduCmdPhotoLength(cmd: String): ByteArray {
         val send = ByteUtil.hexStr2Bytes(cmd)
         val recv = ByteArray(260)
         try {
 //            WalkinApplication.mReadCardOptV2.transmitApdu(AidlConstants.CardType.IC.getValue(), baCommandAPDU, ByteArray(260))
             val len = WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 send,
                 recv
             )
@@ -1496,14 +1492,14 @@ class CheckInActivity() : BaseActivity() {
         return recv
     }
 
-    private fun transmitApduCmdPhoto(cmd: String, hexSize: String): ByteArray? {
+    private fun transmitApduCmdPhoto(cmd: String, hexSize: String): ByteArray {
         val send = ByteUtil.hexStr2Bytes(cmd)
         val recv = ByteArray(260)
         val size = Integer.parseInt(hexSize, 16)
         var xx = ByteArray(size)
         try {
             val len = WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 send,
                 recv
             )
@@ -1617,7 +1613,7 @@ class CheckInActivity() : BaseActivity() {
         try {
             //base  offset  fix    length
             WalkinApplication.mReadCardOptV2.transmitApdu(
-                AidlConstants.CardType.IC.getValue(),
+                AidlConstants.CardType.IC.value,
                 baCommandAPDU,
                 ByteArray(260)
             )
@@ -1660,7 +1656,7 @@ class CheckInActivity() : BaseActivity() {
         //整形转化为16进制字符串，同时看一下长度，长度不是偶数，那么前面补0
         var hex = Integer.toHexString(value)
         hex = if (hex.length % 2 == 1) "0$hex" else hex
-        return hex.toUpperCase()
+        return hex.uppercase(Locale.getDefault())
     }
 
     companion object {
