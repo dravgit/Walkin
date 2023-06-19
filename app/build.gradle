@@ -11,8 +11,8 @@ android {
         applicationId "com.cyp.walkin"
         minSdkVersion 22
         targetSdkVersion 33
-        versionCode 9
-        versionName "8.0.2"
+        versionCode 10
+        versionName "8.0.4"
         //WalkinKeyStore3 password : 123456
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
