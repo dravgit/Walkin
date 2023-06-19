@@ -1028,7 +1028,7 @@ class CheckInActivity : BaseActivity() {
         val currentWidth = cacheBitmap.width
         val currentHeight = cacheBitmap.height
 
-        val desiredWidth = 200
+        val desiredWidth = 250
         val scaleRatio = desiredWidth.toDouble() / currentWidth
         val desiredHeight = (currentHeight * scaleRatio).toInt()
 
