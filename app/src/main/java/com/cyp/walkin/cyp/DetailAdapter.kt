@@ -152,7 +152,7 @@ class DetailAdapter     // RecyclerView recyclerView;
         val currentWidth = cacheBitmap.width
         val currentHeight = cacheBitmap.height
 
-        val desiredWidth = 200
+        val desiredWidth = 350
         val scaleRatio = desiredWidth.toDouble() / currentWidth
         val desiredHeight = (currentHeight * scaleRatio).toInt()
 
